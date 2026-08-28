@@ -60,11 +60,7 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
             transition: transform 0.1s;
             word-break: break-word;
-        }
-        .role-card.spy {
-            background: #4a0e0e;
-            color: #ff6b6b;
-            box-shadow: inset 0 0 30px rgba(255,0,0,0.2);
+            color: white;
         }
         .player-badge {
             display: inline-block;
@@ -447,13 +443,16 @@
                 
                 playerHeader.textContent = `Игрок ${playerNum}`;
                 
+                // ВАЖНО: Все видят одинаковый синий цвет!
+                // Никаких отличий для шпиона!
                 if (isSpy) {
                     roleDisplay.textContent = currentPair.spy;
-                    roleDisplay.classList.add('spy');
                 } else {
                     roleDisplay.textContent = currentPair.civilian;
-                    roleDisplay.classList.remove('spy');
                 }
+                
+                // Убираем красный класс, если он был
+                roleDisplay.classList.remove('spy');
                 
                 showScreen(screenRole);
             }
