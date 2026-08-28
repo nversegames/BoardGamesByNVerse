@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мафия — Bluetooth игра</title>
+    <title>Мафия — Онлайн игра</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -63,6 +63,36 @@
             text-align: center;
         }
 
+        .player-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .player-btn {
+            padding: 12px 20px;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .player-btn:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .player-btn.active {
+            border-color: var(--gold);
+            background: rgba(226, 183, 20, 0.2);
+            color: var(--gold);
+        }
+
         .btn {
             padding: 15px 30px;
             border: none;
@@ -71,7 +101,7 @@
             font-size: 16px;
             font-weight: bold;
             transition: all 0.3s;
-            margin: 10px;
+            margin: 5px;
             position: relative;
             overflow: hidden;
         }
@@ -117,6 +147,7 @@
             padding: 15px;
             border-radius: 10px;
             margin: 15px;
+            word-break: break-all;
         }
 
         .status-container {
@@ -131,6 +162,12 @@
             padding: 10px 15px;
             border-radius: 20px;
             font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .status-online {
@@ -143,6 +180,12 @@
             background: rgba(241, 196, 15, 0.2);
             border: 1px solid #f1c40f;
             color: #f1c40f;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
 
         .phase-banner {
@@ -180,6 +223,12 @@
             border: 2px solid var(--border);
             transition: all 0.3s;
             cursor: pointer;
+            position: relative;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .player-card.dead { 
@@ -193,7 +242,22 @@
             background: rgba(52, 152, 219, 0.15);
         }
 
-        .player-avatar { font-size: 40px; margin-bottom: 10px; }
+        .player-card.mafia {
+            border-color: var(--red);
+            background: rgba(231, 76, 60, 0.15);
+        }
+
+        .player-avatar { 
+            font-size: 40px; 
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
         .player-name { font-weight: bold; margin-bottom: 5px; }
         .player-role { font-size: 12px; color: var(--muted); }
 
@@ -213,11 +277,23 @@
             overflow-y: auto;
             margin-top: 20px;
             font-size: 14px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) transparent;
+        }
+
+        .log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 4px;
         }
 
         .log-entry {
             padding: 5px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            animation: slideIn 0.3s ease;
         }
 
         .modal {
@@ -240,6 +316,12 @@
             max-width: 400px;
             text-align: center;
             border: 2px solid var(--gold);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .role-icon { font-size: 60px; margin-bottom: 20px; }
@@ -255,6 +337,13 @@
             padding: 15px;
             border-radius: 10px;
             margin: 10px;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         .success {
@@ -264,24 +353,6 @@
             padding: 15px;
             border-radius: 10px;
             margin: 10px;
-        }
-
-        .bluetooth-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-
-        .bt-connected {
-            background: var(--green);
-            box-shadow: 0 0 10px var(--green);
-        }
-
-        .bt-disconnected {
-            background: var(--red);
-            box-shadow: 0 0 10px var(--red);
         }
 
         .instructions {
@@ -302,49 +373,65 @@
             padding-left: 20px;
             line-height: 1.8;
         }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        .copy-tooltip {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--gold);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 10px;
+            animation: slideUp 0.3s ease;
+            display: none;
+        }
+
+        .copy-tooltip.show { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1 class="title">🔫 МАФИЯ</h1>
-            <p style="color: var(--muted);">
-                <span class="bluetooth-indicator bt-disconnected" id="btIndicator"></span>
-                Bluetooth игра
-            </p>
+            <p style="color: var(--muted);">Онлайн игра для друзей</p>
         </div>
 
         <!-- МЕНЮ -->
         <div id="menuScreen" class="menu">
             <div class="instructions">
-                <h3>📱 Инструкция:</h3>
+                <h3>📱 Как играть:</h3>
                 <ol>
-                    <li>Хост создаёт комнату с названием и паролем</li>
-                    <li>Игроки нажимают "Найти игру" и видят список доступных комнат</li>
-                    <li>Выберите комнату и введите пароль</li>
-                    <li>Дождитесь подключения всех игроков</li>
+                    <li><strong>Хост</strong> нажимает "Создать комнату" и получает код</li>
+                    <li>Хост отправляет код друзьям (через SMS, мессенджер, голосом)</li>
+                    <li><strong>Игроки</strong> вводят код и нажимают "Подключиться"</li>
+                    <li>Когда все подключились, хост нажимает "Начать игру"</li>
                 </ol>
             </div>
 
-            <div id="createRoomForm">
-                <h2>Создать комнату:</h2>
-                <input type="text" id="roomNameInput" class="input-field" placeholder="Название комнаты (1-8 символов)" maxlength="8">
-                <input type="password" id="roomPasswordInput" class="input-field" placeholder="Пароль (1-5 цифр)" maxlength="5" pattern="[0-9]*">
-                <select id="playerCountSelect" class="input-field">
-                    <option value="3">3 игрока</option>
-                    <option value="4">4 игрока</option>
-                    <option value="5">5 игроков</option>
-                    <option value="6">6 игроков</option>
-                </select>
-                <button class="btn btn-primary" onclick="createBluetoothRoom()">📡 Создать Bluetooth комнату</button>
+            <h2>Выберите количество игроков:</h2>
+            <div class="player-selector">
+                <button class="player-btn active" data-count="3">3 игрока</button>
+                <button class="player-btn" data-count="4">4 игрока</button>
+                <button class="player-btn" data-count="5">5 игроков</button>
+                <button class="player-btn" data-count="6">6 игроков</button>
             </div>
-
+            
+            <button class="btn btn-primary" onclick="createRoom()">🏠 Создать комнату</button>
+            
             <div style="margin-top: 30px;">
-                <h2>Найти игру:</h2>
-                <button class="btn btn-blue" onclick="scanForRooms()">🔍 Сканировать комнаты</button>
-                <div id="roomsList"></div>
+                <h3>Подключиться к комнате:</h3>
+                <input type="text" id="roomCodeInput" class="input-field" placeholder="Введите код комнаты">
+                <button class="btn btn-blue" onclick="joinRoom()">🔗 Подключиться</button>
             </div>
-
             <div id="errorMsg" class="error hidden"></div>
             <div id="successMsg" class="success hidden"></div>
         </div>
@@ -352,10 +439,9 @@
         <!-- ИГРА -->
         <div id="gameScreen" class="hidden">
             <div style="text-align: center;">
-                <div class="room-info">
-                    <p>Комната: <span id="roomNameDisplay"></span></p>
-                    <p>Пароль: <span id="roomPasswordDisplay"></span></p>
-                </div>
+                <p>Код комнаты:</p>
+                <div class="room-info" id="roomCodeDisplay" onclick="copyRoomCode()">123456</div>
+                <button class="btn btn-blue" onclick="copyRoomCode()">📋 Копировать</button>
                 <button class="btn btn-red" onclick="leaveRoom()">🚪 Покинуть игру</button>
             </div>
 
@@ -384,6 +470,10 @@
         </div>
     </div>
 
+    <!-- ТУЛТИП КОПИРОВАНИЯ -->
+    <div class="copy-tooltip" id="copyTooltip">✅ Код скопирован!</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
         // ============ КОНСТАНТЫ ============
         const ROLES = {
@@ -411,14 +501,13 @@
         };
 
         // ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
-        let bluetoothDevice = null;
-        let bluetoothServer = null;
-        let bluetoothService = null;
+        let peer = null;
+        let connections = [];
+        let myPeerId = '';
         let isHost = false;
         let myPlayerIndex = -1;
-        let roomName = '';
-        let roomPassword = '';
         let selectedPlayers = 3;
+        let roomCode = '';
         let gameState = {
             phase: 'day',
             day: 1,
@@ -428,188 +517,50 @@
             over: false
         };
 
-        // UUID для Bluetooth сервиса
-        const SERVICE_UUID = '12345678-1234-5678-1234-567812345678';
-        const CHARACTERISTIC_UUID = '87654321-4321-8765-4321-876543218765';
-
-        // ============ BLUETOOTH ФУНКЦИИ ============
-        async function createBluetoothRoom() {
-            roomName = document.getElementById('roomNameInput').value.trim();
-            roomPassword = document.getElementById('roomPasswordInput').value.trim();
-            selectedPlayers = parseInt(document.getElementById('playerCountSelect').value);
-
-            // Валидация
-            if (!roomName || roomName.length < 1 || roomName.length > 8) {
-                showError('❌ Название комнаты должно быть от 1 до 8 символов!');
-                return;
-            }
-
-            if (!roomPassword || roomPassword.length < 1 || roomPassword.length > 5 || !/^\d+$/.test(roomPassword)) {
-                showError('❌ Пароль должен быть от 1 до 5 цифр!');
-                return;
-            }
-
-            try {
-                // Проверяем поддержку Bluetooth
-                if (!navigator.bluetooth) {
-                    showError('❌ Ваш браузер не поддерживает Web Bluetooth API!');
-                    return;
-                }
-
-                // Запрашиваем доступ к Bluetooth
-                bluetoothDevice = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: [SERVICE_UUID]
-                });
-
-                bluetoothDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
-
-                // Подключаемся к GATT серверу
-                bluetoothServer = await bluetoothDevice.gatt.connect();
-                bluetoothService = await bluetoothServer.getPrimaryService(SERVICE_UUID);
-
-                isHost = true;
-                myPlayerIndex = 0;
-
-                document.getElementById('btIndicator').className = 'bluetooth-indicator bt-connected';
-                document.getElementById('menuScreen').classList.add('hidden');
-                document.getElementById('gameScreen').classList.remove('hidden');
-                document.getElementById('roomNameDisplay').textContent = roomName;
-                document.getElementById('roomPasswordDisplay').textContent = roomPassword;
-
-                initGame();
-                gameState.players[0].isConnected = true;
-                showRole(0);
-                updateUI();
-
-                addLog('📡 Bluetooth комната создана');
-                addLog('🏠 Название: ' + roomName);
-                addLog('🔑 Пароль: ' + roomPassword);
-                addLog('⏳ Ожидание игроков...');
-
-                showSuccess('✅ Bluetooth комната создана!');
-            } catch (error) {
-                console.error('❌ Ошибка Bluetooth:', error);
-                if (error.name === 'NotFoundError') {
-                    showError('❌ Bluetooth устройство не найдено!');
-                } else if (error.name === 'SecurityError') {
-                    showError('❌ Нет разрешения на использование Bluetooth!');
-                } else {
-                    showError('❌ Ошибка Bluetooth: ' + error.message);
-                }
-            }
+        // ============ ГЕНЕРАЦИЯ КОДА КОМНАТЫ ============
+        function generateRoomCode() {
+            // Генерируем 6-значный код (только цифры, легко передать голосом)
+            return Math.floor(100000 + Math.random() * 900000).toString();
         }
 
-        async function scanForRooms() {
-            try {
-                if (!navigator.bluetooth) {
-                    showError('❌ Ваш браузер не поддерживает Web Bluetooth API!');
-                    return;
-                }
-
-                showSuccess('🔍 Сканирование Bluetooth устройств...');
-
-                bluetoothDevice = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: [SERVICE_UUID]
-                });
-
-                bluetoothDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
-
-                bluetoothServer = await bluetoothDevice.gatt.connect();
-                bluetoothService = await bluetoothServer.getPrimaryService(SERVICE_UUID);
-
-                // Отображаем найденное устройство
-                const roomsList = document.getElementById('roomsList');
-                roomsList.innerHTML = `
-                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
-                        <p><strong>Найдено устройство:</strong> ${bluetoothDevice.name || 'Неизвестное устройство'}</p>
-                        <input type="password" id="joinPasswordInput" class="input-field" placeholder="Введите пароль" maxlength="5">
-                        <button class="btn btn-green" onclick="joinBluetoothRoom()">🔗 Подключиться</button>
-                    </div>
-                `;
-
-                showSuccess('✅ Устройство найдено! Введите пароль.');
-            } catch (error) {
-                console.error('❌ Ошибка сканирования:', error);
-                if (error.name === 'NotFoundError') {
-                    showError('❌ Bluetooth устройства не найдены!');
-                } else if (error.name === 'SecurityError') {
-                    showError('❌ Нет разрешения на использование Bluetooth!');
-                } else {
-                    showError('❌ Ошибка сканирования: ' + error.message);
-                }
-            }
-        }
-
-        async function joinBluetoothRoom() {
-            const password = document.getElementById('joinPasswordInput').value.trim();
-
-            if (!password || password.length < 1 || password.length > 5 || !/^\d+$/.test(password)) {
-                showError('❌ Введите корректный пароль (1-5 цифр)!');
-                return;
-            }
-
-            try {
-                // В реальном приложении здесь была бы проверка пароля
-                // через Bluetooth характеристику
-                
-                isHost = false;
-                document.getElementById('btIndicator').className = 'bluetooth-indicator bt-connected';
-                document.getElementById('menuScreen').classList.add('hidden');
-                document.getElementById('gameScreen').classList.remove('hidden');
-                document.getElementById('roomNameDisplay').textContent = bluetoothDevice.name || 'Bluetooth комната';
-                document.getElementById('roomPasswordDisplay').textContent = password;
-
-                // Получаем индекс игрока от хоста (в упрощенной версии)
-                myPlayerIndex = 1; // В реальности хост должен назначить индекс
-
-                addLog('🔗 Подключено к Bluetooth комнате');
-                addLog('⏳ Ожидание роли...');
-
-                showSuccess('✅ Успешное подключение!');
-            } catch (error) {
-                console.error('❌ Ошибка подключения:', error);
-                showError('❌ Не удалось подключиться: ' + error.message);
-            }
-        }
-
-        function onBluetoothDisconnected() {
-            console.log('❌ Bluetooth соединение разорвано');
-            document.getElementById('btIndicator').className = 'bluetooth-indicator bt-disconnected';
-            showError('❌ Bluetooth соединение разорвано!');
-            
-            if (gameState.started) {
-                addLog('❌ Соединение потеряно!');
-            }
-        }
-
-        function leaveRoom() {
-            if (bluetoothDevice && bluetoothDevice.gatt.connected) {
-                bluetoothDevice.gatt.disconnect();
-            }
-            
-            bluetoothDevice = null;
-            bluetoothServer = null;
-            bluetoothService = null;
-            isHost = false;
-            myPlayerIndex = -1;
-            roomName = '';
-            roomPassword = '';
-            
-            document.getElementById('btIndicator').className = 'bluetooth-indicator bt-disconnected';
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('menuScreen').classList.remove('hidden');
-            
-            gameState = {
-                phase: 'day',
-                day: 1,
-                players: [],
-                votes: {},
-                started: false,
-                over: false
+        // ============ СОХРАНЕНИЕ СОСТОЯНИЯ ============
+        function saveState() {
+            const state = {
+                roomCode,
+                isHost,
+                myPlayerIndex,
+                selectedPlayers,
+                gameState
             };
+            localStorage.setItem('mafiaGameState', JSON.stringify(state));
         }
+
+        function loadState() {
+            const saved = localStorage.getItem('mafiaGameState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                roomCode = state.roomCode;
+                isHost = state.isHost;
+                myPlayerIndex = state.myPlayerIndex;
+                selectedPlayers = state.selectedPlayers;
+                gameState = state.gameState;
+                return true;
+            }
+            return false;
+        }
+
+        function clearState() {
+            localStorage.removeItem('mafiaGameState');
+        }
+
+        // ============ ВЫБОР ИГРОКОВ ============
+        document.querySelectorAll('.player-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedPlayers = parseInt(this.dataset.count);
+            });
+        });
 
         // ============ ПОКАЗ УВЕДОМЛЕНИЙ ============
         function showError(msg) {
@@ -624,6 +575,277 @@
             el.textContent = msg;
             el.classList.remove('hidden');
             setTimeout(() => el.classList.add('hidden'), 3000);
+        }
+
+        // ============ СОЗДАНИЕ КОМНАТЫ ============
+        function createRoom() {
+            roomCode = generateRoomCode();
+            isHost = true;
+            myPlayerIndex = 0;
+            
+            console.log('🏠 Создание комнаты с кодом:', roomCode);
+            
+            // Используем код как ID для PeerJS
+            const peerId = 'mafia-' + roomCode;
+            initPeer(peerId);
+            
+            document.getElementById('menuScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('roomCodeDisplay').textContent = roomCode;
+            
+            initGame();
+            gameState.players[0].isConnected = true;
+            showRole(0);
+            updateUI();
+            saveState();
+            
+            addLog('🏠 Комната создана');
+            addLog('📋 Код: ' + roomCode);
+            addLog('📱 Сообщите код друзьям');
+            addLog('⏳ Ожидание игроков...');
+            addLog('👥 Нужно игроков: ' + selectedPlayers);
+        }
+
+        // ============ ПОДКЛЮЧЕНИЕ К КОМНАТЕ ============
+        function joinRoom() {
+            const inputCode = document.getElementById('roomCodeInput').value.trim();
+            if (!inputCode) {
+                showError('❌ Введите код комнаты!');
+                return;
+            }
+
+            if (inputCode.length !== 6 || !/^\d+$/.test(inputCode)) {
+                showError('❌ Код должен содержать 6 цифр!');
+                return;
+            }
+
+            console.log('🔗 Подключение к комнате:', inputCode);
+            roomCode = inputCode;
+            isHost = false;
+            
+            const tempPeerId = 'player-' + Math.random().toString(36).substr(2, 8);
+            initPeer(tempPeerId);
+            
+            document.getElementById('menuScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('roomCodeDisplay').textContent = roomCode;
+            
+            addLog('🔗 Подключение...');
+            
+            // Пробуем подключиться
+            setTimeout(() => {
+                try {
+                    const hostPeerId = 'mafia-' + inputCode;
+                    const conn = peer.connect(hostPeerId, { 
+                        reliable: true,
+                        serialization: 'json'
+                    });
+                    
+                    conn.on('open', () => {
+                        console.log('✅ Подключено к хосту!');
+                        connections.push(conn);
+                        setupConnection(conn);
+                        addLog('✅ Подключено!');
+                        addLog('⏳ Ожидание роли...');
+                        showSuccess('✅ Успешное подключение!');
+                        saveState();
+                    });
+                    
+                    conn.on('error', (err) => {
+                        console.error('❌ Ошибка подключения:', err);
+                        showError('❌ Не удалось подключиться! Комната не существует.');
+                        leaveRoom();
+                    });
+                } catch (error) {
+                    console.error('❌ Ошибка подключения:', error);
+                    showError('❌ Не удалось подключиться!');
+                    leaveRoom();
+                }
+            }, 1000);
+        }
+
+        // ============ ИНИЦИАЛИЗАЦИЯ PEERJS ============
+        function initPeer(id) {
+            try {
+                peer = new Peer(id, {
+                    debug: 1,
+                    config: {
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:stun1.l.google.com:19302' }
+                        ]
+                    }
+                });
+
+                peer.on('open', (peerId) => {
+                    myPeerId = peerId;
+                    console.log('✅ Peer открыт:', peerId);
+                });
+
+                peer.on('connection', (conn) => {
+                    console.log('📞 Входящее соединение от:', conn.peer);
+                    
+                    conn.on('open', () => {
+                        console.log('✅ Соединение установлено с:', conn.peer);
+                        
+                        // Проверяем, не превышено ли количество игроков
+                        if (connections.length >= selectedPlayers - 1) {
+                            conn.send({
+                                type: 'room-full',
+                                message: 'Комната заполнена!'
+                            });
+                            setTimeout(() => conn.close(), 1000);
+                            return;
+                        }
+                        
+                        // Проверяем, не началась ли уже игра
+                        if (gameState.started) {
+                            conn.send({
+                                type: 'game-already-started',
+                                message: 'Игра уже началась!'
+                            });
+                            setTimeout(() => conn.close(), 1000);
+                            return;
+                        }
+                        
+                        connections.push(conn);
+                        setupConnection(conn);
+                        
+                        // Назначаем индекс игроку
+                        const playerIndex = connections.length;
+                        if (playerIndex < selectedPlayers) {
+                            console.log('👤 Назначаю индекс:', playerIndex);
+                            conn.send({
+                                type: 'assign-player',
+                                playerIndex: playerIndex
+                            });
+                        }
+                        
+                        saveState();
+                    });
+
+                    conn.on('error', (err) => {
+                        console.error('❌ Ошибка соединения:', err);
+                    });
+                });
+
+                peer.on('error', (err) => {
+                    console.error('❌ PeerJS ошибка:', err);
+                    if (err.type === 'peer-unavailable') {
+                        showError('❌ Комната не найдена! Проверьте код.');
+                        leaveRoom();
+                    } else if (err.type === 'unavailable-id') {
+                        showError('❌ Этот код уже используется! Попробуйте другой.');
+                    } else {
+                        showError('❌ Ошибка: ' + err.type);
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Ошибка инициализации PeerJS:', error);
+                showError('❌ Не удалось инициализировать соединение');
+            }
+        }
+
+        function setupConnection(conn) {
+            conn.on('data', (data) => {
+                console.log('📨 Получено:', data.type);
+                handleData(data);
+            });
+
+            conn.on('close', () => {
+                console.log('🔌 Соединение закрыто');
+                const index = connections.indexOf(conn);
+                if (index > -1) {
+                    connections.splice(index, 1);
+                }
+                if (isHost && gameState.players[index + 1]) {
+                    gameState.players[index + 1].isConnected = false;
+                    addLog('❌ Игрок ' + (index + 2) + ' отключился');
+                    updateUI();
+                }
+            });
+        }
+
+        function broadcast(data) {
+            connections.forEach(conn => {
+                if (conn.open) {
+                    conn.send(data);
+                }
+            });
+        }
+
+        // ============ ОБРАБОТКА ДАННЫХ ============
+        function handleData(data) {
+            switch(data.type) {
+                case 'assign-player':
+                    myPlayerIndex = data.playerIndex;
+                    console.log('🎯 Мой индекс:', myPlayerIndex);
+                    if (gameState.players[myPlayerIndex]) {
+                        gameState.players[myPlayerIndex].isConnected = true;
+                        showRole(myPlayerIndex);
+                        updateUI();
+                        saveState();
+                    }
+                    break;
+
+                case 'room-full':
+                    showError('❌ ' + data.message);
+                    leaveRoom();
+                    break;
+
+                case 'game-already-started':
+                    showError('❌ ' + data.message);
+                    leaveRoom();
+                    break;
+
+                case 'game-state':
+                    gameState = data.gameState;
+                    updateUI();
+                    saveState();
+                    break;
+
+                case 'vote':
+                    if (gameState.players[data.targetId] && gameState.players[data.playerIndex]) {
+                        gameState.votes[data.targetId] = (gameState.votes[data.targetId] || 0) + 1;
+                        addLog(gameState.players[data.playerIndex].name + ' ➜ ' + gameState.players[data.targetId].name);
+                        updateUI();
+                    }
+                    break;
+
+                case 'start-game':
+                    startGame();
+                    break;
+
+                case 'night':
+                    goToNight();
+                    break;
+
+                case 'game-over':
+                    gameState.over = true;
+                    showGameOver(data.message);
+                    break;
+            }
+        }
+
+        function leaveRoom() {
+            if (peer) {
+                peer.destroy();
+            }
+            connections = [];
+            myPlayerIndex = -1;
+            isHost = false;
+            roomCode = '';
+            gameState = {
+                phase: 'day',
+                day: 1,
+                players: [],
+                votes: {},
+                started: false,
+                over: false
+            };
+            clearState();
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('menuScreen').classList.remove('hidden');
         }
 
         // ============ ИНИЦИАЛИЗАЦИЯ ИГРЫ ============
@@ -697,6 +919,14 @@
                 if (!player.isAlive) card.classList.add('dead');
                 if (player.id === myPlayerIndex) card.classList.add('me');
                 
+                const isMafia = player.role === ROLES.MAFIA || player.role === ROLES.DON;
+                const myRole = gameState.players[myPlayerIndex]?.role;
+                const iAmMafia = myRole === ROLES.MAFIA || myRole === ROLES.DON;
+                
+                if (gameState.over || player.id === myPlayerIndex || (iAmMafia && isMafia)) {
+                    card.classList.add('mafia');
+                }
+                
                 card.innerHTML = `
                     <div class="player-avatar">${player.avatar}</div>
                     <div class="player-name">${player.name}</div>
@@ -753,6 +983,14 @@
             log.scrollTop = log.scrollHeight;
         }
 
+        function copyRoomCode() {
+            navigator.clipboard.writeText(roomCode).then(() => {
+                const tooltip = document.getElementById('copyTooltip');
+                tooltip.classList.add('show');
+                setTimeout(() => tooltip.classList.remove('show'), 2000);
+            });
+        }
+
         function showRole(index) {
             const player = gameState.players[index];
             if (player) {
@@ -797,6 +1035,12 @@
             addLog('☀️ День 1. Город просыпается');
             
             updateUI();
+            saveState();
+            
+            if (isHost) {
+                broadcast({ type: 'start-game' });
+                broadcast({ type: 'game-state', gameState: gameState });
+            }
         }
 
         function goToNight() {
@@ -808,10 +1052,16 @@
             
             addLog('🌙 Ночь. Город засыпает...');
             updateUI();
+            saveState();
             
             if (isHost) {
+                broadcast({ type: 'night' });
+                broadcast({ type: 'game-state', gameState: gameState });
+                
                 setTimeout(() => {
-                    performNightActions();
+                    if (gameState.phase === 'night') {
+                        performNightActions();
+                    }
                 }, 10000);
             }
         }
@@ -840,6 +1090,9 @@
             
             addLog('☀️ День ' + gameState.day + '. Город просыпается');
             updateUI();
+            saveState();
+            
+            broadcast({ type: 'game-state', gameState: gameState });
         }
 
         function startVoting() {
@@ -854,6 +1107,7 @@
             addLog('🗳️ Голосование началось!');
             addLog('👆 Нажмите на игрока, чтобы проголосовать');
             updateUI();
+            saveState();
             
             if (isHost) {
                 setTimeout(() => {
@@ -871,7 +1125,13 @@
             
             gameState.votes[playerId] = (gameState.votes[playerId] || 0) + 1;
             addLog(gameState.players[myPlayerIndex].name + ' ➜ ' + gameState.players[playerId].name);
-            updateUI();
+            
+            if (isHost) {
+                updateUI();
+                saveState();
+            } else {
+                broadcast({ type: 'vote', playerIndex: myPlayerIndex, targetId: playerId });
+            }
         }
 
         function determineVoteResult() {
@@ -904,6 +1164,8 @@
             document.getElementById('nightBtn').disabled = false;
             
             updateUI();
+            saveState();
+            broadcast({ type: 'game-state', gameState: gameState });
         }
 
         function checkWin() {
@@ -947,7 +1209,44 @@
             document.getElementById('voteBtn').disabled = true;
             
             updateUI();
+            saveState();
+            
+            if (isHost) {
+                broadcast({ type: 'game-over', message: message });
+            }
         }
+
+        // ============ АВТОВОССТАНОВЛЕНИЕ ============
+        window.addEventListener('load', () => {
+            if (loadState() && roomCode) {
+                console.log('🔄 Восстановление состояния...');
+                document.getElementById('menuScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                document.getElementById('roomCodeDisplay').textContent = roomCode;
+                
+                if (isHost) {
+                    initPeer('mafia-' + roomCode);
+                } else {
+                    const tempPeerId = 'player-' + Math.random().toString(36).substr(2, 8);
+                    initPeer(tempPeerId);
+                    
+                    setTimeout(() => {
+                        try {
+                            const conn = peer.connect('mafia-' + roomCode, { reliable: true });
+                            conn.on('open', () => {
+                                connections.push(conn);
+                                setupConnection(conn);
+                                addLog('✅ Переподключено!');
+                            });
+                        } catch (error) {
+                            console.error('Ошибка переподключения:', error);
+                        }
+                    }, 1000);
+                }
+                
+                updateUI();
+            }
+        });
     </script>
 </body>
 </html>
