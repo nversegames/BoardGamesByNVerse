@@ -146,6 +146,11 @@
             font-size: 0.9rem;
             color: #ccc;
         }
+        .lock-icon {
+            font-size: 5rem;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
 <body>
@@ -153,7 +158,7 @@
         <!-- ЭКРАН 1: ВЫБОР КОЛИЧЕСТВА ИГРОКОВ -->
         <div id="screen-select">
             <h1>🕵️ ШПИОН</h1>
-            <p class="subtitle">Мега версия • 100+ локаций</p>
+            <p class="subtitle">Мега версия • 130+ локаций</p>
             <div class="step-title">На сколько человек играем?</div>
             <div class="btn-grid" id="player-select">
                 <!-- Кнопки добавятся из JS -->
@@ -161,17 +166,26 @@
             <div class="info-text">Минимум 3, максимум 10</div>
         </div>
 
-        <!-- ЭКРАН 2: ПЕРЕДАЧА ТЕЛЕФОНА И ПОКАЗ РОЛИ -->
+        <!-- ЭКРАН 2: ПОКАЗ СЛОВА -->
         <div id="screen-role" class="hidden">
             <div id="player-header" class="player-badge">Игрок 1</div>
-            <div class="step-title" id="role-instruction">Посмотри слово и передай телефон</div>
+            <div class="step-title">Запомни слово и нажми "Скрыть"</div>
             <div id="role-display" class="role-card">СЛОВО</div>
-            <div class="pass-text" id="pass-message">📱 Передай телефон →</div>
-            <button class="primary" id="next-player-btn">Следующий игрок</button>
+            <button class="primary" id="hide-word-btn">🙈 Скрыть и передать</button>
             <button class="secondary" id="restart-from-role">🔄 Заново</button>
         </div>
 
-        <!-- ЭКРАН 3: НАЧАЛО ИГРЫ -->
+        <!-- ЭКРАН 3: ЗАГЛУШКА МЕЖДУ ИГРОКАМИ -->
+        <div id="screen-hidden" class="hidden">
+            <div id="next-player-header" class="player-badge">Игрок 2</div>
+            <div class="lock-icon">🔒</div>
+            <div class="step-title">Передай телефон следующему игроку</div>
+            <div class="pass-text" id="pass-message-hidden">📱 Телефон у Игрока 2?</div>
+            <button class="primary" id="show-word-btn">👁️ Показать слово</button>
+            <button class="secondary" id="restart-from-hidden">🔄 Заново</button>
+        </div>
+
+        <!-- ЭКРАН 4: НАЧАЛО ИГРЫ -->
         <div id="screen-start" class="hidden">
             <h1>🎉 ВСЁ!</h1>
             <div class="step-title">Роли розданы. Обсуждайте и найдите шпиона!</div>
@@ -183,7 +197,6 @@
     <script>
         (function(){
             // ================== БОЛЬШАЯ БАЗА СЛОВ ==================
-            // civilian - слово для мирных, spy - слово для шпиона
             const WORD_PAIRS = [
                 // --- ЕДА И НАПИТКИ ---
                 { civilian: "Арбуз", spy: "Дыня" },
@@ -360,33 +373,36 @@
             let currentPlayerIndex = 0;
             let currentPair = null;
             let spyIndex = -1;
-            
-            // Флаг, чтобы одна и та же пара не выпадала два раза подряд (опционально)
             let lastPairIndex = -1;
 
             // --- ЭЛЕМЕНТЫ ---
             const screenSelect = document.getElementById('screen-select');
             const screenRole = document.getElementById('screen-role');
+            const screenHidden = document.getElementById('screen-hidden');
             const screenStart = document.getElementById('screen-start');
             
             const playerSelectDiv = document.getElementById('player-select');
             const playerHeader = document.getElementById('player-header');
             const roleDisplay = document.getElementById('role-display');
-            const passMessage = document.getElementById('pass-message');
-            const nextPlayerBtn = document.getElementById('next-player-btn');
+            const hideWordBtn = document.getElementById('hide-word-btn');
             const restartFromRole = document.getElementById('restart-from-role');
+            
+            const nextPlayerHeader = document.getElementById('next-player-header');
+            const passMessageHidden = document.getElementById('pass-message-hidden');
+            const showWordBtn = document.getElementById('show-word-btn');
+            const restartFromHidden = document.getElementById('restart-from-hidden');
+            
             const restartFromStart = document.getElementById('restart-from-start');
             const finalWords = document.getElementById('final-words');
 
             // --- ФУНКЦИИ ---
             function showScreen(screen) {
-                [screenSelect, screenRole, screenStart].forEach(s => s.classList.add('hidden'));
+                [screenSelect, screenRole, screenHidden, screenStart].forEach(s => s.classList.add('hidden'));
                 screen.classList.remove('hidden');
             }
 
             function initPlayerButtons() {
                 playerSelectDiv.innerHTML = '';
-                // Минимум 3 игрока, максимум 10
                 for (let i = 3; i <= 10; i++) {
                     const btn = document.createElement('button');
                     btn.textContent = i;
@@ -400,7 +416,6 @@
 
             function startRoleAssignment() {
                 currentPlayerIndex = 0;
-                // Выбираем случайную пару, но не такую же, как в прошлый раз (если это возможно)
                 let randomPairIndex;
                 do {
                     randomPairIndex = Math.floor(Math.random() * WORD_PAIRS.length);
@@ -408,17 +423,13 @@
                 
                 lastPairIndex = randomPairIndex;
                 currentPair = WORD_PAIRS[randomPairIndex];
-                
-                // Выбираем случайного шпиона (0..totalPlayers-1)
                 spyIndex = Math.floor(Math.random() * totalPlayers);
                 
-                showScreen(screenRole);
-                updateRoleScreen();
+                showRoleScreen();
             }
 
-            function updateRoleScreen() {
+            function showRoleScreen() {
                 const playerNum = currentPlayerIndex + 1;
-                const isLastPlayer = currentPlayerIndex === totalPlayers - 1;
                 const isSpy = currentPlayerIndex === spyIndex;
                 
                 playerHeader.textContent = `Игрок ${playerNum}`;
@@ -431,23 +442,23 @@
                     roleDisplay.classList.remove('spy');
                 }
                 
+                showScreen(screenRole);
+            }
+
+            function showHiddenScreen() {
+                const nextPlayerNum = currentPlayerIndex + 2; // +1 для следующего, +1 для номера
+                const isLastPlayer = currentPlayerIndex === totalPlayers - 1;
+                
                 if (isLastPlayer) {
-                    passMessage.textContent = "✅ Все посмотрели!";
-                    nextPlayerBtn.textContent = "🏁 Начать игру";
-                } else {
-                    passMessage.textContent = `📱 Передай телефон Игроку ${playerNum + 1}`;
-                    nextPlayerBtn.textContent = "👁️ Скрыть и передать";
+                    // Если это был последний игрок, сразу показываем экран старта
+                    showStartScreen();
+                    return;
                 }
                 
-                // Убираем старый обработчик
-                nextPlayerBtn.onclick = () => {
-                    if (currentPlayerIndex < totalPlayers - 1) {
-                        currentPlayerIndex++;
-                        updateRoleScreen();
-                    } else {
-                        showStartScreen();
-                    }
-                };
+                nextPlayerHeader.textContent = `Игрок ${nextPlayerNum}`;
+                passMessageHidden.textContent = `📱 Телефон у Игрока ${nextPlayerNum}?`;
+                
+                showScreen(screenHidden);
             }
 
             function showStartScreen() {
@@ -462,12 +473,25 @@
                 showScreen(screenSelect);
             }
 
+            // --- ОБРАБОТЧИКИ ---
+            hideWordBtn.addEventListener('click', () => {
+                // Переходим к следующему игроку
+                currentPlayerIndex++;
+                showHiddenScreen();
+            });
+
+            showWordBtn.addEventListener('click', () => {
+                // Показываем слово текущему игроку
+                showRoleScreen();
+            });
+
+            // Кнопки возврата
+            restartFromRole.addEventListener('click', resetToMenu);
+            restartFromHidden.addEventListener('click', resetToMenu);
+            restartFromStart.addEventListener('click', resetToMenu);
+
             // --- ЗАПУСК ---
             initPlayerButtons();
-            
-            restartFromRole.addEventListener('click', resetToMenu);
-            restartFromStart.addEventListener('click', resetToMenu);
-            
             showScreen(screenSelect);
         })();
     </script>
