@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мафия — Онлайн игра</title>
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <title>Мафия — Bluetooth игра</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -34,7 +33,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             background: var(--card);
             border-radius: 20px;
@@ -448,17 +447,51 @@
         }
 
         .timer.show { display: block; }
+
+        .instructions {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        .instructions h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1 class="title">🔫 МАФИЯ</h1>
-            <p style="color: var(--muted);">Онлайн игра для друзей</p>
+            <p style="color: var(--muted);">Bluetooth игра для друзей</p>
         </div>
 
         <!-- МЕНЮ -->
         <div id="menuScreen" class="menu">
+            <div class="instructions">
+                <h3>📱 Инструкция по подключению:</h3>
+                <ol>
+                    <li>Один игрок нажимает <strong>"Создать комнату"</strong> и становится хостом</li>
+                    <li>Другие игроки нажимают <strong>"Подключиться"</strong> и вводят ID комнаты</li>
+                    <li>Все игроки должны быть в одной Wi-Fi сети или использовать Bluetooth</li>
+                    <li>Дождитесь подключения всех игроков</li>
+                    <li>Хост нажимает <strong>"Начать игру"</strong></li>
+                </ol>
+            </div>
+
             <h2>Выберите количество игроков:</h2>
             <div class="player-selector">
                 <button class="player-btn active" data-count="3">3 игрока</button>
@@ -484,6 +517,7 @@
                 <p>ID комнаты:</p>
                 <div class="room-id" id="roomIdDisplay" onclick="copyRoomId()"></div>
                 <button class="btn btn-blue" onclick="copyRoomId()">📋 Копировать</button>
+                <button class="btn btn-red" onclick="leaveRoom()" style="margin-top: 10px;">🚪 Покинуть игру</button>
             </div>
 
             <div class="status-container" id="statusContainer"></div>
@@ -517,6 +551,7 @@
     <!-- ТУЛТИП КОПИРОВАНИЯ -->
     <div class="copy-tooltip" id="copyTooltip">✅ ID скопирован!</div>
 
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
         // ============ КОНСТАНТЫ ============
         const ROLES = {
@@ -562,7 +597,38 @@
         };
         let timerInterval = null;
         let currentTimer = 0;
-        let nightActionTimer = 30; // секунды на ночные действия
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 3;
+
+        // ============ СОХРАНЕНИЕ СОСТОЯНИЯ ============
+        function saveState() {
+            const state = {
+                roomId,
+                isHost,
+                myPlayerIndex,
+                selectedPlayers,
+                gameState
+            };
+            localStorage.setItem('mafiaGameState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('mafiaGameState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                roomId = state.roomId;
+                isHost = state.isHost;
+                myPlayerIndex = state.myPlayerIndex;
+                selectedPlayers = state.selectedPlayers;
+                gameState = state.gameState;
+                return true;
+            }
+            return false;
+        }
+
+        function clearState() {
+            localStorage.removeItem('mafiaGameState');
+        }
 
         // ============ ВЫБОР ИГРОКОВ ============
         document.querySelectorAll('.player-btn').forEach(btn => {
@@ -588,11 +654,11 @@
             setTimeout(() => el.classList.add('hidden'), 3000);
         }
 
-        // ============ PEERJS ============
+        // ============ ИНИЦИАЛИЗАЦИЯ PEERJS ============
         function initPeer(id) {
             try {
                 peer = new Peer(id, {
-                    debug: 3,
+                    debug: 2,
                     config: {
                         iceServers: [
                             { urls: 'stun:stun.l.google.com:19302' },
@@ -614,6 +680,7 @@
                         document.getElementById('roomIdDisplay').textContent = peerId;
                         addLog('✅ Комната создана: ' + peerId);
                         addLog('📱 Отправьте ID друзьям');
+                        saveState();
                     }
                 });
 
@@ -655,6 +722,8 @@
                                 playerIndex: playerIndex
                             });
                         }
+                        
+                        saveState();
                     });
 
                     conn.on('error', (err) => {
@@ -664,15 +733,21 @@
 
                 peer.on('disconnected', () => {
                     console.log('🔄 Переподключение...');
-                    setTimeout(() => {
-                        peer.reconnect();
-                    }, 3000);
+                    if (reconnectAttempts < maxReconnectAttempts) {
+                        reconnectAttempts++;
+                        setTimeout(() => {
+                            peer.reconnect();
+                        }, 3000);
+                    } else {
+                        showError('❌ Не удалось переподключиться');
+                    }
                 });
 
                 peer.on('error', (err) => {
                     console.error('❌ PeerJS ошибка:', err);
                     if (err.type === 'peer-unavailable') {
                         showError('❌ Комната не найдена! Проверьте ID.');
+                        leaveRoom();
                     } else if (err.type === 'network') {
                         showError('❌ Проблема с сетью! Проверьте соединение.');
                     } else if (err.type === 'unavailable-id') {
@@ -700,9 +775,18 @@
                     connections.splice(index, 1);
                 }
                 if (isHost) {
-                    updateStatuses();
-                    broadcast({ type: 'player-disconnected', playerIndex: index + 1 });
+                    const disconnectedPlayerIndex = index + 1;
+                    if (gameState.players[disconnectedPlayerIndex]) {
+                        gameState.players[disconnectedPlayerIndex].isConnected = false;
+                        addLog('❌ Игрок ' + (disconnectedPlayerIndex + 1) + ' отключился');
+                        updateUI();
+                        saveState();
+                    }
                 }
+            });
+
+            conn.on('error', (err) => {
+                console.error('❌ Ошибка соединения:', err);
             });
         }
 
@@ -724,6 +808,7 @@
                         gameState.players[myPlayerIndex].isConnected = true;
                         showRole(myPlayerIndex);
                         updateUI();
+                        saveState();
                         if (isHost) {
                             broadcast({ type: 'player-connected', playerIndex: myPlayerIndex });
                             checkAllConnected();
@@ -733,12 +818,12 @@
 
                 case 'room-full':
                     showError('❌ ' + data.message);
-                    disconnectPeer();
+                    leaveRoom();
                     break;
 
                 case 'game-already-started':
                     showError('❌ ' + data.message);
-                    disconnectPeer();
+                    leaveRoom();
                     break;
 
                 case 'player-connected':
@@ -746,21 +831,15 @@
                         gameState.players[data.playerIndex].isConnected = true;
                         addLog('✅ Игрок ' + (data.playerIndex + 1) + ' подключился');
                         updateUI();
+                        saveState();
                         if (isHost) checkAllConnected();
-                    }
-                    break;
-
-                case 'player-disconnected':
-                    if (gameState.players[data.playerIndex]) {
-                        gameState.players[data.playerIndex].isConnected = false;
-                        addLog('❌ Игрок ' + (data.playerIndex + 1) + ' отключился');
-                        updateUI();
                     }
                     break;
 
                 case 'game-state':
                     gameState = data.gameState;
                     updateUI();
+                    saveState();
                     break;
 
                 case 'vote':
@@ -779,10 +858,6 @@
                     goToNight();
                     break;
 
-                case 'night-action':
-                    handleNightAction(data);
-                    break;
-
                 case 'game-over':
                     gameState.over = true;
                     showGameOver(data.message);
@@ -790,16 +865,10 @@
             }
         }
 
-        function disconnectPeer() {
+        function leaveRoom() {
             if (peer) {
                 peer.destroy();
             }
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('menuScreen').classList.remove('hidden');
-            resetGame();
-        }
-
-        function resetGame() {
             connections = [];
             myPlayerIndex = -1;
             isHost = false;
@@ -813,6 +882,10 @@
                 over: false,
                 nightActions: {}
             };
+            clearState();
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('menuScreen').classList.remove('hidden');
+            stopTimer();
         }
 
         // ============ СОЗДАНИЕ КОМНАТЫ ============
@@ -832,6 +905,7 @@
             gameState.players[0].isConnected = true;
             showRole(0);
             updateUI();
+            saveState();
             
             addLog('🏠 Комната создана');
             addLog('📋 ID: ' + roomId);
@@ -867,7 +941,10 @@
             // Пробуем подключиться
             setTimeout(() => {
                 try {
-                    const conn = peer.connect(inputRoomId, { reliable: true });
+                    const conn = peer.connect(inputRoomId, { 
+                        reliable: true,
+                        serialization: 'json'
+                    });
                     
                     conn.on('open', () => {
                         console.log('✅ Подключено к хосту!');
@@ -875,17 +952,19 @@
                         setupConnection(conn);
                         addLog('✅ Подключено!');
                         addLog('⏳ Ожидание роли...');
+                        showSuccess('✅ Успешное подключение!');
+                        saveState();
                     });
                     
                     conn.on('error', (err) => {
                         console.error('❌ Ошибка подключения:', err);
                         showError('❌ Не удалось подключиться! Комната не существует или хост офлайн.');
-                        disconnectPeer();
+                        leaveRoom();
                     });
                 } catch (error) {
                     console.error('❌ Ошибка подключения:', error);
                     showError('❌ Не удалось подключиться!');
-                    disconnectPeer();
+                    leaveRoom();
                 }
             }, 1000);
         }
@@ -1109,6 +1188,7 @@
             addLog('☀️ День 1. Город просыпается');
             
             updateUI();
+            saveState();
             
             if (isHost) {
                 broadcast({ type: 'start-game' });
@@ -1127,24 +1207,18 @@
             addLog('🌙 Ночь. Город засыпает...');
             startTimer(30);
             updateUI();
+            saveState();
             
             if (isHost) {
                 broadcast({ type: 'night' });
                 broadcast({ type: 'game-state', gameState: gameState });
-            }
-        }
-
-        function handleNightAction(data) {
-            if (isHost) {
-                gameState.nightActions[data.playerIndex] = data.action;
                 
-                // Проверяем, все ли действия выполнены
-                const alivePlayers = gameState.players.filter(p => p.isAlive);
-                const requiredActions = alivePlayers.filter(p => p.role === ROLES.MAFIA || p.role === ROLES.DON);
-                
-                if (Object.keys(gameState.nightActions).length >= requiredActions.length) {
-                    performNightActions();
-                }
+                // Автоматически выполняем ночные действия через 10 секунд
+                setTimeout(() => {
+                    if (gameState.phase === 'night') {
+                        performNightActions();
+                    }
+                }, 10000);
             }
         }
 
@@ -1157,30 +1231,13 @@
             
             // Мафия убивает
             if (mafia.length > 0 && civilians.length > 0) {
-                let target;
-                
-                // Проверяем, выбрала ли мафия цель
-                const mafiaActions = Object.values(gameState.nightActions);
-                if (mafiaActions.length > 0) {
-                    target = civilians[Math.floor(Math.random() * civilians.length)];
-                } else {
-                    target = civilians[Math.floor(Math.random() * civilians.length)];
-                }
+                const target = civilians[Math.floor(Math.random() * civilians.length)];
                 
                 // Доктор лечит
                 const doctor = alive.find(p => p.role === ROLES.DOCTOR);
                 let healedPlayer = null;
                 if (doctor) {
                     healedPlayer = civilians[Math.floor(Math.random() * civilians.length)];
-                }
-                
-                // Шериф проверяет
-                const sheriff = alive.find(p => p.role === ROLES.SHERIFF);
-                if (sheriff) {
-                    const checkedPlayer = civilians[Math.floor(Math.random() * civilians.length)];
-                    if (checkedPlayer && (isMafia(checkedPlayer))) {
-                        addLog('🔍 Шериф нашёл мафию!');
-                    }
                 }
                 
                 // Применяем лечение
@@ -1205,6 +1262,7 @@
             
             addLog('☀️ День ' + gameState.day + '. Город просыпается');
             updateUI();
+            saveState();
             
             broadcast({ type: 'game-state', gameState: gameState });
         }
@@ -1219,31 +1277,24 @@
             document.getElementById('nightBtn').disabled = true;
             
             addLog('🗳️ Голосование началось!');
+            addLog('👆 Нажмите на игрока, чтобы проголосовать');
             updateUI();
+            saveState();
             
             if (isHost) {
                 setTimeout(() => {
-                    // Боты голосуют
-                    const alive = gameState.players.filter(p => p.isAlive);
-                    alive.forEach(p => {
-                        if (p.id !== myPlayerIndex && p.isConnected === false) {
-                            const targets = alive.filter(t => t.id !== p.id);
-                            const target = targets[Math.floor(Math.random() * targets.length)];
-                            if (target) {
-                                gameState.votes[target.id] = (gameState.votes[target.id] || 0) + 1;
-                                addLog(p.name + ' ➜ ' + target.name);
-                            }
-                        }
-                    });
-                    
+                    // Автоматически завершаем голосование через 15 секунд
                     determineVoteResult();
-                }, 5000);
+                }, 15000);
             }
         }
 
         function voteFor(playerId) {
             if (gameState.phase !== 'voting') return;
-            if (!gameState.players[myPlayerIndex].isAlive) return;
+            if (!gameState.players[myPlayerIndex].isAlive) {
+                showError('❌ Вы мертвы и не можете голосовать!');
+                return;
+            }
             
             gameState.votes[playerId] = (gameState.votes[playerId] || 0) + 1;
             addLog(gameState.players[myPlayerIndex].name + ' ➜ ' + gameState.players[playerId].name);
@@ -1255,6 +1306,7 @@
             }
             
             updateUI();
+            saveState();
         }
 
         function handleVote(playerIndex, targetId) {
@@ -1293,6 +1345,7 @@
             document.getElementById('nightBtn').disabled = false;
             
             updateUI();
+            saveState();
             broadcast({ type: 'game-state', gameState: gameState });
         }
 
@@ -1338,11 +1391,51 @@
             document.getElementById('voteBtn').disabled = true;
             
             updateUI();
+            saveState();
             
             if (isHost) {
                 broadcast({ type: 'game-over', message: message });
             }
         }
+
+        // ============ АВТОВОССТАНОВЛЕНИЕ ============
+        window.addEventListener('load', () => {
+            if (loadState()) {
+                console.log('🔄 Восстановление состояния...');
+                if (roomId && myPlayerIndex >= 0) {
+                    document.getElementById('menuScreen').classList.add('hidden');
+                    document.getElementById('gameScreen').classList.remove('hidden');
+                    document.getElementById('roomIdDisplay').textContent = roomId;
+                    
+                    if (isHost) {
+                        // Пересоздаем как хост
+                        initPeer(roomId);
+                    } else {
+                        // Переподключаемся как игрок
+                        const tempPeerId = 'player-' + Math.random().toString(36).substr(2, 8);
+                        initPeer(tempPeerId);
+                        
+                        setTimeout(() => {
+                            const conn = peer.connect(roomId, { reliable: true });
+                            conn.on('open', () => {
+                                connections.push(conn);
+                                setupConnection(conn);
+                                addLog('✅ Переподключено!');
+                            });
+                        }, 1000);
+                    }
+                    
+                    updateUI();
+                }
+            }
+        });
+
+        // ============ ОБРАБОТКА ЗАКРЫТИЯ ============
+        window.addEventListener('beforeunload', () => {
+            if (gameState.started && !gameState.over) {
+                saveState();
+            }
+        });
     </script>
 </body>
 </html>
