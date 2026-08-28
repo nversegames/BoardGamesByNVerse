@@ -185,7 +185,16 @@
             <button class="secondary" id="restart-from-hidden">🔄 Заново</button>
         </div>
 
-        <!-- ЭКРАН 4: НАЧАЛО ИГРЫ -->
+        <!-- ЭКРАН 4: ВСЕ ПОСМОТРЕЛИ -->
+        <div id="screen-all-done" class="hidden">
+            <div class="lock-icon">🎉</div>
+            <div class="step-title">Все игроки посмотрели свои слова!</div>
+            <div class="pass-text">Готовы начать обсуждение?</div>
+            <button class="primary" id="start-game-btn">🏁 Начать игру</button>
+            <button class="secondary" id="restart-from-done">🔄 Заново</button>
+        </div>
+
+        <!-- ЭКРАН 5: НАЧАЛО ИГРЫ -->
         <div id="screen-start" class="hidden">
             <h1>🎉 ВСЁ!</h1>
             <div class="step-title">Роли розданы. Обсуждайте и найдите шпиона!</div>
@@ -379,6 +388,7 @@
             const screenSelect = document.getElementById('screen-select');
             const screenRole = document.getElementById('screen-role');
             const screenHidden = document.getElementById('screen-hidden');
+            const screenAllDone = document.getElementById('screen-all-done');
             const screenStart = document.getElementById('screen-start');
             
             const playerSelectDiv = document.getElementById('player-select');
@@ -392,12 +402,15 @@
             const showWordBtn = document.getElementById('show-word-btn');
             const restartFromHidden = document.getElementById('restart-from-hidden');
             
+            const startGameBtn = document.getElementById('start-game-btn');
+            const restartFromDone = document.getElementById('restart-from-done');
+            
             const restartFromStart = document.getElementById('restart-from-start');
             const finalWords = document.getElementById('final-words');
 
             // --- ФУНКЦИИ ---
             function showScreen(screen) {
-                [screenSelect, screenRole, screenHidden, screenStart].forEach(s => s.classList.add('hidden'));
+                [screenSelect, screenRole, screenHidden, screenAllDone, screenStart].forEach(s => s.classList.add('hidden'));
                 screen.classList.remove('hidden');
             }
 
@@ -446,19 +459,18 @@
             }
 
             function showHiddenScreen() {
-                const nextPlayerNum = currentPlayerIndex + 2; // +1 для следующего, +1 для номера
-                const isLastPlayer = currentPlayerIndex === totalPlayers - 1;
+                const isLastPlayer = currentPlayerIndex >= totalPlayers - 1;
                 
                 if (isLastPlayer) {
-                    // Если это был последний игрок, сразу показываем экран старта
-                    showStartScreen();
-                    return;
+                    // Все посмотрели, показываем экран "Все посмотрели"
+                    showScreen(screenAllDone);
+                } else {
+                    // Показываем заглушку для следующего игрока
+                    const nextPlayerNum = currentPlayerIndex + 2;
+                    nextPlayerHeader.textContent = `Игрок ${nextPlayerNum}`;
+                    passMessageHidden.textContent = `📱 Телефон у Игрока ${nextPlayerNum}?`;
+                    showScreen(screenHidden);
                 }
-                
-                nextPlayerHeader.textContent = `Игрок ${nextPlayerNum}`;
-                passMessageHidden.textContent = `📱 Телефон у Игрока ${nextPlayerNum}?`;
-                
-                showScreen(screenHidden);
             }
 
             function showStartScreen() {
@@ -475,19 +487,22 @@
 
             // --- ОБРАБОТЧИКИ ---
             hideWordBtn.addEventListener('click', () => {
-                // Переходим к следующему игроку
                 currentPlayerIndex++;
                 showHiddenScreen();
             });
 
             showWordBtn.addEventListener('click', () => {
-                // Показываем слово текущему игроку
                 showRoleScreen();
+            });
+
+            startGameBtn.addEventListener('click', () => {
+                showStartScreen();
             });
 
             // Кнопки возврата
             restartFromRole.addEventListener('click', resetToMenu);
             restartFromHidden.addEventListener('click', resetToMenu);
+            restartFromDone.addEventListener('click', resetToMenu);
             restartFromStart.addEventListener('click', resetToMenu);
 
             // --- ЗАПУСК ---
