@@ -379,7 +379,7 @@
 
             // --- СОСТОЯНИЕ ---
             let totalPlayers = 3;
-            let currentPlayerIndex = 0;
+            let currentPlayerIndex = 0; // Индекс игрока, который СЕЙЧАС смотрит слово
             let currentPair = null;
             let spyIndex = -1;
             let lastPairIndex = -1;
@@ -428,7 +428,7 @@
             }
 
             function startRoleAssignment() {
-                currentPlayerIndex = 0;
+                currentPlayerIndex = 0; // Начинаем с первого игрока
                 let randomPairIndex;
                 do {
                     randomPairIndex = Math.floor(Math.random() * WORD_PAIRS.length);
@@ -458,19 +458,27 @@
                 showScreen(screenRole);
             }
 
-            function showHiddenScreen() {
-                const isLastPlayer = currentPlayerIndex >= totalPlayers - 1;
-                
-                if (isLastPlayer) {
-                    // Все посмотрели, показываем экран "Все посмотрели"
+            // Вызывается когда игрок нажал "Скрыть"
+            function handleHideWord() {
+                // Проверяем, был ли это последний игрок
+                if (currentPlayerIndex >= totalPlayers - 1) {
+                    // Это был последний игрок, показываем экран "Все посмотрели"
                     showScreen(screenAllDone);
                 } else {
-                    // Показываем заглушку для следующего игрока
-                    const nextPlayerNum = currentPlayerIndex + 2;
+                    // Это не последний игрок, показываем заглушку для следующего
+                    const nextPlayerNum = currentPlayerIndex + 2; // +1 к индексу, +1 к номеру
                     nextPlayerHeader.textContent = `Игрок ${nextPlayerNum}`;
                     passMessageHidden.textContent = `📱 Телефон у Игрока ${nextPlayerNum}?`;
                     showScreen(screenHidden);
                 }
+            }
+
+            // Вызывается когда игрок нажал "Показать слово" на заглушке
+            function handleShowWord() {
+                // Переходим к следующему игроку
+                currentPlayerIndex++;
+                // Показываем его слово
+                showRoleScreen();
             }
 
             function showStartScreen() {
@@ -486,18 +494,9 @@
             }
 
             // --- ОБРАБОТЧИКИ ---
-            hideWordBtn.addEventListener('click', () => {
-                currentPlayerIndex++;
-                showHiddenScreen();
-            });
-
-            showWordBtn.addEventListener('click', () => {
-                showRoleScreen();
-            });
-
-            startGameBtn.addEventListener('click', () => {
-                showStartScreen();
-            });
+            hideWordBtn.addEventListener('click', handleHideWord);
+            showWordBtn.addEventListener('click', handleShowWord);
+            startGameBtn.addEventListener('click', showStartScreen);
 
             // Кнопки возврата
             restartFromRole.addEventListener('click', resetToMenu);
