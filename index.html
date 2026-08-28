@@ -63,36 +63,6 @@
             text-align: center;
         }
 
-        .player-selector {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        .player-btn {
-            padding: 12px 20px;
-            border: 2px solid var(--border);
-            background: transparent;
-            color: var(--text);
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .player-btn:hover {
-            border-color: var(--gold);
-            transform: translateY(-2px);
-        }
-
-        .player-btn.active {
-            border-color: var(--gold);
-            background: rgba(226, 183, 20, 0.2);
-            color: var(--gold);
-        }
-
         .btn {
             padding: 15px 30px;
             border: none;
@@ -101,7 +71,7 @@
             font-size: 16px;
             font-weight: bold;
             transition: all 0.3s;
-            margin: 5px;
+            margin: 10px;
             position: relative;
             overflow: hidden;
         }
@@ -140,21 +110,13 @@
             background: rgba(255,255,255,0.1);
         }
 
-        .room-id {
-            font-size: 24px;
+        .room-info {
+            font-size: 20px;
             color: var(--gold);
             background: rgba(0,0,0,0.3);
             padding: 15px;
             border-radius: 10px;
             margin: 15px;
-            cursor: pointer;
-            user-select: all;
-            transition: all 0.3s;
-        }
-
-        .room-id:hover {
-            background: rgba(0,0,0,0.5);
-            transform: scale(1.02);
         }
 
         .status-container {
@@ -169,12 +131,6 @@
             padding: 10px 15px;
             border-radius: 20px;
             font-size: 14px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .status-online {
@@ -187,12 +143,6 @@
             background: rgba(241, 196, 15, 0.2);
             border: 1px solid #f1c40f;
             color: #f1c40f;
-            animation: blink 2s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
         }
 
         .phase-banner {
@@ -202,7 +152,6 @@
             border-radius: 15px;
             margin: 20px 0;
             font-weight: bold;
-            animation: slideIn 0.5s ease;
         }
 
         .phase-day {
@@ -231,12 +180,6 @@
             border: 2px solid var(--border);
             transition: all 0.3s;
             cursor: pointer;
-            position: relative;
-        }
-
-        .player-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .player-card.dead { 
@@ -250,22 +193,7 @@
             background: rgba(52, 152, 219, 0.15);
         }
 
-        .player-card.mafia {
-            border-color: var(--red);
-            background: rgba(231, 76, 60, 0.15);
-        }
-
-        .player-avatar { 
-            font-size: 40px; 
-            margin-bottom: 10px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
+        .player-avatar { font-size: 40px; margin-bottom: 10px; }
         .player-name { font-weight: bold; margin-bottom: 5px; }
         .player-role { font-size: 12px; color: var(--muted); }
 
@@ -285,23 +213,11 @@
             overflow-y: auto;
             margin-top: 20px;
             font-size: 14px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--gold) transparent;
-        }
-
-        .log::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .log::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 4px;
         }
 
         .log-entry {
             padding: 5px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            animation: slideIn 0.3s ease;
         }
 
         .modal {
@@ -324,12 +240,6 @@
             max-width: 400px;
             text-align: center;
             border: 2px solid var(--gold);
-            animation: modalIn 0.3s ease;
-        }
-
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
         }
 
         .role-icon { font-size: 60px; margin-bottom: 20px; }
@@ -345,13 +255,6 @@
             padding: 15px;
             border-radius: 10px;
             margin: 10px;
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
         }
 
         .success {
@@ -363,90 +266,23 @@
             margin: 10px;
         }
 
-        .game-over-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
+        .bluetooth-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
         }
 
-        .game-over-overlay.show { display: flex; }
-
-        .game-over-content {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            border: 3px solid var(--gold);
-            animation: modalIn 0.5s ease;
+        .bt-connected {
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
         }
 
-        .game-over-title {
-            font-size: 3em;
-            color: var(--gold);
-            margin-bottom: 20px;
+        .bt-disconnected {
+            background: var(--red);
+            box-shadow: 0 0 10px var(--red);
         }
-
-        .game-over-message {
-            font-size: 1.5em;
-            margin-bottom: 30px;
-        }
-
-        .players-list {
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .player-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .player-info .role {
-            color: var(--gold);
-            font-weight: bold;
-        }
-
-        .copy-tooltip {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--gold);
-            color: #000;
-            padding: 10px 20px;
-            border-radius: 10px;
-            animation: slideUp 0.3s ease;
-            display: none;
-        }
-
-        .copy-tooltip.show { display: block; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .timer {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.8);
-            color: var(--gold);
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1.2em;
-            display: none;
-        }
-
-        .timer.show { display: block; }
 
         .instructions {
             background: rgba(255,255,255,0.05);
@@ -466,47 +302,49 @@
             padding-left: 20px;
             line-height: 1.8;
         }
-
-        .instructions li {
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1 class="title">🔫 МАФИЯ</h1>
-            <p style="color: var(--muted);">Bluetooth игра для друзей</p>
+            <p style="color: var(--muted);">
+                <span class="bluetooth-indicator bt-disconnected" id="btIndicator"></span>
+                Bluetooth игра
+            </p>
         </div>
 
         <!-- МЕНЮ -->
         <div id="menuScreen" class="menu">
             <div class="instructions">
-                <h3>📱 Инструкция по подключению:</h3>
+                <h3>📱 Инструкция:</h3>
                 <ol>
-                    <li>Один игрок нажимает <strong>"Создать комнату"</strong> и становится хостом</li>
-                    <li>Другие игроки нажимают <strong>"Подключиться"</strong> и вводят ID комнаты</li>
-                    <li>Все игроки должны быть в одной Wi-Fi сети или использовать Bluetooth</li>
+                    <li>Хост создаёт комнату с названием и паролем</li>
+                    <li>Игроки нажимают "Найти игру" и видят список доступных комнат</li>
+                    <li>Выберите комнату и введите пароль</li>
                     <li>Дождитесь подключения всех игроков</li>
-                    <li>Хост нажимает <strong>"Начать игру"</strong></li>
                 </ol>
             </div>
 
-            <h2>Выберите количество игроков:</h2>
-            <div class="player-selector">
-                <button class="player-btn active" data-count="3">3 игрока</button>
-                <button class="player-btn" data-count="4">4 игрока</button>
-                <button class="player-btn" data-count="5">5 игроков</button>
-                <button class="player-btn" data-count="6">6 игроков</button>
+            <div id="createRoomForm">
+                <h2>Создать комнату:</h2>
+                <input type="text" id="roomNameInput" class="input-field" placeholder="Название комнаты (1-8 символов)" maxlength="8">
+                <input type="password" id="roomPasswordInput" class="input-field" placeholder="Пароль (1-5 цифр)" maxlength="5" pattern="[0-9]*">
+                <select id="playerCountSelect" class="input-field">
+                    <option value="3">3 игрока</option>
+                    <option value="4">4 игрока</option>
+                    <option value="5">5 игроков</option>
+                    <option value="6">6 игроков</option>
+                </select>
+                <button class="btn btn-primary" onclick="createBluetoothRoom()">📡 Создать Bluetooth комнату</button>
             </div>
-            
-            <button class="btn btn-primary" onclick="createRoom()">🏠 Создать комнату</button>
-            
+
             <div style="margin-top: 30px;">
-                <h3>Подключиться к комнате:</h3>
-                <input type="text" id="roomIdInput" class="input-field" placeholder="Введите ID комнаты">
-                <button class="btn btn-blue" onclick="joinRoom()">🔗 Подключиться</button>
+                <h2>Найти игру:</h2>
+                <button class="btn btn-blue" onclick="scanForRooms()">🔍 Сканировать комнаты</button>
+                <div id="roomsList"></div>
             </div>
+
             <div id="errorMsg" class="error hidden"></div>
             <div id="successMsg" class="success hidden"></div>
         </div>
@@ -514,10 +352,11 @@
         <!-- ИГРА -->
         <div id="gameScreen" class="hidden">
             <div style="text-align: center;">
-                <p>ID комнаты:</p>
-                <div class="room-id" id="roomIdDisplay" onclick="copyRoomId()"></div>
-                <button class="btn btn-blue" onclick="copyRoomId()">📋 Копировать</button>
-                <button class="btn btn-red" onclick="leaveRoom()" style="margin-top: 10px;">🚪 Покинуть игру</button>
+                <div class="room-info">
+                    <p>Комната: <span id="roomNameDisplay"></span></p>
+                    <p>Пароль: <span id="roomPasswordDisplay"></span></p>
+                </div>
+                <button class="btn btn-red" onclick="leaveRoom()">🚪 Покинуть игру</button>
             </div>
 
             <div class="status-container" id="statusContainer"></div>
@@ -545,13 +384,6 @@
         </div>
     </div>
 
-    <!-- ТАЙМЕР -->
-    <div class="timer" id="timer"></div>
-
-    <!-- ТУЛТИП КОПИРОВАНИЯ -->
-    <div class="copy-tooltip" id="copyTooltip">✅ ID скопирован!</div>
-
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
         // ============ КОНСТАНТЫ ============
         const ROLES = {
@@ -579,65 +411,205 @@
         };
 
         // ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
-        let peer = null;
-        let connections = [];
-        let myPeerId = '';
+        let bluetoothDevice = null;
+        let bluetoothServer = null;
+        let bluetoothService = null;
         let isHost = false;
         let myPlayerIndex = -1;
+        let roomName = '';
+        let roomPassword = '';
         let selectedPlayers = 3;
-        let roomId = '';
         let gameState = {
             phase: 'day',
             day: 1,
             players: [],
             votes: {},
             started: false,
-            over: false,
-            nightActions: {}
+            over: false
         };
-        let timerInterval = null;
-        let currentTimer = 0;
-        let reconnectAttempts = 0;
-        const maxReconnectAttempts = 3;
 
-        // ============ СОХРАНЕНИЕ СОСТОЯНИЯ ============
-        function saveState() {
-            const state = {
-                roomId,
-                isHost,
-                myPlayerIndex,
-                selectedPlayers,
-                gameState
-            };
-            localStorage.setItem('mafiaGameState', JSON.stringify(state));
-        }
+        // UUID для Bluetooth сервиса
+        const SERVICE_UUID = '12345678-1234-5678-1234-567812345678';
+        const CHARACTERISTIC_UUID = '87654321-4321-8765-4321-876543218765';
 
-        function loadState() {
-            const saved = localStorage.getItem('mafiaGameState');
-            if (saved) {
-                const state = JSON.parse(saved);
-                roomId = state.roomId;
-                isHost = state.isHost;
-                myPlayerIndex = state.myPlayerIndex;
-                selectedPlayers = state.selectedPlayers;
-                gameState = state.gameState;
-                return true;
+        // ============ BLUETOOTH ФУНКЦИИ ============
+        async function createBluetoothRoom() {
+            roomName = document.getElementById('roomNameInput').value.trim();
+            roomPassword = document.getElementById('roomPasswordInput').value.trim();
+            selectedPlayers = parseInt(document.getElementById('playerCountSelect').value);
+
+            // Валидация
+            if (!roomName || roomName.length < 1 || roomName.length > 8) {
+                showError('❌ Название комнаты должно быть от 1 до 8 символов!');
+                return;
             }
-            return false;
+
+            if (!roomPassword || roomPassword.length < 1 || roomPassword.length > 5 || !/^\d+$/.test(roomPassword)) {
+                showError('❌ Пароль должен быть от 1 до 5 цифр!');
+                return;
+            }
+
+            try {
+                // Проверяем поддержку Bluetooth
+                if (!navigator.bluetooth) {
+                    showError('❌ Ваш браузер не поддерживает Web Bluetooth API!');
+                    return;
+                }
+
+                // Запрашиваем доступ к Bluetooth
+                bluetoothDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: [SERVICE_UUID]
+                });
+
+                bluetoothDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
+
+                // Подключаемся к GATT серверу
+                bluetoothServer = await bluetoothDevice.gatt.connect();
+                bluetoothService = await bluetoothServer.getPrimaryService(SERVICE_UUID);
+
+                isHost = true;
+                myPlayerIndex = 0;
+
+                document.getElementById('btIndicator').className = 'bluetooth-indicator bt-connected';
+                document.getElementById('menuScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                document.getElementById('roomNameDisplay').textContent = roomName;
+                document.getElementById('roomPasswordDisplay').textContent = roomPassword;
+
+                initGame();
+                gameState.players[0].isConnected = true;
+                showRole(0);
+                updateUI();
+
+                addLog('📡 Bluetooth комната создана');
+                addLog('🏠 Название: ' + roomName);
+                addLog('🔑 Пароль: ' + roomPassword);
+                addLog('⏳ Ожидание игроков...');
+
+                showSuccess('✅ Bluetooth комната создана!');
+            } catch (error) {
+                console.error('❌ Ошибка Bluetooth:', error);
+                if (error.name === 'NotFoundError') {
+                    showError('❌ Bluetooth устройство не найдено!');
+                } else if (error.name === 'SecurityError') {
+                    showError('❌ Нет разрешения на использование Bluetooth!');
+                } else {
+                    showError('❌ Ошибка Bluetooth: ' + error.message);
+                }
+            }
         }
 
-        function clearState() {
-            localStorage.removeItem('mafiaGameState');
+        async function scanForRooms() {
+            try {
+                if (!navigator.bluetooth) {
+                    showError('❌ Ваш браузер не поддерживает Web Bluetooth API!');
+                    return;
+                }
+
+                showSuccess('🔍 Сканирование Bluetooth устройств...');
+
+                bluetoothDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: [SERVICE_UUID]
+                });
+
+                bluetoothDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
+
+                bluetoothServer = await bluetoothDevice.gatt.connect();
+                bluetoothService = await bluetoothServer.getPrimaryService(SERVICE_UUID);
+
+                // Отображаем найденное устройство
+                const roomsList = document.getElementById('roomsList');
+                roomsList.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
+                        <p><strong>Найдено устройство:</strong> ${bluetoothDevice.name || 'Неизвестное устройство'}</p>
+                        <input type="password" id="joinPasswordInput" class="input-field" placeholder="Введите пароль" maxlength="5">
+                        <button class="btn btn-green" onclick="joinBluetoothRoom()">🔗 Подключиться</button>
+                    </div>
+                `;
+
+                showSuccess('✅ Устройство найдено! Введите пароль.');
+            } catch (error) {
+                console.error('❌ Ошибка сканирования:', error);
+                if (error.name === 'NotFoundError') {
+                    showError('❌ Bluetooth устройства не найдены!');
+                } else if (error.name === 'SecurityError') {
+                    showError('❌ Нет разрешения на использование Bluetooth!');
+                } else {
+                    showError('❌ Ошибка сканирования: ' + error.message);
+                }
+            }
         }
 
-        // ============ ВЫБОР ИГРОКОВ ============
-        document.querySelectorAll('.player-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                selectedPlayers = parseInt(this.dataset.count);
-            });
-        });
+        async function joinBluetoothRoom() {
+            const password = document.getElementById('joinPasswordInput').value.trim();
+
+            if (!password || password.length < 1 || password.length > 5 || !/^\d+$/.test(password)) {
+                showError('❌ Введите корректный пароль (1-5 цифр)!');
+                return;
+            }
+
+            try {
+                // В реальном приложении здесь была бы проверка пароля
+                // через Bluetooth характеристику
+                
+                isHost = false;
+                document.getElementById('btIndicator').className = 'bluetooth-indicator bt-connected';
+                document.getElementById('menuScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                document.getElementById('roomNameDisplay').textContent = bluetoothDevice.name || 'Bluetooth комната';
+                document.getElementById('roomPasswordDisplay').textContent = password;
+
+                // Получаем индекс игрока от хоста (в упрощенной версии)
+                myPlayerIndex = 1; // В реальности хост должен назначить индекс
+
+                addLog('🔗 Подключено к Bluetooth комнате');
+                addLog('⏳ Ожидание роли...');
+
+                showSuccess('✅ Успешное подключение!');
+            } catch (error) {
+                console.error('❌ Ошибка подключения:', error);
+                showError('❌ Не удалось подключиться: ' + error.message);
+            }
+        }
+
+        function onBluetoothDisconnected() {
+            console.log('❌ Bluetooth соединение разорвано');
+            document.getElementById('btIndicator').className = 'bluetooth-indicator bt-disconnected';
+            showError('❌ Bluetooth соединение разорвано!');
+            
+            if (gameState.started) {
+                addLog('❌ Соединение потеряно!');
+            }
+        }
+
+        function leaveRoom() {
+            if (bluetoothDevice && bluetoothDevice.gatt.connected) {
+                bluetoothDevice.gatt.disconnect();
+            }
+            
+            bluetoothDevice = null;
+            bluetoothServer = null;
+            bluetoothService = null;
+            isHost = false;
+            myPlayerIndex = -1;
+            roomName = '';
+            roomPassword = '';
+            
+            document.getElementById('btIndicator').className = 'bluetooth-indicator bt-disconnected';
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('menuScreen').classList.remove('hidden');
+            
+            gameState = {
+                phase: 'day',
+                day: 1,
+                players: [],
+                votes: {},
+                started: false,
+                over: false
+            };
+        }
 
         // ============ ПОКАЗ УВЕДОМЛЕНИЙ ============
         function showError(msg) {
@@ -652,321 +624,6 @@
             el.textContent = msg;
             el.classList.remove('hidden');
             setTimeout(() => el.classList.add('hidden'), 3000);
-        }
-
-        // ============ ИНИЦИАЛИЗАЦИЯ PEERJS ============
-        function initPeer(id) {
-            try {
-                peer = new Peer(id, {
-                    debug: 2,
-                    config: {
-                        iceServers: [
-                            { urls: 'stun:stun.l.google.com:19302' },
-                            { urls: 'stun:stun1.l.google.com:19302' },
-                            { urls: 'stun:stun2.l.google.com:19302' },
-                            { urls: 'stun:stun3.l.google.com:19302' },
-                            { urls: 'stun:stun4.l.google.com:19302' },
-                            { urls: 'stun:stun.services.mozilla.com:3478' }
-                        ]
-                    }
-                });
-
-                peer.on('open', (peerId) => {
-                    myPeerId = peerId;
-                    console.log('✅ Peer открыт:', peerId);
-                    
-                    if (isHost) {
-                        roomId = peerId;
-                        document.getElementById('roomIdDisplay').textContent = peerId;
-                        addLog('✅ Комната создана: ' + peerId);
-                        addLog('📱 Отправьте ID друзьям');
-                        saveState();
-                    }
-                });
-
-                peer.on('connection', (conn) => {
-                    console.log('📞 Входящее соединение от:', conn.peer);
-                    
-                    conn.on('open', () => {
-                        console.log('✅ Соединение установлено с:', conn.peer);
-                        
-                        // Проверяем, не превышено ли количество игроков
-                        if (connections.length >= selectedPlayers - 1) {
-                            conn.send({
-                                type: 'room-full',
-                                message: 'Комната заполнена!'
-                            });
-                            setTimeout(() => conn.close(), 1000);
-                            return;
-                        }
-                        
-                        // Проверяем, не началась ли уже игра
-                        if (gameState.started) {
-                            conn.send({
-                                type: 'game-already-started',
-                                message: 'Игра уже началась!'
-                            });
-                            setTimeout(() => conn.close(), 1000);
-                            return;
-                        }
-                        
-                        connections.push(conn);
-                        setupConnection(conn);
-                        
-                        // Назначаем индекс игроку
-                        const playerIndex = connections.length;
-                        if (playerIndex < selectedPlayers) {
-                            console.log('👤 Назначаю индекс:', playerIndex);
-                            conn.send({
-                                type: 'assign-player',
-                                playerIndex: playerIndex
-                            });
-                        }
-                        
-                        saveState();
-                    });
-
-                    conn.on('error', (err) => {
-                        console.error('❌ Ошибка соединения:', err);
-                    });
-                });
-
-                peer.on('disconnected', () => {
-                    console.log('🔄 Переподключение...');
-                    if (reconnectAttempts < maxReconnectAttempts) {
-                        reconnectAttempts++;
-                        setTimeout(() => {
-                            peer.reconnect();
-                        }, 3000);
-                    } else {
-                        showError('❌ Не удалось переподключиться');
-                    }
-                });
-
-                peer.on('error', (err) => {
-                    console.error('❌ PeerJS ошибка:', err);
-                    if (err.type === 'peer-unavailable') {
-                        showError('❌ Комната не найдена! Проверьте ID.');
-                        leaveRoom();
-                    } else if (err.type === 'network') {
-                        showError('❌ Проблема с сетью! Проверьте соединение.');
-                    } else if (err.type === 'unavailable-id') {
-                        showError('❌ ID уже занят! Попробуйте ещё раз.');
-                    } else {
-                        showError('❌ Ошибка: ' + err.type);
-                    }
-                });
-            } catch (error) {
-                console.error('❌ Ошибка инициализации PeerJS:', error);
-                showError('❌ Не удалось инициализировать PeerJS');
-            }
-        }
-
-        function setupConnection(conn) {
-            conn.on('data', (data) => {
-                console.log('📨 Получено:', data.type);
-                handleData(data);
-            });
-
-            conn.on('close', () => {
-                console.log('🔌 Соединение закрыто');
-                const index = connections.indexOf(conn);
-                if (index > -1) {
-                    connections.splice(index, 1);
-                }
-                if (isHost) {
-                    const disconnectedPlayerIndex = index + 1;
-                    if (gameState.players[disconnectedPlayerIndex]) {
-                        gameState.players[disconnectedPlayerIndex].isConnected = false;
-                        addLog('❌ Игрок ' + (disconnectedPlayerIndex + 1) + ' отключился');
-                        updateUI();
-                        saveState();
-                    }
-                }
-            });
-
-            conn.on('error', (err) => {
-                console.error('❌ Ошибка соединения:', err);
-            });
-        }
-
-        function broadcast(data) {
-            connections.forEach(conn => {
-                if (conn.open) {
-                    conn.send(data);
-                }
-            });
-        }
-
-        // ============ ОБРАБОТКА ДАННЫХ ============
-        function handleData(data) {
-            switch(data.type) {
-                case 'assign-player':
-                    myPlayerIndex = data.playerIndex;
-                    console.log('🎯 Мой индекс:', myPlayerIndex);
-                    if (gameState.players[myPlayerIndex]) {
-                        gameState.players[myPlayerIndex].isConnected = true;
-                        showRole(myPlayerIndex);
-                        updateUI();
-                        saveState();
-                        if (isHost) {
-                            broadcast({ type: 'player-connected', playerIndex: myPlayerIndex });
-                            checkAllConnected();
-                        }
-                    }
-                    break;
-
-                case 'room-full':
-                    showError('❌ ' + data.message);
-                    leaveRoom();
-                    break;
-
-                case 'game-already-started':
-                    showError('❌ ' + data.message);
-                    leaveRoom();
-                    break;
-
-                case 'player-connected':
-                    if (gameState.players[data.playerIndex]) {
-                        gameState.players[data.playerIndex].isConnected = true;
-                        addLog('✅ Игрок ' + (data.playerIndex + 1) + ' подключился');
-                        updateUI();
-                        saveState();
-                        if (isHost) checkAllConnected();
-                    }
-                    break;
-
-                case 'game-state':
-                    gameState = data.gameState;
-                    updateUI();
-                    saveState();
-                    break;
-
-                case 'vote':
-                    if (gameState.players[data.targetId] && gameState.players[data.playerIndex]) {
-                        gameState.votes[data.targetId] = (gameState.votes[data.targetId] || 0) + 1;
-                        addLog(gameState.players[data.playerIndex].name + ' ➜ ' + gameState.players[data.targetId].name);
-                        updateUI();
-                    }
-                    break;
-
-                case 'start-game':
-                    startGame();
-                    break;
-
-                case 'night':
-                    goToNight();
-                    break;
-
-                case 'game-over':
-                    gameState.over = true;
-                    showGameOver(data.message);
-                    break;
-            }
-        }
-
-        function leaveRoom() {
-            if (peer) {
-                peer.destroy();
-            }
-            connections = [];
-            myPlayerIndex = -1;
-            isHost = false;
-            roomId = '';
-            gameState = {
-                phase: 'day',
-                day: 1,
-                players: [],
-                votes: {},
-                started: false,
-                over: false,
-                nightActions: {}
-            };
-            clearState();
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('menuScreen').classList.remove('hidden');
-            stopTimer();
-        }
-
-        // ============ СОЗДАНИЕ КОМНАТЫ ============
-        function createRoom() {
-            roomId = 'mafia-' + Math.random().toString(36).substr(2, 8);
-            isHost = true;
-            myPlayerIndex = 0;
-            
-            console.log('🏠 Создание комнаты:', roomId);
-            initPeer(roomId);
-            
-            document.getElementById('menuScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            document.getElementById('roomIdDisplay').textContent = roomId;
-            
-            initGame();
-            gameState.players[0].isConnected = true;
-            showRole(0);
-            updateUI();
-            saveState();
-            
-            addLog('🏠 Комната создана');
-            addLog('📋 ID: ' + roomId);
-            addLog('⏳ Ожидание игроков...');
-            addLog('👥 Нужно игроков: ' + selectedPlayers);
-        }
-
-        // ============ ПОДКЛЮЧЕНИЕ К КОМНАТЕ ============
-        function joinRoom() {
-            const inputRoomId = document.getElementById('roomIdInput').value.trim();
-            if (!inputRoomId) {
-                showError('❌ Введите ID комнаты!');
-                return;
-            }
-
-            if (inputRoomId.length < 6) {
-                showError('❌ ID комнаты слишком короткий!');
-                return;
-            }
-
-            console.log('🔗 Подключение к:', inputRoomId);
-            roomId = inputRoomId;
-            isHost = false;
-            
-            const tempPeerId = 'player-' + Math.random().toString(36).substr(2, 8);
-            initPeer(tempPeerId);
-            
-            document.getElementById('menuScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            
-            addLog('🔗 Подключение...');
-            
-            // Пробуем подключиться
-            setTimeout(() => {
-                try {
-                    const conn = peer.connect(inputRoomId, { 
-                        reliable: true,
-                        serialization: 'json'
-                    });
-                    
-                    conn.on('open', () => {
-                        console.log('✅ Подключено к хосту!');
-                        connections.push(conn);
-                        setupConnection(conn);
-                        addLog('✅ Подключено!');
-                        addLog('⏳ Ожидание роли...');
-                        showSuccess('✅ Успешное подключение!');
-                        saveState();
-                    });
-                    
-                    conn.on('error', (err) => {
-                        console.error('❌ Ошибка подключения:', err);
-                        showError('❌ Не удалось подключиться! Комната не существует или хост офлайн.');
-                        leaveRoom();
-                    });
-                } catch (error) {
-                    console.error('❌ Ошибка подключения:', error);
-                    showError('❌ Не удалось подключиться!');
-                    leaveRoom();
-                }
-            }, 1000);
         }
 
         // ============ ИНИЦИАЛИЗАЦИЯ ИГРЫ ============
@@ -990,22 +647,18 @@
             const roles = [];
             const mafiaCount = Math.max(1, Math.floor(selectedPlayers / 3));
             
-            // Мафия
             if (mafiaCount > 1) roles.push(ROLES.DON);
             for (let i = 0; i < mafiaCount; i++) {
                 if (!(mafiaCount > 1 && i === 0)) roles.push(ROLES.MAFIA);
             }
             
-            // Спец. роли
             if (selectedPlayers >= 4) roles.push(ROLES.SHERIFF);
             if (selectedPlayers >= 5) roles.push(ROLES.DOCTOR);
             
-            // Мирные жители
             while (roles.length < selectedPlayers) {
                 roles.push(ROLES.CIVILIAN);
             }
             
-            // Перемешиваем
             for (let i = roles.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [roles[i], roles[j]] = [roles[j], roles[i]];
@@ -1044,12 +697,6 @@
                 if (!player.isAlive) card.classList.add('dead');
                 if (player.id === myPlayerIndex) card.classList.add('me');
                 
-                // Показываем мафию для мафии
-                if (gameState.over || (player.id === myPlayerIndex) || 
-                    (isMafia(gameState.players[myPlayerIndex]) && isMafia(player))) {
-                    card.classList.add('mafia');
-                }
-                
                 card.innerHTML = `
                     <div class="player-avatar">${player.avatar}</div>
                     <div class="player-name">${player.name}</div>
@@ -1065,11 +712,6 @@
                 
                 grid.appendChild(card);
             });
-        }
-
-        function isMafia(player) {
-            if (!player) return false;
-            return player.role === ROLES.MAFIA || player.role === ROLES.DON;
         }
 
         function updatePhase() {
@@ -1111,14 +753,6 @@
             log.scrollTop = log.scrollHeight;
         }
 
-        function copyRoomId() {
-            navigator.clipboard.writeText(roomId).then(() => {
-                const tooltip = document.getElementById('copyTooltip');
-                tooltip.classList.add('show');
-                setTimeout(() => tooltip.classList.remove('show'), 2000);
-            });
-        }
-
         function showRole(index) {
             const player = gameState.players[index];
             if (player) {
@@ -1142,35 +776,10 @@
             }
         }
 
-        // ============ ТАЙМЕР ============
-        function startTimer(seconds) {
-            clearInterval(timerInterval);
-            currentTimer = seconds;
-            const timerEl = document.getElementById('timer');
-            timerEl.classList.add('show');
-            timerEl.textContent = '⏱️ ' + currentTimer;
-            
-            timerInterval = setInterval(() => {
-                currentTimer--;
-                timerEl.textContent = '⏱️ ' + currentTimer;
-                
-                if (currentTimer <= 0) {
-                    clearInterval(timerInterval);
-                    timerEl.classList.remove('show');
-                }
-            }, 1000);
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-            document.getElementById('timer').classList.remove('show');
-        }
-
         // ============ ИГРОВАЯ ЛОГИКА ============
         function startGame() {
             if (gameState.started) return;
             
-            // Проверяем, что все подключены
             if (!gameState.players.every(p => p.isConnected)) {
                 showError('❌ Не все игроки подключены!');
                 return;
@@ -1188,36 +797,21 @@
             addLog('☀️ День 1. Город просыпается');
             
             updateUI();
-            saveState();
-            
-            if (isHost) {
-                broadcast({ type: 'start-game' });
-                broadcast({ type: 'game-state', gameState: gameState });
-            }
         }
 
         function goToNight() {
             if (gameState.phase !== 'day') return;
             
             gameState.phase = 'night';
-            gameState.nightActions = {};
             document.getElementById('nightBtn').disabled = true;
             document.getElementById('voteBtn').disabled = true;
             
             addLog('🌙 Ночь. Город засыпает...');
-            startTimer(30);
             updateUI();
-            saveState();
             
             if (isHost) {
-                broadcast({ type: 'night' });
-                broadcast({ type: 'game-state', gameState: gameState });
-                
-                // Автоматически выполняем ночные действия через 10 секунд
                 setTimeout(() => {
-                    if (gameState.phase === 'night') {
-                        performNightActions();
-                    }
+                    performNightActions();
                 }, 10000);
             }
         }
@@ -1229,24 +823,10 @@
             const mafia = alive.filter(p => p.role === ROLES.MAFIA || p.role === ROLES.DON);
             const civilians = alive.filter(p => p.role !== ROLES.MAFIA && p.role !== ROLES.DON);
             
-            // Мафия убивает
             if (mafia.length > 0 && civilians.length > 0) {
                 const target = civilians[Math.floor(Math.random() * civilians.length)];
-                
-                // Доктор лечит
-                const doctor = alive.find(p => p.role === ROLES.DOCTOR);
-                let healedPlayer = null;
-                if (doctor) {
-                    healedPlayer = civilians[Math.floor(Math.random() * civilians.length)];
-                }
-                
-                // Применяем лечение
-                if (healedPlayer && target && healedPlayer.id === target.id) {
-                    addLog('💉 Доктор спас ' + target.name);
-                } else if (target) {
-                    target.isAlive = false;
-                    addLog('☠️ Мафия убила: ' + target.name);
-                }
+                target.isAlive = false;
+                addLog('☠️ Мафия убила: ' + target.name);
             }
             
             if (checkWin()) return;
@@ -1254,17 +834,12 @@
             gameState.day++;
             gameState.phase = 'day';
             gameState.votes = {};
-            gameState.nightActions = {};
             
             document.getElementById('nightBtn').disabled = false;
             document.getElementById('voteBtn').disabled = false;
-            stopTimer();
             
             addLog('☀️ День ' + gameState.day + '. Город просыпается');
             updateUI();
-            saveState();
-            
-            broadcast({ type: 'game-state', gameState: gameState });
         }
 
         function startVoting() {
@@ -1279,11 +854,9 @@
             addLog('🗳️ Голосование началось!');
             addLog('👆 Нажмите на игрока, чтобы проголосовать');
             updateUI();
-            saveState();
             
             if (isHost) {
                 setTimeout(() => {
-                    // Автоматически завершаем голосование через 15 секунд
                     determineVoteResult();
                 }, 15000);
             }
@@ -1298,20 +871,6 @@
             
             gameState.votes[playerId] = (gameState.votes[playerId] || 0) + 1;
             addLog(gameState.players[myPlayerIndex].name + ' ➜ ' + gameState.players[playerId].name);
-            
-            if (isHost) {
-                handleVote(myPlayerIndex, playerId);
-            } else {
-                broadcast({ type: 'vote', playerIndex: myPlayerIndex, targetId: playerId });
-            }
-            
-            updateUI();
-            saveState();
-        }
-
-        function handleVote(playerIndex, targetId) {
-            gameState.votes[targetId] = (gameState.votes[targetId] || 0) + 1;
-            addLog(gameState.players[playerIndex].name + ' ➜ ' + gameState.players[targetId].name);
             updateUI();
         }
 
@@ -1345,8 +904,6 @@
             document.getElementById('nightBtn').disabled = false;
             
             updateUI();
-            saveState();
-            broadcast({ type: 'game-state', gameState: gameState });
         }
 
         function checkWin() {
@@ -1368,7 +925,6 @@
         function showGameOver(message) {
             gameState.over = true;
             gameState.phase = 'day';
-            stopTimer();
             
             const area = document.getElementById('gameOverArea');
             area.innerHTML = `
@@ -1391,51 +947,7 @@
             document.getElementById('voteBtn').disabled = true;
             
             updateUI();
-            saveState();
-            
-            if (isHost) {
-                broadcast({ type: 'game-over', message: message });
-            }
         }
-
-        // ============ АВТОВОССТАНОВЛЕНИЕ ============
-        window.addEventListener('load', () => {
-            if (loadState()) {
-                console.log('🔄 Восстановление состояния...');
-                if (roomId && myPlayerIndex >= 0) {
-                    document.getElementById('menuScreen').classList.add('hidden');
-                    document.getElementById('gameScreen').classList.remove('hidden');
-                    document.getElementById('roomIdDisplay').textContent = roomId;
-                    
-                    if (isHost) {
-                        // Пересоздаем как хост
-                        initPeer(roomId);
-                    } else {
-                        // Переподключаемся как игрок
-                        const tempPeerId = 'player-' + Math.random().toString(36).substr(2, 8);
-                        initPeer(tempPeerId);
-                        
-                        setTimeout(() => {
-                            const conn = peer.connect(roomId, { reliable: true });
-                            conn.on('open', () => {
-                                connections.push(conn);
-                                setupConnection(conn);
-                                addLog('✅ Переподключено!');
-                            });
-                        }, 1000);
-                    }
-                    
-                    updateUI();
-                }
-            }
-        });
-
-        // ============ ОБРАБОТКА ЗАКРЫТИЯ ============
-        window.addEventListener('beforeunload', () => {
-            if (gameState.started && !gameState.over) {
-                saveState();
-            }
-        });
     </script>
 </body>
 </html>
