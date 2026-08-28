@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Шпион — Быстрая игра</title>
+    <title>Шпион — Мега версия</title>
     <style>
         * {
             box-sizing: border-box;
-            user-select: none; /* Чтобы нельзя было случайно выделить текст */
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
             font-family: 'Arial', sans-serif;
         }
@@ -33,7 +33,7 @@
         }
         h1 {
             margin: 0 0 8px;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             letter-spacing: 2px;
             color: #e94560;
             text-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
@@ -153,12 +153,12 @@
         <!-- ЭКРАН 1: ВЫБОР КОЛИЧЕСТВА ИГРОКОВ -->
         <div id="screen-select">
             <h1>🕵️ ШПИОН</h1>
-            <p class="subtitle">Игра на вечеринку</p>
+            <p class="subtitle">Мега версия • 100+ локаций</p>
             <div class="step-title">На сколько человек играем?</div>
             <div class="btn-grid" id="player-select">
                 <!-- Кнопки добавятся из JS -->
             </div>
-            <div class="info-text">Минимум 2, максимум 10</div>
+            <div class="info-text">Минимум 3, максимум 10</div>
         </div>
 
         <!-- ЭКРАН 2: ПЕРЕДАЧА ТЕЛЕФОНА И ПОКАЗ РОЛИ -->
@@ -182,26 +182,187 @@
 
     <script>
         (function(){
-            // --- НАСТРОЙКИ ИГРЫ ---
-            // Слова подобраны так, чтобы было похоже и не сразу понятно
+            // ================== БОЛЬШАЯ БАЗА СЛОВ ==================
+            // civilian - слово для мирных, spy - слово для шпиона
             const WORD_PAIRS = [
+                // --- ЕДА И НАПИТКИ ---
                 { civilian: "Арбуз", spy: "Дыня" },
-                { civilian: "Банан", spy: "Клубника" }, // Твой пример
+                { civilian: "Банан", spy: "Клубника" },
+                { civilian: "Яблоко", spy: "Груша" },
+                { civilian: "Апельсин", spy: "Мандарин" },
                 { civilian: "Кофе", spy: "Чай" },
-                { civilian: "Спанч Боб", spy: "Патрик" }, // Твой пример с мультиком
                 { civilian: "Пицца", spy: "Бургер" },
-                { civilian: "Такси", spy: "Автобус" },
-                { civilian: "Лето", spy: "Весна" },
+                { civilian: "Суп", spy: "Борщ" },
+                { civilian: "Пельмени", spy: "Вареники" },
+                { civilian: "Шашлык", spy: "Барбекю" },
+                { civilian: "Сыр", spy: "Масло" },
+                { civilian: "Хлеб", spy: "Батон" },
+                { civilian: "Молоко", spy: "Кефир" },
+                { civilian: "Шоколад", spy: "Конфета" },
+                { civilian: "Мороженое", spy: "Йогурт" },
+                { civilian: "Сок", spy: "Компот" },
+                { civilian: "Торт", spy: "Пирожное" },
+                { civilian: "Салат", spy: "Овощи" },
+                { civilian: "Рыба", spy: "Креветка" },
+                { civilian: "Курица", spy: "Индейка" },
+                { civilian: "Яйцо", spy: "Омлет" },
+                { civilian: "Мёд", spy: "Варенье" },
+                { civilian: "Каша", spy: "Пюре" },
+                { civilian: "Водка", spy: "Коньяк" },
+                { civilian: "Пиво", spy: "Квас" },
+                { civilian: "Лимон", spy: "Лайм" },
+                { civilian: "Огурец", spy: "Кабачок" },
+                { civilian: "Помидор", spy: "Перец" },
+                { civilian: "Гриб", spy: "Трюфель" },
+                
+                // --- ЖИВОТНЫЕ ---
                 { civilian: "Собака", spy: "Кошка" },
+                { civilian: "Лев", spy: "Тигр" },
+                { civilian: "Волк", spy: "Лиса" },
+                { civilian: "Заяц", spy: "Кролик" },
+                { civilian: "Орёл", spy: "Ястреб" },
+                { civilian: "Пчела", spy: "Оса" },
+                { civilian: "Дельфин", spy: "Кит" },
+                { civilian: "Мышь", spy: "Крыса" },
+                { civilian: "Лошадь", spy: "Пони" },
+                { civilian: "Корова", spy: "Бык" },
+                { civilian: "Змея", spy: "Ящерица" },
+                { civilian: "Жираф", spy: "Слон" },
+                { civilian: "Крокодил", spy: "Аллигатор" },
+                { civilian: "Пингвин", spy: "Тюлень" },
+                { civilian: "Свинья", spy: "Кабан" },
+                { civilian: "Коза", spy: "Баран" },
+                { civilian: "Утка", spy: "Гусь" },
+                { civilian: "Воробей", spy: "Синица" },
+
+                // --- ТРАНСПОРТ ---
+                { civilian: "Такси", spy: "Автобус" },
+                { civilian: "Машина", spy: "Мотоцикл" },
+                { civilian: "Самолёт", spy: "Вертолёт" },
+                { civilian: "Поезд", spy: "Электричка" },
+                { civilian: "Велосипед", spy: "Самокат" },
+                { civilian: "Корабль", spy: "Лодка" },
+                { civilian: "Трамвай", spy: "Троллейбус" },
+                { civilian: "Грузовик", spy: "Трактор" },
+                { civilian: "Метро", spy: "Подземка" },
+                { civilian: "Паром", spy: "Яхта" },
+
+                // --- ОДЕЖДА И АКСЕССУАРЫ ---
+                { civilian: "Джинсы", spy: "Шорты" },
+                { civilian: "Кроссовки", spy: "Кеды" },
+                { civilian: "Шапка", spy: "Кепка" },
+                { civilian: "Куртка", spy: "Пальто" },
+                { civilian: "Свитер", spy: "Кофта" },
+                { civilian: "Ботинки", spy: "Сапоги" },
+                { civilian: "Часы", spy: "Браслет" },
+                { civilian: "Очки", spy: "Линзы" },
+                { civilian: "Футболка", spy: "Рубашка" },
+                { civilian: "Носки", spy: "Колготки" },
+
+                // --- ПРИРОДА И МИР ---
+                { civilian: "Цветок", spy: "Дерево" },
+                { civilian: "Небо", spy: "Космос" },
+                { civilian: "Море", spy: "Океан" },
+                { civilian: "Лес", spy: "Парк" },
+                { civilian: "Гора", spy: "Холм" },
+                { civilian: "Река", spy: "Ручей" },
+                { civilian: "Озеро", spy: "Пруд" },
+                { civilian: "Солнце", spy: "Луна" },
+                { civilian: "Звезда", spy: "Планета" },
+                { civilian: "Снег", spy: "Лёд" },
+                { civilian: "Дождь", spy: "Град" },
+                { civilian: "Ветер", spy: "Ураган" },
+                { civilian: "Радуга", spy: "Мираж" },
+                { civilian: "Вулкан", spy: "Гейзер" },
+                { civilian: "Пещера", spy: "Тоннель" },
+                { civilian: "Пустыня", spy: "Пляж" },
+                { civilian: "Остров", spy: "Полуостров" },
+
+                // --- ГОРОД И МЕСТА ---
+                { civilian: "Ресторан", spy: "Кафе" },
+                { civilian: "Больница", spy: "Аптека" },
+                { civilian: "Школа", spy: "Университет" },
                 { civilian: "Кинотеатр", spy: "Театр" },
-                { civilian: "Йога", spy: "Пилатес" }
+                { civilian: "Музей", spy: "Выставка" },
+                { civilian: "Библиотека", spy: "Книжный магазин" },
+                { civilian: "Аэропорт", spy: "Вокзал" },
+                { civilian: "Банк", spy: "Обменник" },
+                { civilian: "Полиция", spy: "Суд" },
+                { civilian: "Зоопарк", spy: "Цирк" },
+                { civilian: "Парк", spy: "Сад" },
+                { civilian: "Стадион", spy: "Спортзал" },
+                { civilian: "Тюрьма", spy: "Казарма" },
+                { civilian: "Отель", spy: "Хостел" },
+
+                // --- РАЗВЛЕЧЕНИЯ И ХОББИ ---
+                { civilian: "Йога", spy: "Пилатес" },
+                { civilian: "Футбол", spy: "Баскетбол" },
+                { civilian: "Теннис", spy: "Бадминтон" },
+                { civilian: "Шахматы", spy: "Шашки" },
+                { civilian: "Рыбалка", spy: "Охота" },
+                { civilian: "Караоке", spy: "Концерт" },
+                { civilian: "Плавание", spy: "Дайвинг" },
+                { civilian: "Гитара", spy: "Скрипка" },
+                { civilian: "Рисование", spy: "Фотография" },
+                { civilian: "Танцы", spy: "Балет" },
+
+                // --- ПРОФЕССИИ ---
+                { civilian: "Врач", spy: "Ветеринар" },
+                { civilian: "Повар", spy: "Кондитер" },
+                { civilian: "Полицейский", spy: "Пожарный" },
+                { civilian: "Учитель", spy: "Профессор" },
+                { civilian: "Пилот", spy: "Стюардесса" },
+                { civilian: "Программист", spy: "Хакер" },
+                { civilian: "Фермер", spy: "Садовник" },
+                { civilian: "Строитель", spy: "Архитектор" },
+
+                // --- ТЕХНИКА ---
+                { civilian: "Телефон", spy: "Планшет" },
+                { civilian: "Компьютер", spy: "Ноутбук" },
+                { civilian: "Телевизор", spy: "Монитор" },
+                { civilian: "Наушники", spy: "Колонка" },
+                { civilian: "Холодильник", spy: "Морозилка" },
+                { civilian: "Пылесос", spy: "Веник" },
+                { civilian: "Микроволновка", spy: "Духовка" },
+                { civilian: "Фен", spy: "Плойка" },
+
+                // --- РАЗНОЕ ---
+                { civilian: "Деньги", spy: "Банковская карта" },
+                { civilian: "Книга", spy: "Журнал" },
+                { civilian: "Зеркало", spy: "Окно" },
+                { civilian: "Ключ", spy: "Замок" },
+                { civilian: "Зонт", spy: "Плащ" },
+                { civilian: "Подушка", spy: "Одеяло" },
+                { civilian: "Зубная паста", spy: "Мыло" },
+                { civilian: "Духи", spy: "Дезодорант" },
+                { civilian: "Рюкзак", spy: "Сумка" },
+                { civilian: "Подарок", spy: "Сюрприз" },
+                { civilian: "Свеча", spy: "Лампа" },
+                { civilian: "Бумага", spy: "Картон" },
+                { civilian: "Ножницы", spy: "Нож" },
+                { civilian: "Молоток", spy: "Отвёртка" },
+                { civilian: "Колесо", spy: "Руль" },
+                { civilian: "Лестница", spy: "Эскалатор" },
+
+                // --- МУЛЬТФИЛЬМЫ И ИГРЫ ---
+                { civilian: "Спанч Боб", spy: "Патрик" },
+                { civilian: "Микки Маус", spy: "Дональд Дак" },
+                { civilian: "Бэтмен", spy: "Супермен" },
+                { civilian: "Марио", spy: "Луиджи" },
+                { civilian: "Покемон", spy: "Дигимон" },
+                { civilian: "Шрек", spy: "Фиона" },
+                { civilian: "Мстители", spy: "Лига Справедливости" },
+                { civilian: "Гарри Поттер", spy: "Рон Уизли" }
             ];
 
             // --- СОСТОЯНИЕ ---
             let totalPlayers = 3;
-            let currentPlayerIndex = 0; // 0-based
+            let currentPlayerIndex = 0;
             let currentPair = null;
             let spyIndex = -1;
+            
+            // Флаг, чтобы одна и та же пара не выпадала два раза подряд (опционально)
+            let lastPairIndex = -1;
 
             // --- ЭЛЕМЕНТЫ ---
             const screenSelect = document.getElementById('screen-select');
@@ -219,16 +380,14 @@
 
             // --- ФУНКЦИИ ---
             function showScreen(screen) {
-                // Скрыть все
                 [screenSelect, screenRole, screenStart].forEach(s => s.classList.add('hidden'));
-                // Показать нужный
                 screen.classList.remove('hidden');
             }
 
             function initPlayerButtons() {
                 playerSelectDiv.innerHTML = '';
-                // Кнопки 2-10
-                for (let i = 2; i <= 10; i++) {
+                // Минимум 3 игрока, максимум 10
+                for (let i = 3; i <= 10; i++) {
                     const btn = document.createElement('button');
                     btn.textContent = i;
                     btn.addEventListener('click', () => {
@@ -239,17 +398,20 @@
                 }
             }
 
-            // Выбор случайной пары слов и назначение шпиона
             function startRoleAssignment() {
-                // Сброс
                 currentPlayerIndex = 0;
-                // Выбрать случайную пару
-                const randomPairIndex = Math.floor(Math.random() * WORD_PAIRS.length);
+                // Выбираем случайную пару, но не такую же, как в прошлый раз (если это возможно)
+                let randomPairIndex;
+                do {
+                    randomPairIndex = Math.floor(Math.random() * WORD_PAIRS.length);
+                } while (randomPairIndex === lastPairIndex && WORD_PAIRS.length > 1);
+                
+                lastPairIndex = randomPairIndex;
                 currentPair = WORD_PAIRS[randomPairIndex];
-                // Выбрать случайного шпиона (0..totalPlayers-1)
+                
+                // Выбираем случайного шпиона (0..totalPlayers-1)
                 spyIndex = Math.floor(Math.random() * totalPlayers);
                 
-                // Переключиться на экран ролей
                 showScreen(screenRole);
                 updateRoleScreen();
             }
@@ -259,48 +421,36 @@
                 const isLastPlayer = currentPlayerIndex === totalPlayers - 1;
                 const isSpy = currentPlayerIndex === spyIndex;
                 
-                // Шапка: "Игрок X"
                 playerHeader.textContent = `Игрок ${playerNum}`;
                 
-                // Если шпион, показываем его слово, иначе гражданского
                 if (isSpy) {
                     roleDisplay.textContent = currentPair.spy;
                     roleDisplay.classList.add('spy');
-                    // Небольшая подсказка, чтобы шпион знал, что он шпион (но не выдавал себя)
-                    // В реальной игре лучше просто показать слово без явной надписи "ШПИОН", чтобы никто не увидел.
-                    // Но можно сделать иначе: просто слово, а игрок сам догадается при обсуждении.
-                    // Для удобства оставим слово, а для теста можно убрать класс 'spy', если не хочешь выделять.
                 } else {
                     roleDisplay.textContent = currentPair.civilian;
                     roleDisplay.classList.remove('spy');
                 }
                 
-                // Сообщение о передаче
                 if (isLastPlayer) {
                     passMessage.textContent = "✅ Все посмотрели!";
                     nextPlayerBtn.textContent = "🏁 Начать игру";
-                    nextPlayerBtn.classList.add('primary');
                 } else {
                     passMessage.textContent = `📱 Передай телефон Игроку ${playerNum + 1}`;
                     nextPlayerBtn.textContent = "👁️ Скрыть и передать";
                 }
                 
-                // Обработчик кнопки "Следующий"
-                // Сначала удалим старый обработчик, чтобы не дублировался
+                // Убираем старый обработчик
                 nextPlayerBtn.onclick = () => {
                     if (currentPlayerIndex < totalPlayers - 1) {
-                        // Переход к следующему игроку
                         currentPlayerIndex++;
                         updateRoleScreen();
                     } else {
-                        // Это был последний игрок -> Завершаем раздачу
                         showStartScreen();
                     }
                 };
             }
 
             function showStartScreen() {
-                // Показать слова (чтобы ведущий видел, но в реальной игре можно не показывать)
                 finalWords.innerHTML = `
                     <div>🔵 Мирные: <b>${currentPair.civilian}</b></div>
                     <div>🔴 Шпион: <b>${currentPair.spy}</b> (игрок №${spyIndex + 1})</div>
@@ -312,14 +462,12 @@
                 showScreen(screenSelect);
             }
 
-            // --- ИНИЦИАЛИЗАЦИЯ ---
+            // --- ЗАПУСК ---
             initPlayerButtons();
-
-            // Кнопки возврата в меню
+            
             restartFromRole.addEventListener('click', resetToMenu);
             restartFromStart.addEventListener('click', resetToMenu);
-
-            // Показ стартового экрана
+            
             showScreen(screenSelect);
         })();
     </script>
