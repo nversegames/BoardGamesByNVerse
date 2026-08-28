@@ -59,9 +59,7 @@
             100% { text-shadow: 0 0 20px rgba(226, 183, 20, 0.5); }
         }
 
-        .menu {
-            text-align: center;
-        }
+        .menu { text-align: center; }
 
         .btn {
             padding: 15px 30px;
@@ -81,9 +79,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        .btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
+        .btn:active:not(:disabled) { transform: translateY(0); }
 
         .btn-primary { background: var(--gold); color: #000; }
         .btn-blue { background: var(--blue); color: #fff; }
@@ -424,52 +420,9 @@
             min-width: 120px;
         }
 
-        .role-card .avatar {
-            font-size: 30px;
-        }
-
-        .role-card .name {
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        .role-card .role {
-            color: var(--muted);
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .timer-bar {
-            height: 5px;
-            background: #333;
-            border-radius: 5px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .timer-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--gold), var(--red));
-            transition: width 1s linear;
-        }
-
-        .player-details {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--card);
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid var(--gold);
-            z-index: 100;
-            display: none;
-        }
-
-        .player-details.show {
-            display: block;
-            animation: modalIn 0.3s;
-        }
+        .role-card .avatar { font-size: 30px; }
+        .role-card .name { font-weight: bold; margin-top: 5px; }
+        .role-card .role { color: var(--muted); font-size: 12px; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -487,44 +440,29 @@
             <div class="instructions">
                 <h3>📱 Как играть:</h3>
                 <ol>
-                    <li>Хост создаёт комнату с названием и паролем</li>
-                    <li>Игроки нажимают "Найти игру" и видят список доступных комнат</li>
-                    <li>Выберите комнату и введите пароль</li>
-                    <li>Дождитесь подключения всех игроков</li>
+                    <li>Один игрок нажимает "Создать комнату" (становится хостом)</li>
+                    <li>Другие игроки нажимают "Найти игру" и подключаются</li>
+                    <li>Хост принимает подключения и раздает роли</li>
+                    <li>Игра начинается когда все игроки подключились</li>
                 </ol>
             </div>
 
             <div id="createRoomForm">
-                <h2>Создать комнату:</h2>
-                <input type="text" id="roomNameInput" class="input-field" placeholder="Название комнаты (1-8 символов)" maxlength="8">
-                <input type="password" id="roomPasswordInput" class="input-field" placeholder="Пароль (1-5 цифр)" maxlength="5" pattern="[0-9]*">
+                <h2>🎮 Создать комнату:</h2>
+                <input type="text" id="playerNameInput" class="input-field" placeholder="Ваше имя" maxlength="10">
                 <select id="playerCountSelect" class="input-field">
                     <option value="3">3 игрока</option>
                     <option value="4">4 игрока</option>
                     <option value="5">5 игроков</option>
                     <option value="6">6 игроков</option>
-                    <option value="7">7 игроков</option>
-                    <option value="8">8 игроков</option>
-                    <option value="9">9 игроков</option>
-                    <option value="10">10 игроков</option>
                 </select>
-                <div>
-                    <label>
-                        <input type="checkbox" id="enableSpectatorMode"> Режим наблюдателя
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <input type="checkbox" id="enableTimer" checked> Таймер на ходы
-                    </label>
-                </div>
-                <button class="btn btn-primary" onclick="createBluetoothRoom()">📡 Создать Bluetooth комнату</button>
+                <button class="btn btn-primary" onclick="createRoom()">📡 Создать комнату</button>
             </div>
 
             <div style="margin-top: 30px;">
-                <h2>Найти игру:</h2>
-                <button class="btn btn-blue" onclick="scanForRooms()">🔍 Сканировать комнаты</button>
-                <div id="roomsList"></div>
+                <h2>🔍 Присоединиться:</h2>
+                <button class="btn btn-blue" onclick="findGame()">🔍 Найти игру</button>
+                <div id="gamesList"></div>
             </div>
 
             <div id="errorMsg" class="error hidden"></div>
@@ -535,29 +473,20 @@
         <div id="gameScreen" class="hidden">
             <div style="text-align: center;">
                 <div class="room-info">
-                    <p>Комната: <span id="roomNameDisplay"></span></p>
-                    <p>Пароль: <span id="roomPasswordDisplay"></span></p>
+                    <p>Игрок: <span id="playerNameDisplay"></span></p>
                     <p>Игроки: <span id="playerCountDisplay"></span></p>
                 </div>
-                <button class="btn btn-red" onclick="leaveRoom()">🚪 Покинуть игру</button>
+                <button class="btn btn-red" onclick="leaveGame()">🚪 Выйти</button>
             </div>
 
             <div class="status-container" id="statusContainer"></div>
-            <div id="timerContainer" class="hidden">
-                <div class="timer" id="timerDisplay">30</div>
-                <div class="timer-bar">
-                    <div class="timer-bar-fill" id="timerBarFill"></div>
-                </div>
-            </div>
             <div id="phaseBanner" class="phase-banner phase-day">☀️ ДЕНЬ 1</div>
             <div class="players-grid" id="playersGrid"></div>
 
-            <div class="actions" id="gameActions">
-                <button class="btn btn-primary" id="startBtn" onclick="startGame()" disabled>🎮 Начать</button>
+            <div class="actions">
+                <button class="btn btn-primary" id="startBtn" onclick="startGame()" disabled>🎮 Начать игру</button>
                 <button class="btn btn-green" id="nightBtn" onclick="goToNight()" disabled>🌙 Ночь</button>
                 <button class="btn btn-blue" id="voteBtn" onclick="startVoting()" disabled>🗳️ Голосование</button>
-                <button class="btn btn-purple" id="spectateBtn" onclick="toggleSpectate()" disabled>👁️ Наблюдать</button>
-                <button class="btn btn-orange" id="muteBtn" onclick="toggleMute()">🔊 Звук</button>
             </div>
 
             <div class="log" id="gameLog"></div>
@@ -575,15 +504,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ВЫБОРА ДЕЙСТВИЯ -->
-    <div class="modal" id="actionModal">
-        <div class="modal-content">
-            <h2 id="actionTitle">Выберите действие</h2>
-            <div id="actionPlayers"></div>
-            <button class="btn btn-red" onclick="closeActionModal()" style="margin-top: 20px;">Отмена</button>
-        </div>
-    </div>
-
     <script>
         // ============ КОНСТАНТЫ ============
         const ROLES = {
@@ -591,7 +511,6 @@
             DON: 'Дон',
             SHERIFF: 'Шериф',
             DOCTOR: 'Доктор',
-            MANIAC: 'Маньяк',
             CIVILIAN: 'Мирный житель'
         };
 
@@ -600,26 +519,15 @@
             'Дон': '👑',
             'Шериф': '🔍',
             'Доктор': '💉',
-            'Маньяк': '🔪',
             'Мирный житель': '👤'
         };
 
         const ROLE_DESC = {
             'Мафия': 'Вы - мафия. Ночью убивайте мирных жителей.',
-            'Дон': 'Вы - дон мафии. Руководите мафией. Можете проверять игроков.',
+            'Дон': 'Вы - дон мафии. Руководите мафией.',
             'Шериф': 'Вы - шериф. Ночью проверяйте игроков.',
             'Доктор': 'Вы - доктор. Ночью лечите игроков.',
-            'Маньяк': 'Вы - маньяк. Убивайте всех по одиночке.',
             'Мирный житель': 'Вы - мирный житель. Найдите мафию.'
-        };
-
-        const ROLE_TEAM = {
-            'Мафия': 'red',
-            'Дон': 'red',
-            'Шериф': 'blue',
-            'Доктор': 'blue',
-            'Маньяк': 'neutral',
-            'Мирный житель': 'blue'
         };
 
         // UUID для Bluetooth сервиса
@@ -632,106 +540,32 @@
         let bluetoothService = null;
         let bluetoothCharacteristic = null;
         let isHost = false;
-        let myPlayerIndex = -1;
-        let roomName = '';
-        let roomPassword = '';
+        let myPlayerIndex = 0;
+        let myPlayerName = '';
         let selectedPlayers = 3;
-        let spectatorMode = false;
-        let timerEnabled = true;
-        let soundEnabled = true;
-        let currentTimer = null;
-        let nightActions = {};
-        let doctorHealTarget = null;
-        let sheriffCheckTarget = null;
-        let donCheckTarget = null;
-        let maniacKillTarget = null;
-        let mafiaKillTarget = null;
-
+        let connectedPlayers = [];
+        
         let gameState = {
             phase: 'day',
             day: 1,
             players: [],
             votes: {},
             started: false,
-            over: false,
-            nightActions: {},
-            healTarget: null,
-            checkTarget: null
+            over: false
         };
 
-        // ============ ЗВУКОВЫЕ ЭФФЕКТЫ ============
-        const sounds = {
-            day: createSound('day'),
-            night: createSound('night'),
-            kill: createSound('kill'),
-            vote: createSound('vote'),
-            win: createSound('win'),
-            lose: createSound('lose')
-        };
-
-        function createSound(type) {
-            const audio = new Audio();
-            audio.src = `data:audio/wav;base64,${getSoundData(type)}`;
-            return audio;
-        }
-
-        function getSoundData(type) {
-            // Простые звуковые эффекты
-            const sounds = {
-                day: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
-                night: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
-                kill: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
-                vote: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
-                win: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
-                lose: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='
-            };
-            return sounds[type] || sounds.day;
-        }
-
-        function playSound(type) {
-            if (soundEnabled && sounds[type]) {
-                sounds[type].play().catch(() => {});
-            }
-        }
-
-        function toggleMute() {
-            soundEnabled = !soundEnabled;
-            document.getElementById('muteBtn').textContent = soundEnabled ? '🔊 Звук' : '🔇 Без звука';
-        }
-
-        function toggleSpectate() {
-            spectatorMode = !spectatorMode;
-            document.getElementById('spectateBtn').textContent = spectatorMode ? '👁️ Выйти из наблюдения' : '👁️ Наблюдать';
-            updateUI();
-        }
-
-        // ============ BLUETOOTH ФУНКЦИИ ============
-        async function createBluetoothRoom() {
-            roomName = document.getElementById('roomNameInput').value.trim();
-            roomPassword = document.getElementById('roomPasswordInput').value.trim();
+        // ============ ФУНКЦИИ ДЛЯ ХОСТА ============
+        async function createRoom() {
+            myPlayerName = document.getElementById('playerNameInput').value.trim() || 'Хост';
             selectedPlayers = parseInt(document.getElementById('playerCountSelect').value);
-            spectatorMode = document.getElementById('enableSpectatorMode').checked;
-            timerEnabled = document.getElementById('enableTimer').checked;
-
-            // Валидация
-            if (!roomName || roomName.length < 1 || roomName.length > 8) {
-                showError('❌ Название комнаты должно быть от 1 до 8 символов!');
-                return;
-            }
-
-            if (!roomPassword || roomPassword.length < 1 || roomPassword.length > 5 || !/^\d+$/.test(roomPassword)) {
-                showError('❌ Пароль должен быть от 1 до 5 цифр!');
-                return;
-            }
 
             try {
-                // Проверяем поддержку Bluetooth
                 if (!navigator.bluetooth) {
                     showError('❌ Ваш браузер не поддерживает Web Bluetooth API!');
                     return;
                 }
 
-                // Запрашиваем доступ к Bluetooth
+                // Хост запрашивает Bluetooth устройство (создает виртуальный сервер)
                 bluetoothDevice = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
                     optionalServices: [SERVICE_UUID]
@@ -739,184 +573,51 @@
 
                 bluetoothDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
 
-                // Подключаемся к GATT серверу
                 bluetoothServer = await bluetoothDevice.gatt.connect();
                 bluetoothService = await bluetoothServer.getPrimaryService(SERVICE_UUID);
                 bluetoothCharacteristic = await bluetoothService.getCharacteristic(CHARACTERISTIC_UUID);
 
                 isHost = true;
                 myPlayerIndex = 0;
-
+                
                 document.getElementById('btIndicator').className = 'bluetooth-indicator bt-connected';
                 document.getElementById('menuScreen').classList.add('hidden');
                 document.getElementById('gameScreen').classList.remove('hidden');
-                document.getElementById('roomNameDisplay').textContent = roomName;
-                document.getElementById('roomPasswordDisplay').textContent = roomPassword;
-                document.getElementById('playerCountDisplay').textContent = `0/${selectedPlayers}`;
+                document.getElementById('playerNameDisplay').textContent = myPlayerName;
+                document.getElementById('playerCountDisplay').textContent = `1/${selectedPlayers}`;
 
                 initGame();
                 gameState.players[0].isConnected = true;
+                gameState.players[0].name = myPlayerName;
+                connectedPlayers.push({
+                    index: 0,
+                    name: myPlayerName,
+                    device: bluetoothDevice,
+                    characteristic: bluetoothCharacteristic
+                });
+                
                 showRole(0);
                 updateUI();
 
-                addLog('📡 Bluetooth комната создана');
-                addLog('🏠 Название: ' + roomName);
-                addLog('🔑 Пароль: ' + roomPassword);
-                addLog(`👥 Максимум игроков: ${selectedPlayers}`);
-                if (spectatorMode) addLog('👁️ Режим наблюдателя включен');
-                if (timerEnabled) addLog('⏱️ Таймер включен');
-                addLog('⏳ Ожидание игроков...');
+                addLog('📡 Комната создана!');
+                addLog(`👑 Вы хост: ${myPlayerName}`);
+                addLog(`👥 Ожидание игроков (1/${selectedPlayers})`);
 
-                showSuccess('✅ Bluetooth комната создана!');
+                showSuccess('✅ Комната создана! Другие игроки могут подключаться');
                 
                 // Начинаем слушать подключения
                 listenForConnections();
             } catch (error) {
-                console.error('❌ Ошибка Bluetooth:', error);
+                console.error('❌ Ошибка создания комнаты:', error);
                 if (error.name === 'NotFoundError') {
                     showError('❌ Bluetooth устройство не найдено!');
-                } else if (error.name === 'SecurityError') {
-                    showError('❌ Нет разрешения на использование Bluetooth!');
-                } else if (error.name === 'InvalidStateError') {
-                    showError('❌ Bluetooth устройство уже подключено!');
                 } else {
-                    showError('❌ Ошибка Bluetooth: ' + error.message);
+                    showError('❌ Ошибка: ' + error.message);
                 }
             }
-        }
-
-        async function scanForRooms() {
-            try {
-                if (!navigator.bluetooth) {
-                    showError('❌ Ваш браузер не поддерживает Web Bluetooth API!');
-                    return;
-                }
-
-                showSuccess('🔍 Сканирование Bluetooth устройств...');
-
-                const device = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: [SERVICE_UUID]
-                });
-
-                device.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
-
-                const server = await device.gatt.connect();
-                const service = await server.getPrimaryService(SERVICE_UUID);
-                const characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
-
-                // Читаем информацию о комнате
-                const value = await characteristic.readValue();
-                const decoder = new TextDecoder('utf-8');
-                const roomInfo = JSON.parse(decoder.decode(value));
-
-                bluetoothDevice = device;
-                bluetoothServer = server;
-                bluetoothService = service;
-                bluetoothCharacteristic = characteristic;
-
-                // Отображаем найденную комнату
-                const roomsList = document.getElementById('roomsList');
-                roomsList.innerHTML = `
-                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
-                        <p><strong>Найдена комната:</strong> ${roomInfo.name}</p>
-                        <p>Игроков: ${roomInfo.connected}/${roomInfo.maxPlayers}</p>
-                        <p>Режим: ${roomInfo.spectatorMode ? 'Наблюдатель' : 'Обычный'}</p>
-                        <input type="password" id="joinPasswordInput" class="input-field" placeholder="Введите пароль" maxlength="5">
-                        <button class="btn btn-green" onclick="joinBluetoothRoom('${roomInfo.name}')">🔗 Подключиться</button>
-                    </div>
-                `;
-
-                showSuccess('✅ Комната найдена! Введите пароль.');
-            } catch (error) {
-                console.error('❌ Ошибка сканирования:', error);
-                if (error.name === 'NotFoundError') {
-                    showError('❌ Bluetooth устройства не найдены!');
-                } else if (error.name === 'SecurityError') {
-                    showError('❌ Нет разрешения на использование Bluetooth!');
-                } else {
-                    showError('❌ Ошибка сканирования: ' + error.message);
-                }
-            }
-        }
-
-        async function joinBluetoothRoom(roomNameFromScan) {
-            const password = document.getElementById('joinPasswordInput').value.trim();
-
-            if (!password || password.length < 1 || password.length > 5 || !/^\d+$/.test(password)) {
-                showError('❌ Введите корректный пароль (1-5 цифр)!');
-                return;
-            }
-
-            try {
-                // Отправляем пароль на проверку
-                const encoder = new TextEncoder();
-                const data = JSON.stringify({
-                    type: 'join',
-                    password: password,
-                    playerName: 'Игрок'
-                });
-                
-                await bluetoothCharacteristic.writeValue(encoder.encode(data));
-
-                // Ждем подтверждения
-                await waitForJoinConfirmation();
-
-                isHost = false;
-                document.getElementById('btIndicator').className = 'bluetooth-indicator bt-connected';
-                document.getElementById('menuScreen').classList.add('hidden');
-                document.getElementById('gameScreen').classList.remove('hidden');
-                
-                roomName = roomNameFromScan;
-                roomPassword = password;
-                
-                document.getElementById('roomNameDisplay').textContent = roomName;
-                document.getElementById('roomPasswordDisplay').textContent = password;
-
-                addLog('🔗 Подключено к Bluetooth комнате');
-                addLog('⏳ Ожидание роли...');
-
-                showSuccess('✅ Успешное подключение!');
-                
-                // Начинаем слушать обновления от хоста
-                listenForUpdates();
-            } catch (error) {
-                console.error('❌ Ошибка подключения:', error);
-                if (error.message === 'wrong_password') {
-                    showError('❌ Неверный пароль!');
-                } else {
-                    showError('❌ Не удалось подключиться: ' + error.message);
-                }
-            }
-        }
-
-        async function waitForJoinConfirmation() {
-            return new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    reject(new Error('timeout'));
-                }, 5000);
-
-                bluetoothCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
-                    clearTimeout(timeout);
-                    const value = event.target.value;
-                    const decoder = new TextDecoder('utf-8');
-                    const data = JSON.parse(decoder.decode(value));
-                    
-                    if (data.type === 'join_accepted') {
-                        myPlayerIndex = data.playerIndex;
-                        resolve();
-                    } else if (data.type === 'join_rejected') {
-                        reject(new Error('wrong_password'));
-                    }
-                });
-
-                bluetoothCharacteristic.startNotifications();
-            });
         }
 
         async function listenForConnections() {
-            if (!isHost) return;
-            
             try {
                 await bluetoothCharacteristic.startNotifications();
                 
@@ -925,73 +626,52 @@
                     const decoder = new TextDecoder('utf-8');
                     const data = JSON.parse(decoder.decode(value));
                     
-                    if (data.type === 'join') {
+                    if (data.type === 'join_request') {
                         handleJoinRequest(data);
-                    } else if (data.type === 'action') {
+                    } else if (data.type === 'player_action') {
                         handlePlayerAction(data);
                     }
                 });
-            } catch (error) {
-                console.error('Ошибка при прослушивании подключений:', error);
-            }
-        }
-
-        async function listenForUpdates() {
-            try {
-                await bluetoothCharacteristic.startNotifications();
                 
-                bluetoothCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
-                    const value = event.target.value;
-                    const decoder = new TextDecoder('utf-8');
-                    const data = JSON.parse(decoder.decode(value));
-                    
-                    if (data.type === 'update') {
-                        updateGameState(data.gameState);
-                    } else if (data.type === 'role') {
-                        assignRole(data.role, data.playerIndex);
-                    } else if (data.type === 'action_request') {
-                        showActionRequest(data.action);
-                    }
-                });
+                addLog('🔍 Ожидание подключений...');
             } catch (error) {
-                console.error('Ошибка при прослушивании обновлений:', error);
+                console.error('Ошибка при прослушивании:', error);
             }
         }
 
         async function handleJoinRequest(data) {
-            if (!isHost) return;
+            const connectedCount = gameState.players.filter(p => p.isConnected).length;
             
-            const connectedPlayers = gameState.players.filter(p => p.isConnected).length;
-            
-            if (connectedPlayers >= selectedPlayers) {
-                // Комната заполнена
-                await sendToClient({ type: 'join_rejected', reason: 'full' });
+            if (connectedCount >= selectedPlayers) {
+                await sendResponse({ type: 'join_rejected', reason: 'Комната заполнена' });
                 return;
             }
             
-            if (data.password !== roomPassword) {
-                // Неверный пароль
-                await sendToClient({ type: 'join_rejected', reason: 'password' });
-                return;
-            }
-            
-            // Принимаем игрока
+            // Находим свободный слот
             const playerIndex = gameState.players.findIndex(p => !p.isConnected);
             if (playerIndex === -1) return;
             
             gameState.players[playerIndex].isConnected = true;
-            gameState.players[playerIndex].name = data.playerName || `Игрок ${playerIndex + 1}`;
+            gameState.players[playerIndex].name = data.playerName;
             
-            await sendToClient({ 
-                type: 'join_accepted', 
-                playerIndex: playerIndex,
-                role: gameState.players[playerIndex].role
+            connectedPlayers.push({
+                index: playerIndex,
+                name: data.playerName,
+                device: bluetoothDevice,
+                characteristic: bluetoothCharacteristic
             });
             
-            // Отправляем обновленное состояние всем
-            await broadcastGameState();
+            // Отправляем подтверждение с ролью
+            await sendResponse({
+                type: 'join_accepted',
+                playerIndex: playerIndex,
+                role: gameState.players[playerIndex].role,
+                roomInfo: {
+                    playerCount: `${connectedCount + 1}/${selectedPlayers}`
+                }
+            });
             
-            addLog(`👋 ${gameState.players[playerIndex].name} подключился!`);
+            addLog(`👋 ${data.playerName} подключился!`);
             updateUI();
             
             const totalConnected = gameState.players.filter(p => p.isConnected).length;
@@ -1005,58 +685,170 @@
         }
 
         async function handlePlayerAction(data) {
-            if (!isHost) return;
-            
             if (data.action === 'vote') {
                 handleVote(data.playerIndex, data.targetIndex);
-            } else if (data.action === 'night_action') {
-                handleNightAction(data);
             }
         }
 
-        async function sendToClient(data) {
-            if (!bluetoothCharacteristic) return;
-            
+        async function sendResponse(data) {
             const encoder = new TextEncoder();
             const jsonString = JSON.stringify(data);
             await bluetoothCharacteristic.writeValue(encoder.encode(jsonString));
         }
 
-        async function broadcastGameState() {
-            if (!isHost) return;
+        // ============ ФУНКЦИИ ДЛЯ ИГРОКА ============
+        async function findGame() {
+            try {
+                if (!navigator.bluetooth) {
+                    showError('❌ Ваш браузер не поддерживает Web Bluetooth API!');
+                    return;
+                }
+
+                showSuccess('🔍 Поиск игр...');
+
+                bluetoothDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: [SERVICE_UUID]
+                });
+
+                bluetoothDevice.addEventListener('gattserverdisconnected', onBluetoothDisconnected);
+
+                bluetoothServer = await bluetoothDevice.gatt.connect();
+                bluetoothService = await bluetoothServer.getPrimaryService(SERVICE_UUID);
+                bluetoothCharacteristic = await bluetoothService.getCharacteristic(CHARACTERISTIC_UUID);
+
+                // Отображаем найденную игру
+                const gamesList = document.getElementById('gamesList');
+                gamesList.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
+                        <p><strong>Найдена игра!</strong></p>
+                        <p>Устройство: ${bluetoothDevice.name || 'Неизвестное'}</p>
+                        <input type="text" id="joinNameInput" class="input-field" placeholder="Ваше имя" maxlength="10">
+                        <button class="btn btn-green" onclick="joinGame()">🔗 Подключиться</button>
+                    </div>
+                `;
+
+                showSuccess('✅ Игра найдена! Введите имя для подключения');
+            } catch (error) {
+                console.error('❌ Ошибка поиска:', error);
+                if (error.name === 'NotFoundError') {
+                    showError('❌ Игры не найдены!');
+                } else {
+                    showError('❌ Ошибка: ' + error.message);
+                }
+            }
+        }
+
+        async function joinGame() {
+            const playerName = document.getElementById('joinNameInput').value.trim() || 'Игрок';
             
-            await sendToClient({
-                type: 'update',
-                gameState: gameState
+            try {
+                // Отправляем запрос на подключение
+                const encoder = new TextEncoder();
+                const joinRequest = JSON.stringify({
+                    type: 'join_request',
+                    playerName: playerName
+                });
+                
+                await bluetoothCharacteristic.writeValue(encoder.encode(joinRequest));
+
+                // Ждем ответа
+                await bluetoothCharacteristic.startNotifications();
+                
+                const response = await waitForResponse();
+                
+                if (response.type === 'join_accepted') {
+                    isHost = false;
+                    myPlayerIndex = response.playerIndex;
+                    myPlayerName = playerName;
+                    
+                    document.getElementById('btIndicator').className = 'bluetooth-indicator bt-connected';
+                    document.getElementById('menuScreen').classList.add('hidden');
+                    document.getElementById('gameScreen').classList.remove('hidden');
+                    document.getElementById('playerNameDisplay').textContent = playerName;
+                    document.getElementById('playerCountDisplay').textContent = response.roomInfo.playerCount;
+
+                    // Инициализируем игрока
+                    gameState.players[myPlayerIndex] = {
+                        id: myPlayerIndex,
+                        name: playerName,
+                        role: response.role,
+                        avatar: ROLE_ICONS[response.role],
+                        isAlive: true,
+                        isConnected: true
+                    };
+                    
+                    showRole(myPlayerIndex);
+                    updateUI();
+
+                    addLog('🔗 Подключение успешно!');
+                    addLog(`👤 Вы играете как: ${playerName}`);
+                    
+                    showSuccess('✅ Подключение успешно!');
+                    
+                    // Слушаем обновления от хоста
+                    listenForUpdates();
+                } else {
+                    showError('❌ Отказано: ' + (response.reason || 'неизвестная причина'));
+                }
+            } catch (error) {
+                console.error('❌ Ошибка подключения:', error);
+                showError('❌ Не удалось подключиться: ' + error.message);
+            }
+        }
+
+        function waitForResponse() {
+            return new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Таймаут'));
+                }, 10000);
+
+                bluetoothCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+                    clearTimeout(timeout);
+                    const value = event.target.value;
+                    const decoder = new TextDecoder('utf-8');
+                    const response = JSON.parse(decoder.decode(value));
+                    resolve(response);
+                }, { once: true });
             });
         }
 
+        function listenForUpdates() {
+            bluetoothCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+                const value = event.target.value;
+                const decoder = new TextDecoder('utf-8');
+                const data = JSON.parse(decoder.decode(value));
+                
+                if (data.type === 'game_state') {
+                    updateGameState(data.gameState);
+                } else if (data.type === 'game_start') {
+                    startGameAsPlayer(data);
+                } else if (data.type === 'game_over') {
+                    showGameOver(data.message);
+                }
+            });
+        }
+
+        // ============ ОБЩИЕ ФУНКЦИИ ============
         function onBluetoothDisconnected() {
             console.log('❌ Bluetooth соединение разорвано');
             document.getElementById('btIndicator').className = 'bluetooth-indicator bt-disconnected';
             showError('❌ Bluetooth соединение разорвано!');
-            
-            if (gameState.started && !gameState.over) {
-                addLog('❌ Соединение потеряно!');
-                pauseGame();
-            }
         }
 
-        function leaveRoom() {
+        function leaveGame() {
             if (bluetoothDevice && bluetoothDevice.gatt.connected) {
                 bluetoothDevice.gatt.disconnect();
             }
             
-            clearTimer();
             bluetoothDevice = null;
             bluetoothServer = null;
             bluetoothService = null;
             bluetoothCharacteristic = null;
             isHost = false;
-            myPlayerIndex = -1;
-            roomName = '';
-            roomPassword = '';
-            spectatorMode = false;
+            myPlayerIndex = 0;
+            myPlayerName = '';
+            connectedPlayers = [];
             
             document.getElementById('btIndicator').className = 'bluetooth-indicator bt-disconnected';
             document.getElementById('gameScreen').classList.add('hidden');
@@ -1068,28 +860,10 @@
                 players: [],
                 votes: {},
                 started: false,
-                over: false,
-                nightActions: {},
-                healTarget: null,
-                checkTarget: null
+                over: false
             };
         }
 
-        function pauseGame() {
-            if (currentTimer) {
-                clearInterval(currentTimer);
-                currentTimer = null;
-            }
-            document.getElementById('timerContainer').classList.add('hidden');
-        }
-
-        function resumeGame() {
-            if (timerEnabled && gameState.started && !gameState.over) {
-                startTimer();
-            }
-        }
-
-        // ============ ПОКАЗ УВЕДОМЛЕНИЙ ============
         function showError(msg) {
             const el = document.getElementById('errorMsg');
             el.textContent = msg;
@@ -1104,7 +878,6 @@
             setTimeout(() => el.classList.add('hidden'), 3000);
         }
 
-        // ============ ИНИЦИАЛИЗАЦИЯ ИГРЫ ============
         function initGame() {
             const roles = generateRoles();
             gameState.players = [];
@@ -1112,13 +885,11 @@
             for (let i = 0; i < selectedPlayers; i++) {
                 gameState.players.push({
                     id: i,
-                    name: 'Игрок ' + (i + 1),
+                    name: `Игрок ${i + 1}`,
                     role: roles[i],
                     isAlive: true,
                     isConnected: false,
-                    avatar: ROLE_ICONS[roles[i]],
-                    team: ROLE_TEAM[roles[i]],
-                    isSpectator: false
+                    avatar: ROLE_ICONS[roles[i]]
                 });
             }
         }
@@ -1127,27 +898,18 @@
             const roles = [];
             const mafiaCount = Math.max(1, Math.floor(selectedPlayers / 3));
             
-            // Мафия
-            if (mafiaCount > 1) {
-                roles.push(ROLES.DON);
-                for (let i = 1; i < mafiaCount; i++) {
-                    roles.push(ROLES.MAFIA);
-                }
-            } else {
-                roles.push(ROLES.MAFIA);
+            if (mafiaCount > 1) roles.push(ROLES.DON);
+            for (let i = 0; i < mafiaCount; i++) {
+                if (!(mafiaCount > 1 && i === 0)) roles.push(ROLES.MAFIA);
             }
             
-            // Мирные роли
             if (selectedPlayers >= 4) roles.push(ROLES.SHERIFF);
             if (selectedPlayers >= 5) roles.push(ROLES.DOCTOR);
-            if (selectedPlayers >= 7) roles.push(ROLES.MANIAC);
             
-            // Остальные - мирные жители
             while (roles.length < selectedPlayers) {
                 roles.push(ROLES.CIVILIAN);
             }
             
-            // Перемешиваем
             for (let i = roles.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [roles[i], roles[j]] = [roles[j], roles[i]];
@@ -1156,7 +918,6 @@
             return roles;
         }
 
-        // ============ UI ============
         function updateUI() {
             updateStatuses();
             updatePlayers();
@@ -1171,16 +932,16 @@
             gameState.players.forEach(player => {
                 const badge = document.createElement('div');
                 let statusClass = 'status-waiting';
-                let statusText = '⏳';
+                let statusText = '⏳ Ожидание';
                 
                 if (player.isConnected) {
                     statusClass = 'status-online';
-                    statusText = '✓';
+                    statusText = '✓ Подключен';
                 }
                 
                 if (!player.isAlive && gameState.started) {
                     statusClass = 'status-dead';
-                    statusText = '☠️';
+                    statusText = '☠️ Мёртв';
                 }
                 
                 badge.className = 'status-badge ' + statusClass;
@@ -1199,9 +960,8 @@
                 
                 if (!player.isAlive) card.classList.add('dead');
                 if (player.id === myPlayerIndex) card.classList.add('me');
-                if (player.isSpectator) card.classList.add('no-hover');
                 
-                const showRole = gameState.over || player.id === myPlayerIndex || spectatorMode;
+                const showRole = gameState.over || player.id === myPlayerIndex;
                 
                 let voteCount = gameState.votes[player.id] || 0;
                 
@@ -1213,14 +973,9 @@
                     ${voteCount > 0 ? `<div class="player-votes">${voteCount}</div>` : ''}
                 `;
                 
-                // Обработчики кликов
-                if (gameState.phase === 'voting' && player.isAlive && player.id !== myPlayerIndex && !player.isSpectator) {
+                if (gameState.phase === 'voting' && player.isAlive && player.id !== myPlayerIndex) {
                     card.classList.add('selectable');
                     card.onclick = () => voteFor(player.id);
-                } else if (gameState.phase === 'night' && isHost) {
-                    card.onclick = () => showPlayerActions(player.id);
-                } else if (gameState.over) {
-                    card.onclick = () => showPlayerDetails(player.id);
                 }
                 
                 grid.appendChild(card);
@@ -1245,25 +1000,23 @@
             const startBtn = document.getElementById('startBtn');
             const nightBtn = document.getElementById('nightBtn');
             const voteBtn = document.getElementById('voteBtn');
-            const spectateBtn = document.getElementById('spectateBtn');
             
             if (isHost && !gameState.started) {
                 const allConnected = gameState.players.every(p => p.isConnected);
                 startBtn.disabled = !allConnected;
-                spectateBtn.disabled = true;
+                nightBtn.disabled = true;
+                voteBtn.disabled = true;
             }
             
             if (gameState.started && !gameState.over) {
                 nightBtn.disabled = gameState.phase !== 'day' || !isHost;
                 voteBtn.disabled = gameState.phase !== 'day' || !isHost;
-                spectateBtn.disabled = false;
             }
             
             if (gameState.over) {
                 nightBtn.disabled = true;
                 voteBtn.disabled = true;
                 startBtn.disabled = true;
-                spectateBtn.disabled = true;
             }
         }
 
@@ -1293,71 +1046,6 @@
             document.getElementById('roleModal').classList.remove('show');
         }
 
-        function showPlayerDetails(index) {
-            const player = gameState.players[index];
-            if (!player) return;
-            
-            // Показываем детали игрока в модалке
-            const modal = document.createElement('div');
-            modal.className = 'player-details show';
-            modal.innerHTML = `
-                <h3>${player.avatar} ${player.name}</h3>
-                <p>Роль: ${player.role}</p>
-                <p>Статус: ${player.isAlive ? 'Жив' : 'Мёртв'}</p>
-                <button class="btn btn-primary" onclick="this.parentElement.remove()">Закрыть</button>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // ============ ТАЙМЕР ============
-        function startTimer(seconds = 30) {
-            clearTimer();
-            
-            if (!timerEnabled) return;
-            
-            const timerContainer = document.getElementById('timerContainer');
-            const timerDisplay = document.getElementById('timerDisplay');
-            const timerBarFill = document.getElementById('timerBarFill');
-            
-            timerContainer.classList.remove('hidden');
-            timerDisplay.textContent = seconds;
-            timerBarFill.style.width = '100%';
-            
-            let timeLeft = seconds;
-            currentTimer = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = timeLeft;
-                timerBarFill.style.width = `${(timeLeft / seconds) * 100}%`;
-                
-                if (timeLeft <= 0) {
-                    clearTimer();
-                    onTimerEnd();
-                }
-            }, 1000);
-        }
-
-        function clearTimer() {
-            if (currentTimer) {
-                clearInterval(currentTimer);
-                currentTimer = null;
-            }
-            document.getElementById('timerContainer').classList.add('hidden');
-        }
-
-        function onTimerEnd() {
-            if (gameState.phase === 'day') {
-                addLog('⏱️ Время вышло! Переход к голосованию.');
-                startVoting();
-            } else if (gameState.phase === 'voting') {
-                addLog('⏱️ Время голосования вышло!');
-                if (isHost) determineVoteResult();
-            } else if (gameState.phase === 'night') {
-                addLog('⏱️ Ночь закончилась.');
-                if (isHost) performNightActions();
-            }
-        }
-
-        // ============ ИГРОВАЯ ЛОГИКА ============
         function startGame() {
             if (gameState.started) return;
             
@@ -1378,33 +1066,16 @@
             document.getElementById('startBtn').disabled = true;
             document.getElementById('nightBtn').disabled = false;
             document.getElementById('voteBtn').disabled = false;
-            document.getElementById('spectateBtn').disabled = false;
             
             addLog('🎮 ИГРА НАЧАЛАСЬ!');
             addLog('☀️ День 1. Город просыпается');
             
-            playSound('day');
             updateUI();
             
-            if (timerEnabled) {
-                startTimer(60); // День длится 60 секунд
-            }
-            
-            // Отправляем роли всем игрокам
-            broadcastRoles();
-        }
-
-        function broadcastRoles() {
-            if (!isHost) return;
-            
-            gameState.players.forEach((player, index) => {
-                if (player.isConnected && index !== myPlayerIndex) {
-                    sendToClient({
-                        type: 'role',
-                        role: player.role,
-                        playerIndex: index
-                    });
-                }
+            // Отправляем обновление всем игрокам
+            broadcastToPlayers({
+                type: 'game_start',
+                gameState: gameState
             });
         }
 
@@ -1420,243 +1091,28 @@
             document.getElementById('voteBtn').disabled = true;
             
             addLog('🌙 Ночь. Город засыпает...');
-            playSound('night');
-            
-            // Сбрасываем ночные действия
-            nightActions = {};
-            doctorHealTarget = null;
-            sheriffCheckTarget = null;
-            donCheckTarget = null;
-            maniacKillTarget = null;
-            mafiaKillTarget = null;
-            
             updateUI();
             
-            if (timerEnabled) {
-                startTimer(45); // Ночь длится 45 секунд
-            }
-            
-            // Запрашиваем действия у игроков
-            requestNightActions();
-            
-            if (isHost && !timerEnabled) {
-                setTimeout(() => {
-                    performNightActions();
-                }, 15000);
-            }
-        }
-
-        function requestNightActions() {
-            if (!isHost) return;
-            
-            gameState.players.forEach(player => {
-                if (player.isConnected && player.isAlive && player.id !== myPlayerIndex) {
-                    const action = getNightActionForRole(player.role);
-                    if (action) {
-                        sendToClient({
-                            type: 'action_request',
-                            action: action,
-                            playerIndex: player.id
-                        });
-                    }
-                }
-            });
-        }
-
-        function getNightActionForRole(role) {
-            switch (role) {
-                case ROLES.MAFIA:
-                case ROLES.DON:
-                    return 'kill';
-                case ROLES.SHERIFF:
-                    return 'check';
-                case ROLES.DOCTOR:
-                    return 'heal';
-                case ROLES.MANIAC:
-                    return 'maniac_kill';
-                default:
-                    return null;
-            }
-        }
-
-        function showActionRequest(action) {
-            const modal = document.getElementById('actionModal');
-            const title = document.getElementById('actionTitle');
-            const playersContainer = document.getElementById('actionPlayers');
-            
-            let actionText = '';
-            switch (action) {
-                case 'kill':
-                    actionText = '🔫 Выберите цель для убийства';
-                    break;
-                case 'check':
-                    actionText = '🔍 Выберите игрока для проверки';
-                    break;
-                case 'heal':
-                    actionText = '💉 Выберите игрока для лечения';
-                    break;
-                case 'maniac_kill':
-                    actionText = '🔪 Выберите цель для убийства';
-                    break;
-            }
-            
-            title.textContent = actionText;
-            playersContainer.innerHTML = '';
-            
-            gameState.players.forEach(player => {
-                if (player.isAlive && player.id !== myPlayerIndex) {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn btn-blue';
-                    btn.textContent = `${player.avatar} ${player.name}`;
-                    btn.onclick = () => {
-                        sendNightAction(action, player.id);
-                        closeActionModal();
-                    };
-                    playersContainer.appendChild(btn);
-                }
-            });
-            
-            modal.classList.add('show');
-        }
-
-        async function sendNightAction(action, targetIndex) {
-            if (!isHost) {
-                // Отправляем хосту
-                await sendToClient({
-                    type: 'action',
-                    action: 'night_action',
-                    nightAction: action,
-                    targetIndex: targetIndex,
-                    playerIndex: myPlayerIndex
-                });
-            } else {
-                // Хост обрабатывает сам
-                handleNightAction({
-                    action: 'night_action',
-                    nightAction: action,
-                    targetIndex: targetIndex,
-                    playerIndex: myPlayerIndex
-                });
-            }
-        }
-
-        function handleNightAction(data) {
-            const { nightAction, targetIndex, playerIndex } = data;
-            const player = gameState.players[playerIndex];
-            const target = gameState.players[targetIndex];
-            
-            if (!player || !target) return;
-            
-            switch (nightAction) {
-                case 'kill':
-                    if (player.role === ROLES.DON) {
-                        donCheckTarget = targetIndex;
-                    } else {
-                        mafiaKillTarget = targetIndex;
-                    }
-                    break;
-                case 'check':
-                    sheriffCheckTarget = targetIndex;
-                    break;
-                case 'heal':
-                    doctorHealTarget = targetIndex;
-                    break;
-                case 'maniac_kill':
-                    maniacKillTarget = targetIndex;
-                    break;
-            }
-            
-            // Проверяем, все ли действия выполнены
-            checkAllNightActionsDone();
-        }
-
-        function checkAllNightActionsDone() {
-            const alivePlayers = gameState.players.filter(p => p.isAlive);
-            let allDone = true;
-            
-            alivePlayers.forEach(player => {
-                if (player.role === ROLES.MAFIA && !mafiaKillTarget) {
-                    allDone = false;
-                }
-                if (player.role === ROLES.DON && !donCheckTarget) {
-                    allDone = false;
-                }
-                if (player.role === ROLES.SHERIFF && !sheriffCheckTarget) {
-                    allDone = false;
-                }
-                if (player.role === ROLES.DOCTOR && !doctorHealTarget) {
-                    allDone = false;
-                }
-                if (player.role === ROLES.MANIAC && !maniacKillTarget) {
-                    allDone = false;
-                }
-            });
-            
-            if (allDone && isHost) {
+            setTimeout(() => {
                 performNightActions();
-            }
+            }, 5000);
         }
 
         function performNightActions() {
             if (!isHost) return;
             
-            clearTimer();
-            
             const alive = gameState.players.filter(p => p.isAlive);
+            const mafia = alive.filter(p => p.role === ROLES.MAFIA || p.role === ROLES.DON);
+            const civilians = alive.filter(p => p.role !== ROLES.MAFIA && p.role !== ROLES.DON);
             
-            // Мафия убивает
-            if (mafiaKillTarget !== null && gameState.players[mafiaKillTarget]) {
-                const target = gameState.players[mafiaKillTarget];
-                
-                // Проверяем лечение
-                if (doctorHealTarget === mafiaKillTarget) {
-                    addLog(`💉 Доктор спас ${target.name}!`);
-                } else {
-                    target.isAlive = false;
-                    addLog(`☠️ Мафия убила: ${target.name}`);
-                    playSound('kill');
-                }
+            if (mafia.length > 0 && civilians.length > 0) {
+                const target = civilians[Math.floor(Math.random() * civilians.length)];
+                target.isAlive = false;
+                addLog(`☠️ Мафия убила: ${target.name}`);
             }
             
-            // Маньяк убивает
-            if (maniacKillTarget !== null && gameState.players[maniacKillTarget]) {
-                const target = gameState.players[maniacKillTarget];
-                
-                if (doctorHealTarget === maniacKillTarget) {
-                    addLog(`💉 Доктор спас ${target.name} от маньяка!`);
-                } else {
-                    target.isAlive = false;
-                    addLog(`🔪 Маньяк убил: ${target.name}`);
-                    playSound('kill');
-                }
-            }
-            
-            // Шериф проверяет
-            if (sheriffCheckTarget !== null && gameState.players[sheriffCheckTarget]) {
-                const target = gameState.players[sheriffCheckTarget];
-                const sheriff = alive.find(p => p.role === ROLES.SHERIFF);
-                
-                if (sheriff) {
-                    const isMafia = target.role === ROLES.MAFIA || target.role === ROLES.DON;
-                    addLog(`🔍 Шериф проверил ${target.name}: ${isMafia ? 'МАФИЯ!' : 'Мирный'}`);
-                }
-            }
-            
-            // Дон проверяет
-            if (donCheckTarget !== null && gameState.players[donCheckTarget]) {
-                const target = gameState.players[donCheckTarget];
-                const don = alive.find(p => p.role === ROLES.DON);
-                
-                if (don) {
-                    const isSheriff = target.role === ROLES.SHERIFF;
-                    addLog(`👑 Дон проверил ${target.name}: ${isSheriff ? 'ШЕРИФ!' : 'Не шериф'}`);
-                }
-            }
-            
-            // Проверяем победу
             if (checkWin()) return;
             
-            // Переход к следующему дню
             gameState.day++;
             gameState.phase = 'day';
             gameState.votes = {};
@@ -1665,21 +1121,12 @@
             document.getElementById('voteBtn').disabled = false;
             
             addLog(`☀️ День ${gameState.day}. Город просыпается`);
-            playSound('day');
-            
-            // Показываем умерших
-            const deadPlayers = gameState.players.filter(p => !p.isAlive);
-            if (deadPlayers.length > 0) {
-                addLog(`💀 Умершие: ${deadPlayers.map(p => p.name).join(', ')}`);
-            }
-            
             updateUI();
             
-            if (timerEnabled) {
-                startTimer(60);
-            }
-            
-            broadcastGameState();
+            broadcastToPlayers({
+                type: 'game_state',
+                gameState: gameState
+            });
         }
 
         function startVoting() {
@@ -1697,22 +1144,14 @@
             
             addLog('🗳️ Голосование началось!');
             addLog('👆 Нажмите на игрока, чтобы проголосовать');
-            playSound('vote');
-            
             updateUI();
             
-            if (timerEnabled) {
-                startTimer(30);
-            }
-            
-            if (!timerEnabled) {
-                setTimeout(() => {
-                    determineVoteResult();
-                }, 15000);
-            }
+            setTimeout(() => {
+                determineVoteResult();
+            }, 10000);
         }
 
-        async function voteFor(playerId) {
+        function voteFor(playerId) {
             if (gameState.phase !== 'voting') return;
             if (!gameState.players[myPlayerIndex].isAlive) {
                 showError('❌ Вы мертвы и не можете голосовать!');
@@ -1721,76 +1160,44 @@
             
             gameState.votes[playerId] = (gameState.votes[playerId] || 0) + 1;
             addLog(`${gameState.players[myPlayerIndex].name} ➜ ${gameState.players[playerId].name}`);
+            updateUI();
             
             if (!isHost) {
                 // Отправляем голос хосту
-                await sendToClient({
-                    type: 'action',
+                sendPlayerAction({
+                    type: 'player_action',
                     action: 'vote',
                     playerIndex: myPlayerIndex,
                     targetIndex: playerId
                 });
-            }
-            
-            updateUI();
-            
-            // Проверяем, все ли проголосовали
-            if (isHost) {
-                const alivePlayers = gameState.players.filter(p => p.isAlive);
-                const totalVotes = Object.values(gameState.votes).reduce((a, b) => a + b, 0);
-                
-                if (totalVotes >= alivePlayers.length) {
-                    determineVoteResult();
-                }
             }
         }
 
         function handleVote(playerIndex, targetIndex) {
             if (!isHost) return;
             
-            if (gameState.phase !== 'voting') return;
-            if (!gameState.players[playerIndex].isAlive) return;
-            
             gameState.votes[targetIndex] = (gameState.votes[targetIndex] || 0) + 1;
             addLog(`${gameState.players[playerIndex].name} ➜ ${gameState.players[targetIndex].name}`);
-            
             updateUI();
-            
-            // Проверяем, все ли проголосовали
-            const alivePlayers = gameState.players.filter(p => p.isAlive);
-            const totalVotes = Object.values(gameState.votes).reduce((a, b) => a + b, 0);
-            
-            if (totalVotes >= alivePlayers.length) {
-                determineVoteResult();
-            }
         }
 
         function determineVoteResult() {
             if (!isHost) return;
             
-            clearTimer();
-            
             let maxVotes = 0;
             let votedOut = null;
-            let tie = false;
             
             Object.entries(gameState.votes).forEach(([playerId, votes]) => {
                 if (votes > maxVotes) {
                     maxVotes = votes;
                     votedOut = parseInt(playerId);
-                    tie = false;
-                } else if (votes === maxVotes && votes > 0) {
-                    tie = true;
                 }
             });
             
-            if (tie) {
-                addLog('🤝 Ничья! Никто не изгнан.');
-            } else if (votedOut !== null && gameState.players[votedOut]) {
+            if (votedOut !== null && gameState.players[votedOut]) {
                 gameState.players[votedOut].isAlive = false;
                 addLog(`🚫 Изгнан: ${gameState.players[votedOut].name}`);
                 addLog(`Роль: ${gameState.players[votedOut].role}`);
-                playSound('kill');
             } else {
                 addLog('🤝 Никто не изгнан');
             }
@@ -1805,34 +1212,22 @@
             
             updateUI();
             
-            if (timerEnabled) {
-                startTimer(60);
-            }
-            
-            broadcastGameState();
+            broadcastToPlayers({
+                type: 'game_state',
+                gameState: gameState
+            });
         }
 
         function checkWin() {
             const alive = gameState.players.filter(p => p.isAlive);
             const mafiaCount = alive.filter(p => p.role === ROLES.MAFIA || p.role === ROLES.DON).length;
-            const civilianCount = alive.filter(p => p.role !== ROLES.MAFIA && p.role !== ROLES.DON && p.role !== ROLES.MANIAC).length;
-            const maniacCount = alive.filter(p => p.role === ROLES.MANIAC).length;
+            const civilianCount = alive.filter(p => p.role !== ROLES.MAFIA && p.role !== ROLES.DON).length;
             
-            let winner = null;
-            
-            if (mafiaCount === 0 && maniacCount === 0) {
-                winner = 'blue';
+            if (mafiaCount === 0) {
                 showGameOver('🏆 Мирные жители победили!');
-            } else if (mafiaCount >= civilianCount && maniacCount === 0) {
-                winner = 'red';
+                return true;
+            } else if (mafiaCount >= civilianCount) {
                 showGameOver('🔫 Мафия победила!');
-            } else if (maniacCount > 0 && civilianCount <= 1 && mafiaCount === 0) {
-                winner = 'neutral';
-                showGameOver('🔪 Маньяк победил!');
-            }
-            
-            if (winner) {
-                playSound(winner === 'blue' ? 'win' : 'lose');
                 return true;
             }
             
@@ -1842,12 +1237,11 @@
         function showGameOver(message) {
             gameState.over = true;
             gameState.phase = 'day';
-            clearTimer();
             
             const area = document.getElementById('gameOverArea');
             area.innerHTML = `
                 <div class="game-over">
-                    <h2 style="color: var(--gold); margin-bottom: 20px;">${message}</h2>
+                    <h2 style="color: var(--gold);">${message}</h2>
                     <h3>Роли игроков:</h3>
                     <div class="role-list">
                         ${gameState.players.map(p => `
@@ -1855,9 +1249,6 @@
                                 <div class="avatar">${p.avatar}</div>
                                 <div class="name">${p.name}</div>
                                 <div class="role">${p.role}</div>
-                                <div style="color: ${p.isAlive ? 'var(--green)' : 'var(--red)'}; font-size: 12px;">
-                                    ${p.isAlive ? 'Жив' : 'Мёртв'}
-                                </div>
                             </div>
                         `).join('')}
                     </div>
@@ -1867,11 +1258,31 @@
             
             document.getElementById('nightBtn').disabled = true;
             document.getElementById('voteBtn').disabled = true;
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('spectateBtn').disabled = true;
             
             updateUI();
-            broadcastGameState();
+            
+            broadcastToPlayers({
+                type: 'game_over',
+                message: message,
+                gameState: gameState
+            });
+        }
+
+        function broadcastToPlayers(data) {
+            // В реальности здесь отправка всем подключенным устройствам
+            if (bluetoothCharacteristic) {
+                const encoder = new TextEncoder();
+                const jsonString = JSON.stringify(data);
+                bluetoothCharacteristic.writeValue(encoder.encode(jsonString)).catch(console.error);
+            }
+        }
+
+        async function sendPlayerAction(data) {
+            if (bluetoothCharacteristic) {
+                const encoder = new TextEncoder();
+                const jsonString = JSON.stringify(data);
+                await bluetoothCharacteristic.writeValue(encoder.encode(jsonString));
+            }
         }
 
         function updateGameState(newState) {
@@ -1879,80 +1290,18 @@
             updateUI();
         }
 
-        function assignRole(role, playerIndex) {
-            if (gameState.players[playerIndex]) {
-                gameState.players[playerIndex].role = role;
-                gameState.players[playerIndex].avatar = ROLE_ICONS[role];
-                gameState.players[playerIndex].team = ROLE_TEAM[role];
-                
-                if (playerIndex === myPlayerIndex) {
-                    showRole(playerIndex);
-                }
-            }
-        }
-
-        function closeActionModal() {
-            document.getElementById('actionModal').classList.remove('show');
-        }
-
-        // ============ ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ ============
-        function showPlayerActions(playerId) {
-            if (!isHost || gameState.phase !== 'night') return;
+        function startGameAsPlayer(data) {
+            gameState = data.gameState;
+            gameState.started = true;
             
-            const player = gameState.players[playerId];
-            if (!player || !player.isAlive) return;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('nightBtn').disabled = true;
+            document.getElementById('voteBtn').disabled = true;
             
-            const modal = document.getElementById('actionModal');
-            const title = document.getElementById('actionTitle');
-            const playersContainer = document.getElementById('actionPlayers');
+            addLog('🎮 ИГРА НАЧАЛАСЬ!');
+            addLog('☀️ День 1. Город просыпается');
             
-            title.textContent = `Действия для ${player.name}`;
-            playersContainer.innerHTML = '';
-            
-            // Кнопка убийства
-            if (player.role === ROLES.MAFIA || player.role === ROLES.DON || player.role === ROLES.MANIAC) {
-                const killBtn = document.createElement('button');
-                killBtn.className = 'btn btn-red';
-                killBtn.textContent = '🔫 Убить';
-                killBtn.onclick = () => {
-                    mafiaKillTarget = playerId;
-                    closeActionModal();
-                    addLog(`Выбрана цель для убийства: ${player.name}`);
-                };
-                playersContainer.appendChild(killBtn);
-            }
-            
-            // Кнопка проверки
-            if (player.role === ROLES.SHERIFF || player.role === ROLES.DON) {
-                const checkBtn = document.createElement('button');
-                checkBtn.className = 'btn btn-blue';
-                checkBtn.textContent = '🔍 Проверить';
-                checkBtn.onclick = () => {
-                    if (player.role === ROLES.SHERIFF) {
-                        sheriffCheckTarget = playerId;
-                    } else {
-                        donCheckTarget = playerId;
-                    }
-                    closeActionModal();
-                    addLog(`Выбрана цель для проверки: ${player.name}`);
-                };
-                playersContainer.appendChild(checkBtn);
-            }
-            
-            // Кнопка лечения
-            if (player.role === ROLES.DOCTOR) {
-                const healBtn = document.createElement('button');
-                healBtn.className = 'btn btn-green';
-                healBtn.textContent = '💉 Лечить';
-                healBtn.onclick = () => {
-                    doctorHealTarget = playerId;
-                    closeActionModal();
-                    addLog(`Выбрана цель для лечения: ${player.name}`);
-                };
-                playersContainer.appendChild(healBtn);
-            }
-            
-            modal.classList.add('show');
+            updateUI();
         }
     </script>
 </body>
