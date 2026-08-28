@@ -2,783 +2,326 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мафия - Wi-Fi Direct</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Шпион — Быстрая игра</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
+        * {
+            box-sizing: border-box;
+            user-select: none; /* Чтобы нельзя было случайно выделить текст */
+            -webkit-tap-highlight-color: transparent;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #eee;
+        }
+        body {
+            margin: 0;
             min-height: 100vh;
+            background: #1a1a2e;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
-
         .container {
-            max-width: 600px;
+            background: #16213e;
+            border-radius: 32px;
+            padding: 24px;
             width: 100%;
-            background: rgba(0,0,0,0.5);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
-
-        .header {
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             text-align: center;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            color: #e94560;
+            text-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+        }
+        .subtitle {
+            margin: 0 0 24px;
+            color: #a0a0b0;
+            font-size: 0.9rem;
+        }
+        .step-title {
+            font-size: 1.3rem;
             margin-bottom: 20px;
+            color: #f5f5f5;
+            min-height: 2em;
         }
-
-        .title {
-            font-size: 2.5em;
-            color: #e2b714;
-            text-shadow: 0 0 20px rgba(226, 183, 20, 0.5);
-        }
-
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            margin: 10px;
-            transition: all 0.3s;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-primary { background: #e2b714; color: #000; }
-        .btn-blue { background: #3498db; color: #fff; }
-        .btn-green { background: #2ecc71; color: #fff; }
-        .btn-red { background: #e74c3c; color: #fff; }
-
-        .input-field {
-            padding: 15px;
-            border: 2px solid #2a2a4a;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            border-radius: 10px;
-            font-size: 16px;
-            width: 100%;
-            margin: 10px 0;
-        }
-
-        .player-list {
-            margin: 20px 0;
-        }
-
-        .player-item {
-            background: rgba(255,255,255,0.1);
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         .role-card {
-            background: rgba(255,255,255,0.15);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
+            background: #0f3460;
+            padding: 30px 20px;
+            border-radius: 24px;
             margin: 20px 0;
-            animation: fadeIn 0.5s;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+            word-break: break-word;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
+        .role-card.spy {
+            background: #4a0e0e;
+            color: #ff6b6b;
+            box-shadow: inset 0 0 30px rgba(255,0,0,0.2);
         }
-
-        .role-icon { font-size: 60px; }
-        .role-name { font-size: 24px; color: #e2b714; margin: 10px 0; }
-
-        .log {
-            background: rgba(0,0,0,0.4);
-            border-radius: 10px;
-            padding: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            margin: 20px 0;
-            font-size: 14px;
-        }
-
-        .hidden { display: none; }
-
-        .status {
+        .player-badge {
             display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 5px;
+            background: #e94560;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-weight: bold;
         }
-
-        .status-connected { background: #2ecc71; }
-        .status-waiting { background: #f1c40f; animation: blink 1s infinite; }
-        .status-dead { background: #e74c3c; }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .pass-text {
+            font-size: 1.2rem;
+            color: #ffd700;
+            font-weight: bold;
+            margin: 12px 0;
+            animation: pulse 1.5s infinite;
         }
-
-        .game-over {
-            text-align: center;
-            padding: 20px;
-            background: rgba(0,0,0,0.8);
-            border-radius: 15px;
-            border: 2px solid #e2b714;
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        .btn-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
             margin: 20px 0;
+        }
+        button {
+            background: #533483;
+            border: none;
+            color: white;
+            padding: 18px 24px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            min-width: 80px;
+            box-shadow: 0 5px 0 #3b1f5e;
+            letter-spacing: 1px;
+        }
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #3b1f5e;
+        }
+        button.primary {
+            background: #e94560;
+            box-shadow: 0 5px 0 #a02040;
+            width: 100%;
+            margin-top: 8px;
+            font-size: 1.5rem;
+            padding: 20px;
+        }
+        button.primary:active {
+            box-shadow: 0 1px 0 #a02040;
+        }
+        button.secondary {
+            background: #2d4059;
+            box-shadow: 0 5px 0 #1a2533;
+            font-size: 1rem;
+            padding: 12px 20px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .info-text {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-top: 12px;
+        }
+        .word-pair {
+            background: #222;
+            border-radius: 16px;
+            padding: 8px;
+            margin: 8px 0;
+            font-size: 0.9rem;
+            color: #ccc;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 class="title">🔫 МАФИЯ</h1>
-            <p>Wi-Fi Direct игра без интернета</p>
+    <div class="container" id="app">
+        <!-- ЭКРАН 1: ВЫБОР КОЛИЧЕСТВА ИГРОКОВ -->
+        <div id="screen-select">
+            <h1>🕵️ ШПИОН</h1>
+            <p class="subtitle">Игра на вечеринку</p>
+            <div class="step-title">На сколько человек играем?</div>
+            <div class="btn-grid" id="player-select">
+                <!-- Кнопки добавятся из JS -->
+            </div>
+            <div class="info-text">Минимум 2, максимум 10</div>
         </div>
 
-        <!-- Меню -->
-        <div id="menuScreen">
-            <input type="text" id="playerName" class="input-field" placeholder="Ваше имя" maxlength="10">
-            
-            <button class="btn btn-primary" onclick="createHost()">📡 Создать игру (Хост)</button>
-            
-            <div id="hostCode" class="hidden">
-                <p style="text-align: center; margin: 20px 0;">
-                    <strong>Код комнаты:</strong><br>
-                    <span id="roomCode" style="font-size: 2em; color: #e2b714;"></span>
-                </p>
-                <p style="text-align: center; color: #aaa;">
-                    Другие игроки должны ввести этот код
-                </p>
-            </div>
-
-            <input type="text" id="joinCode" class="input-field" placeholder="Код комнаты" maxlength="6">
-            <button class="btn btn-blue" onclick="joinGame()">🔗 Подключиться</button>
-
-            <div class="log" id="menuLog"></div>
+        <!-- ЭКРАН 2: ПЕРЕДАЧА ТЕЛЕФОНА И ПОКАЗ РОЛИ -->
+        <div id="screen-role" class="hidden">
+            <div id="player-header" class="player-badge">Игрок 1</div>
+            <div class="step-title" id="role-instruction">Посмотри слово и передай телефон</div>
+            <div id="role-display" class="role-card">СЛОВО</div>
+            <div class="pass-text" id="pass-message">📱 Передай телефон →</div>
+            <button class="primary" id="next-player-btn">Следующий игрок</button>
+            <button class="secondary" id="restart-from-role">🔄 Заново</button>
         </div>
 
-        <!-- Игра -->
-        <div id="gameScreen" class="hidden">
-            <h2 style="text-align: center;" id="gameStatus"></h2>
-            
-            <div id="roleReveal" class="hidden">
-                <div class="role-card">
-                    <div class="role-icon" id="roleIcon"></div>
-                    <div class="role-name" id="roleName"></div>
-                    <p id="roleDesc"></p>
-                </div>
-            </div>
-
-            <div class="player-list" id="playersList"></div>
-
-            <div id="gameActions">
-                <button class="btn btn-green" id="startBtn" onclick="startGame()">🎮 Начать игру</button>
-                <button class="btn btn-blue" id="nightBtn" onclick="nightPhase()">🌙 Ночь</button>
-                <button class="btn btn-red" id="voteBtn" onclick="votePhase()">🗳️ Голосование</button>
-            </div>
-
-            <div class="log" id="gameLog"></div>
-            
-            <div id="gameOver"></div>
+        <!-- ЭКРАН 3: НАЧАЛО ИГРЫ -->
+        <div id="screen-start" class="hidden">
+            <h1>🎉 ВСЁ!</h1>
+            <div class="step-title">Роли розданы. Обсуждайте и найдите шпиона!</div>
+            <div class="word-pair" id="final-words"></div>
+            <button class="primary" id="restart-from-start">🔄 Играть ещё раз</button>
         </div>
     </div>
 
     <script>
-        // ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
-        let peer = null;
-        let connections = {};
-        let myId = null;
-        let myName = '';
-        let isHost = false;
-        let roomCode = '';
-        
-        // Игровое состояние
-        let gameState = {
-            players: [],
-            phase: 'waiting',
-            day: 0,
-            started: false,
-            over: false
-        };
+        (function(){
+            // --- НАСТРОЙКИ ИГРЫ ---
+            // Слова подобраны так, чтобы было похоже и не сразу понятно
+            const WORD_PAIRS = [
+                { civilian: "Арбуз", spy: "Дыня" },
+                { civilian: "Банан", spy: "Клубника" }, // Твой пример
+                { civilian: "Кофе", spy: "Чай" },
+                { civilian: "Спанч Боб", spy: "Патрик" }, // Твой пример с мультиком
+                { civilian: "Пицца", spy: "Бургер" },
+                { civilian: "Такси", spy: "Автобус" },
+                { civilian: "Лето", spy: "Весна" },
+                { civilian: "Собака", spy: "Кошка" },
+                { civilian: "Кинотеатр", spy: "Театр" },
+                { civilian: "Йога", spy: "Пилатес" }
+            ];
 
-        // Роли
-        const ROLES = {
-            MAFIA: '🔫 Мафия',
-            DON: '👑 Дон',
-            SHERIFF: '🔍 Шериф',
-            DOCTOR: '💉 Доктор',
-            CIVILIAN: '👤 Мирный'
-        };
+            // --- СОСТОЯНИЕ ---
+            let totalPlayers = 3;
+            let currentPlayerIndex = 0; // 0-based
+            let currentPair = null;
+            let spyIndex = -1;
 
-        // ============ ИНИЦИАЛИЗАЦИЯ PEERJS ============
-        function initPeer() {
-            return new Promise((resolve, reject) => {
-                // Создаём peer с уникальным ID
-                peer = new Peer();
-                
-                peer.on('open', (id) => {
-                    myId = id;
-                    console.log('Мой ID:', id);
-                    resolve(id);
-                });
-
-                peer.on('connection', (conn) => {
-                    if (isHost) {
-                        handleIncomingConnection(conn);
-                    }
-                });
-
-                peer.on('error', (err) => {
-                    console.error('PeerJS ошибка:', err);
-                    reject(err);
-                });
-            });
-        }
-
-        // ============ СОЗДАНИЕ КОМНАТЫ ============
-        async function createHost() {
-            myName = document.getElementById('playerName').value.trim() || 'Хост';
+            // --- ЭЛЕМЕНТЫ ---
+            const screenSelect = document.getElementById('screen-select');
+            const screenRole = document.getElementById('screen-role');
+            const screenStart = document.getElementById('screen-start');
             
-            try {
-                await initPeer();
-                isHost = true;
-                
-                // Генерируем простой код комнаты
-                roomCode = myId.slice(0, 6).toUpperCase();
-                
-                document.getElementById('roomCode').textContent = roomCode;
-                document.getElementById('hostCode').classList.remove('hidden');
-                
-                addMenuLog(`📡 Комната создана!`);
-                addMenuLog(`👑 Вы хост: ${myName}`);
-                addMenuLog(`🔑 Код: ${roomCode}`);
-                addMenuLog(`⏳ Ожидание игроков...`);
-                
-                // Добавляем хоста в игру
-                gameState.players.push({
-                    id: myId,
-                    name: myName,
-                    role: null,
-                    alive: true
-                });
-                
-                updatePlayersList();
-            } catch (error) {
-                alert('Ошибка: ' + error.message);
+            const playerSelectDiv = document.getElementById('player-select');
+            const playerHeader = document.getElementById('player-header');
+            const roleDisplay = document.getElementById('role-display');
+            const passMessage = document.getElementById('pass-message');
+            const nextPlayerBtn = document.getElementById('next-player-btn');
+            const restartFromRole = document.getElementById('restart-from-role');
+            const restartFromStart = document.getElementById('restart-from-start');
+            const finalWords = document.getElementById('final-words');
+
+            // --- ФУНКЦИИ ---
+            function showScreen(screen) {
+                // Скрыть все
+                [screenSelect, screenRole, screenStart].forEach(s => s.classList.add('hidden'));
+                // Показать нужный
+                screen.classList.remove('hidden');
             }
-        }
 
-        // ============ ПОДКЛЮЧЕНИЕ К ИГРЕ ============
-        async function joinGame() {
-            myName = document.getElementById('playerName').value.trim() || 'Игрок';
-            roomCode = document.getElementById('joinCode').value.trim().toUpperCase();
-            
-            if (!roomCode) {
-                alert('Введите код комнаты!');
-                return;
-            }
-            
-            try {
-                await initPeer();
-                isHost = false;
-                
-                addMenuLog(`🔍 Подключение к комнате ${roomCode}...`);
-                
-                // Пытаемся найти хост по ID
-                // PeerJS не может искать по ID, поэтому используем полный ID
-                // В реальности нужно передать полный ID через другой канал
-                // Для простоты используем первые 6 символов как код
-                
-                // Пробуем подключиться с разными вариантами ID
-                const possibleIds = [
-                    roomCode.toLowerCase(),
-                    roomCode,
-                    roomCode + '0000',
-                    roomCode + '000000'
-                ];
-                
-                let connected = false;
-                for (const id of possibleIds) {
-                    try {
-                        const conn = peer.connect(id, { reliable: true });
-                        
-                        conn.on('open', () => {
-                            connected = true;
-                            addMenuLog(`✅ Подключено к ${id}`);
-                            
-                            // Отправляем информацию о себе
-                            conn.send({
-                                type: 'join',
-                                name: myName,
-                                peerId: myId
-                            });
-                            
-                            setupConnection(conn, id);
-                            enterGame();
-                        });
-                        
-                        // Ждём немного
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                        if (connected) break;
-                        
-                    } catch (e) {
-                        console.log('Не удалось подключиться к', id);
-                    }
-                }
-                
-                if (!connected) {
-                    addMenuLog('❌ Комната не найдена!');
-                }
-                
-            } catch (error) {
-                alert('Ошибка: ' + error.message);
-            }
-        }
-
-        // ============ ОБРАБОТКА ПОДКЛЮЧЕНИЙ ============
-        function handleIncomingConnection(conn) {
-            conn.on('open', () => {
-                addMenuLog(`👋 Новое подключение!`);
-                
-                conn.on('data', (data) => {
-                    if (data.type === 'join') {
-                        addMenuLog(`👤 ${data.name} хочет присоединиться`);
-                        
-                        // Добавляем игрока
-                        const newPlayer = {
-                            id: data.peerId,
-                            name: data.name,
-                            role: null,
-                            alive: true
-                        };
-                        
-                        gameState.players.push(newPlayer);
-                        connections[data.peerId] = conn;
-                        
-                        // Подтверждаем подключение
-                        conn.send({
-                            type: 'welcome',
-                            players: gameState.players
-                        });
-                        
-                        updatePlayersList();
-                        
-                        // Отправляем обновление всем
-                        broadcastToAll({
-                            type: 'player_joined',
-                            player: newPlayer
-                        });
-                    } else if (data.type === 'action') {
-                        handlePlayerAction(conn, data);
-                    }
-                });
-            });
-        }
-
-        function setupConnection(conn, peerId) {
-            connections[peerId] = conn;
-            
-            conn.on('data', (data) => {
-                if (data.type === 'welcome') {
-                    // Получаем список игроков
-                    gameState.players = data.players;
-                    updatePlayersList();
-                    addGameLog(`✅ Вы присоединились к игре!`);
-                } else if (data.type === 'player_joined') {
-                    addGameLog(`👋 ${data.player.name} присоединился`);
-                } else if (data.type === 'game_start') {
-                    startGameAsPlayer(data);
-                } else if (data.type === 'phase_change') {
-                    handlePhaseChange(data);
-                }
-            });
-        }
-
-        function broadcastToAll(data) {
-            Object.values(connections).forEach(conn => {
-                if (conn.open) {
-                    conn.send(data);
-                }
-            });
-        }
-
-        // ============ ИГРОВАЯ ЛОГИКА ============
-        function startGame() {
-            if (!isHost || gameState.players.length < 3) {
-                alert('Нужно минимум 3 игрока!');
-                return;
-            }
-            
-            // Раздаём роли
-            assignRoles();
-            
-            gameState.started = true;
-            gameState.phase = 'day';
-            gameState.day = 1;
-            
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('nightBtn').disabled = false;
-            document.getElementById('voteBtn').disabled = false;
-            
-            document.getElementById('gameStatus').textContent = `☀️ День ${gameState.day}`;
-            
-            addGameLog('🎮 Игра началась!');
-            addGameLog('☀️ Город просыпается');
-            
-            // Показываем роль хосту
-            showMyRole();
-            
-            // Отправляем роли всем игрокам
-            gameState.players.forEach(player => {
-                if (player.id === myId) return; // Хост уже знает свою роль
-                
-                if (connections[player.id]) {
-                    connections[player.id].send({
-                        type: 'game_start',
-                        role: player.role,
-                        players: gameState.players
+            function initPlayerButtons() {
+                playerSelectDiv.innerHTML = '';
+                // Кнопки 2-10
+                for (let i = 2; i <= 10; i++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i;
+                    btn.addEventListener('click', () => {
+                        totalPlayers = i;
+                        startRoleAssignment();
                     });
+                    playerSelectDiv.appendChild(btn);
                 }
-            });
-            
-            updatePlayersList();
-        }
-
-        function assignRoles() {
-            const players = gameState.players;
-            const count = players.length;
-            
-            // Определяем количество мафии
-            const mafiaCount = Math.floor(count / 3);
-            
-            // Создаём массив ролей
-            let roles = [];
-            
-            if (mafiaCount > 1) {
-                roles.push(ROLES.DON);
-                for (let i = 0; i < mafiaCount - 1; i++) {
-                    roles.push(ROLES.MAFIA);
-                }
-            } else {
-                roles.push(ROLES.MAFIA);
             }
-            
-            if (count >= 4) roles.push(ROLES.SHERIFF);
-            if (count >= 5) roles.push(ROLES.DOCTOR);
-            
-            while (roles.length < count) {
-                roles.push(ROLES.CIVILIAN);
-            }
-            
-            // Перемешиваем роли
-            for (let i = roles.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [roles[i], roles[j]] = [roles[j], roles[i]];
-            }
-            
-            // Назначаем роли
-            players.forEach((player, index) => {
-                player.role = roles[index];
-            });
-        }
 
-        function nightPhase() {
-            if (!isHost || gameState.phase !== 'day') return;
-            
-            gameState.phase = 'night';
-            document.getElementById('gameStatus').textContent = `🌙 Ночь ${gameState.day}`;
-            document.getElementById('nightBtn').disabled = true;
-            document.getElementById('voteBtn').disabled = true;
-            
-            addGameLog('🌙 Наступает ночь...');
-            
-            broadcastToAll({
-                type: 'phase_change',
-                phase: 'night',
-                day: gameState.day
-            });
-            
-            // Симуляция действий мафии
-            setTimeout(() => {
-                performNightActions();
-            }, 3000);
-        }
-
-        function performNightActions() {
-            const alivePlayers = gameState.players.filter(p => p.alive);
-            const mafiaPlayers = alivePlayers.filter(p => 
-                p.role === ROLES.MAFIA || p.role === ROLES.DON
-            );
-            const civilianPlayers = alivePlayers.filter(p => 
-                p.role !== ROLES.MAFIA && p.role !== ROLES.DON
-            );
-            
-            if (mafiaPlayers.length > 0 && civilianPlayers.length > 0) {
-                // Мафия убивает случайного мирного
-                const target = civilianPlayers[Math.floor(Math.random() * civilianPlayers.length)];
-                target.alive = false;
+            // Выбор случайной пары слов и назначение шпиона
+            function startRoleAssignment() {
+                // Сброс
+                currentPlayerIndex = 0;
+                // Выбрать случайную пару
+                const randomPairIndex = Math.floor(Math.random() * WORD_PAIRS.length);
+                currentPair = WORD_PAIRS[randomPairIndex];
+                // Выбрать случайного шпиона (0..totalPlayers-1)
+                spyIndex = Math.floor(Math.random() * totalPlayers);
                 
-                addGameLog(`☠️ Ночью был убит: ${target.name}`);
+                // Переключиться на экран ролей
+                showScreen(screenRole);
+                updateRoleScreen();
+            }
+
+            function updateRoleScreen() {
+                const playerNum = currentPlayerIndex + 1;
+                const isLastPlayer = currentPlayerIndex === totalPlayers - 1;
+                const isSpy = currentPlayerIndex === spyIndex;
                 
-                broadcastToAll({
-                    type: 'player_killed',
-                    playerId: target.id,
-                    playerName: target.name
-                });
-            }
-            
-            // Проверяем победу
-            if (checkWinCondition()) return;
-            
-            // Переходим к дню
-            gameState.phase = 'day';
-            gameState.day++;
-            
-            document.getElementById('gameStatus').textContent = `☀️ День ${gameState.day}`;
-            document.getElementById('nightBtn').disabled = false;
-            document.getElementById('voteBtn').disabled = false;
-            
-            addGameLog(`☀️ Наступает день ${gameState.day}`);
-            
-            broadcastToAll({
-                type: 'phase_change',
-                phase: 'day',
-                day: gameState.day
-            });
-            
-            updatePlayersList();
-        }
-
-        function votePhase() {
-            if (!isHost || gameState.phase !== 'day') return;
-            
-            gameState.phase = 'voting';
-            document.getElementById('gameStatus').textContent = '🗳️ Голосование';
-            document.getElementById('nightBtn').disabled = true;
-            document.getElementById('voteBtn').disabled = true;
-            
-            addGameLog('🗳️ Начинается голосование');
-            
-            broadcastToAll({
-                type: 'phase_change',
-                phase: 'voting'
-            });
-            
-            // Симуляция голосования
-            setTimeout(() => {
-                performVoting();
-            }, 5000);
-        }
-
-        function performVoting() {
-            const alivePlayers = gameState.players.filter(p => p.alive);
-            
-            if (alivePlayers.length === 0) return;
-            
-            // Случайное голосование для простоты
-            const target = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
-            target.alive = false;
-            
-            addGameLog(`🚫 Изгнан: ${target.name}`);
-            addGameLog(`Роль: ${target.role}`);
-            
-            broadcastToAll({
-                type: 'player_killed',
-                playerId: target.id,
-                playerName: target.name,
-                role: target.role
-            });
-            
-            if (checkWinCondition()) return;
-            
-            gameState.phase = 'day';
-            document.getElementById('nightBtn').disabled = false;
-            document.getElementById('voteBtn').disabled = false;
-            
-            updatePlayersList();
-        }
-
-        function checkWinCondition() {
-            const alivePlayers = gameState.players.filter(p => p.alive);
-            const mafiaAlive = alivePlayers.filter(p => 
-                p.role === ROLES.MAFIA || p.role === ROLES.DON
-            ).length;
-            const civiliansAlive = alivePlayers.filter(p => 
-                p.role !== ROLES.MAFIA && p.role !== ROLES.DON
-            ).length;
-            
-            if (mafiaAlive === 0) {
-                endGame('🏆 Мирные жители победили!');
-                return true;
-            } else if (mafiaAlive >= civiliansAlive) {
-                endGame('🔫 Мафия победила!');
-                return true;
-            }
-            
-            return false;
-        }
-
-        function endGame(message) {
-            gameState.over = true;
-            gameState.phase = 'ended';
-            
-            document.getElementById('gameStatus').textContent = '🏁 Игра окончена';
-            document.getElementById('nightBtn').disabled = true;
-            document.getElementById('voteBtn').disabled = true;
-            
-            const gameOverHtml = `
-                <div class="game-over">
-                    <h2>${message}</h2>
-                    <h3>Роли:</h3>
-                    ${gameState.players.map(p => `
-                        <div class="player-item">
-                            <span>${p.name}</span>
-                            <span>${p.role || '???'}</span>
-                            <span>${p.alive ? '✓' : '☠️'}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            
-            document.getElementById('gameOver').innerHTML = gameOverHtml;
-            
-            broadcastToAll({
-                type: 'game_over',
-                message: message,
-                players: gameState.players
-            });
-        }
-
-        // ============ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ============
-        function showMyRole() {
-            const me = gameState.players.find(p => p.id === myId);
-            if (me && me.role) {
-                document.getElementById('roleReveal').classList.remove('hidden');
-                document.getElementById('roleIcon').textContent = me.role.split(' ')[0];
-                document.getElementById('roleName').textContent = me.role.split(' ')[1] || me.role;
-                document.getElementById('roleDesc').textContent = getRoleDescription(me.role);
-            }
-        }
-
-        function getRoleDescription(role) {
-            switch(role) {
-                case ROLES.MAFIA: return 'Вы мафия. Убивайте мирных ночью.';
-                case ROLES.DON: return 'Вы дон. Руководите мафией.';
-                case ROLES.SHERIFF: return 'Вы шериф. Находите мафию.';
-                case ROLES.DOCTOR: return 'Вы доктор. Спасайте игроков.';
-                case ROLES.CIVILIAN: return 'Вы мирный. Найдите мафию.';
-                default: return '';
-            }
-        }
-
-        function startGameAsPlayer(data) {
-            gameState.started = true;
-            gameState.phase = 'day';
-            gameState.day = 1;
-            
-            document.getElementById('gameStatus').textContent = '☀️ День 1';
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('nightBtn').disabled = true;
-            document.getElementById('voteBtn').disabled = true;
-            
-            // Находим свою роль
-            const me = data.players.find(p => p.id === myId);
-            if (me) {
-                const myPlayer = gameState.players.find(p => p.id === myId);
-                if (myPlayer) {
-                    myPlayer.role = me.role;
+                // Шапка: "Игрок X"
+                playerHeader.textContent = `Игрок ${playerNum}`;
+                
+                // Если шпион, показываем его слово, иначе гражданского
+                if (isSpy) {
+                    roleDisplay.textContent = currentPair.spy;
+                    roleDisplay.classList.add('spy');
+                    // Небольшая подсказка, чтобы шпион знал, что он шпион (но не выдавал себя)
+                    // В реальной игре лучше просто показать слово без явной надписи "ШПИОН", чтобы никто не увидел.
+                    // Но можно сделать иначе: просто слово, а игрок сам догадается при обсуждении.
+                    // Для удобства оставим слово, а для теста можно убрать класс 'spy', если не хочешь выделять.
+                } else {
+                    roleDisplay.textContent = currentPair.civilian;
+                    roleDisplay.classList.remove('spy');
                 }
+                
+                // Сообщение о передаче
+                if (isLastPlayer) {
+                    passMessage.textContent = "✅ Все посмотрели!";
+                    nextPlayerBtn.textContent = "🏁 Начать игру";
+                    nextPlayerBtn.classList.add('primary');
+                } else {
+                    passMessage.textContent = `📱 Передай телефон Игроку ${playerNum + 1}`;
+                    nextPlayerBtn.textContent = "👁️ Скрыть и передать";
+                }
+                
+                // Обработчик кнопки "Следующий"
+                // Сначала удалим старый обработчик, чтобы не дублировался
+                nextPlayerBtn.onclick = () => {
+                    if (currentPlayerIndex < totalPlayers - 1) {
+                        // Переход к следующему игроку
+                        currentPlayerIndex++;
+                        updateRoleScreen();
+                    } else {
+                        // Это был последний игрок -> Завершаем раздачу
+                        showStartScreen();
+                    }
+                };
             }
-            
-            addGameLog('🎮 Игра началась!');
-            addGameLog('☀️ Город просыпается');
-            
-            showMyRole();
-            updatePlayersList();
-        }
 
-        function handlePhaseChange(data) {
-            gameState.phase = data.phase;
-            
-            if (data.day) {
-                gameState.day = data.day;
+            function showStartScreen() {
+                // Показать слова (чтобы ведущий видел, но в реальной игре можно не показывать)
+                finalWords.innerHTML = `
+                    <div>🔵 Мирные: <b>${currentPair.civilian}</b></div>
+                    <div>🔴 Шпион: <b>${currentPair.spy}</b> (игрок №${spyIndex + 1})</div>
+                `;
+                showScreen(screenStart);
             }
-            
-            if (data.phase === 'day') {
-                document.getElementById('gameStatus').textContent = `☀️ День ${gameState.day}`;
-            } else if (data.phase === 'night') {
-                document.getElementById('gameStatus').textContent = `🌙 Ночь ${gameState.day}`;
-                addGameLog('🌙 Наступает ночь...');
-            } else if (data.phase === 'voting') {
-                document.getElementById('gameStatus').textContent = '🗳️ Голосование';
-                addGameLog('🗳️ Начинается голосование');
+
+            function resetToMenu() {
+                showScreen(screenSelect);
             }
-        }
 
-        function handlePlayerAction(conn, data) {
-            // Обработка действий игроков (для будущих улучшений)
-        }
+            // --- ИНИЦИАЛИЗАЦИЯ ---
+            initPlayerButtons();
 
-        function updatePlayersList() {
-            const listHtml = gameState.players.map(p => `
-                <div class="player-item">
-                    <span>
-                        <span class="status ${p.alive ? 'status-connected' : 'status-dead'}"></span>
-                        ${p.name}
-                    </span>
-                    <span>${p.role || ''}</span>
-                </div>
-            `).join('');
-            
-            document.getElementById('playersList').innerHTML = listHtml;
-        }
+            // Кнопки возврата в меню
+            restartFromRole.addEventListener('click', resetToMenu);
+            restartFromStart.addEventListener('click', resetToMenu);
 
-        function addMenuLog(msg) {
-            const log = document.getElementById('menuLog');
-            log.innerHTML += `<div>${msg}</div>`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function addGameLog(msg) {
-            const log = document.getElementById('gameLog');
-            log.innerHTML += `<div>${msg}</div>`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function enterGame() {
-            document.getElementById('menuScreen').classList.add('hidden');
-            document.getElementById('gameScreen').classList.remove('hidden');
-            document.getElementById('gameStatus').textContent = '⏳ Ожидание начала игры...';
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('nightBtn').disabled = true;
-            document.getElementById('voteBtn').disabled = true;
-        }
-
-        // Обновляем список игроков каждые 2 секунды для хоста
-        setInterval(() => {
-            if (isHost && gameState.started) {
-                // Отправляем обновления состояния
-                broadcastToAll({
-                    type: 'state_update',
-                    players: gameState.players
-                });
-            }
-        }, 2000);
+            // Показ стартового экрана
+            showScreen(screenSelect);
+        })();
     </script>
-
-    <!-- PeerJS CDN -->
-    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
 </body>
 </html>
