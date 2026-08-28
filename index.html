@@ -362,6 +362,15 @@
             display: none !important;
         }
 
+        .error-message {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -392,8 +401,6 @@
                 <button class="player-btn" data-count="4">4 игрока</button>
                 <button class="player-btn" data-count="5">5 игроков</button>
                 <button class="player-btn" data-count="6">6 игроков</button>
-                <button class="player-btn" data-count="8">8 игроков</button>
-                <button class="player-btn" data-count="10">10 игроков</button>
             </div>
             
             <button class="btn btn-primary" onclick="createRoom()">🏠 Создать комнату</button>
@@ -403,6 +410,7 @@
                 <input type="text" id="roomIdInput" class="input-field" placeholder="Введите ID комнаты">
                 <button class="btn btn-blue" onclick="joinRoom()">🔗 Подключиться</button>
             </div>
+            <div id="errorMessage" class="error-message hidden"></div>
         </div>
 
         <!-- Экран игры -->
@@ -497,14 +505,28 @@
             });
         });
 
-        // Инициализация PeerJS
+        // Функция показа ошибки
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => {
+                errorDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Инициализация PeerJS с облачным сервером
         function initPeer(id) {
+            // Используем публичный сервер PeerJS
             peer = new Peer(id, {
-                debug: 2,
+                debug: 3,
                 config: {
                     'iceServers': [
                         { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' }
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' },
+                        { urls: 'stun:stun3.l.google.com:19302' },
+                        { urls: 'stun:stun4.l.google.com:19302' }
                     ]
                 }
             });
@@ -520,13 +542,17 @@
             });
 
             peer.on('connection', (conn) => {
+                console.log('Входящее соединение от:', conn.peer);
                 conn.on('open', () => {
+                    console.log('Соединение установлено');
                     connections.push(conn);
                     setupConnection(conn);
                     
                     if (isHost) {
+                        // Назначаем игроку индекс
                         const playerIndex = connections.length;
                         if (playerIndex < selectedPlayers) {
+                            console.log('Назначаем игроку индекс:', playerIndex);
                             conn.send({
                                 type: 'assign-player',
                                 playerIndex: playerIndex
@@ -536,31 +562,52 @@
                 });
             });
 
+            peer.on('disconnected', () => {
+                console.log('Отключен от сервера, переподключаюсь...');
+                peer.reconnect();
+            });
+
             peer.on('error', (err) => {
                 console.error('PeerJS error:', err);
-                alert('Ошибка: ' + err.type);
+                if (err.type === 'peer-unavailable') {
+                    showError('Комната не найдена. Проверьте ID.');
+                } else if (err.type === 'network') {
+                    showError('Проблема с сетью. Попробуйте еще раз.');
+                } else if (err.type === 'browser-incompatible') {
+                    showError('Ваш браузер не поддерживает WebRTC. Используйте Chrome или Firefox.');
+                } else {
+                    showError('Ошибка: ' + err.type);
+                }
             });
         }
 
         // Настройка соединения
         function setupConnection(conn) {
             conn.on('data', (data) => {
+                console.log('Получены данные:', data);
                 handleData(data, conn);
             });
 
             conn.on('close', () => {
+                console.log('Соединение закрыто');
                 connections = connections.filter(c => c !== conn);
                 if (isHost) {
                     updateStatuses();
                 }
             });
+
+            conn.on('error', (err) => {
+                console.error('Ошибка соединения:', err);
+            });
         }
 
         // Обработка входящих данных
         function handleData(data, conn) {
+            console.log('Обработка данных:', data.type);
             switch(data.type) {
                 case 'assign-player':
                     myPlayerIndex = data.playerIndex;
+                    console.log('Мой индекс игрока:', myPlayerIndex);
                     connectPlayer(data.playerIndex);
                     break;
                 case 'player-connected':
@@ -589,6 +636,7 @@
         function broadcast(data) {
             connections.forEach(conn => {
                 if (conn.open) {
+                    console.log('Отправка данных:', data.type);
                     conn.send(data);
                 }
             });
@@ -600,6 +648,7 @@
             isHost = true;
             myPlayerIndex = 0;
             
+            console.log('Создание комнаты с ID:', roomId);
             initPeer(roomId);
             
             document.getElementById('menuScreen').classList.add('hidden');
@@ -609,6 +658,7 @@
             connectPlayer(0);
             
             addLog('Комната создана. ID: ' + roomId);
+            addLog('Отправьте ID друзьям для подключения');
             addLog('Ожидание игроков...');
         }
 
@@ -616,10 +666,11 @@
         function joinRoom() {
             roomId = document.getElementById('roomIdInput').value.trim();
             if (!roomId) {
-                alert('Введите ID комнаты');
+                showError('Введите ID комнаты');
                 return;
             }
             
+            console.log('Подключение к комнате:', roomId);
             isHost = false;
             myPeerId = 'player-' + Math.random().toString(36).substr(2, 8);
             
@@ -629,12 +680,22 @@
             document.getElementById('gameScreen').classList.remove('hidden');
             
             // Подключаемся к хосту
-            const conn = peer.connect(roomId, { reliable: true });
+            const conn = peer.connect(roomId, { 
+                reliable: true,
+                metadata: { playerName: 'Игрок' }
+            });
             
             conn.on('open', () => {
+                console.log('Подключение установлено');
                 connections.push(conn);
                 setupConnection(conn);
                 addLog('Подключено к комнате!');
+                addLog('Ожидание назначения роли...');
+            });
+            
+            conn.on('error', (err) => {
+                console.error('Ошибка подключения:', err);
+                showError('Не удалось подключиться. Проверьте ID комнаты.');
             });
         }
 
@@ -664,14 +725,25 @@
             const roles = [];
             const mafiaCount = Math.floor(selectedPlayers / 3) || 1;
             
-            roles.push(ROLES.DON);
-            for (let i = 1; i < mafiaCount; i++) {
+            // Добавляем мафию
+            if (mafiaCount === 1) {
                 roles.push(ROLES.MAFIA);
+            } else {
+                roles.push(ROLES.DON);
+                for (let i = 1; i < mafiaCount; i++) {
+                    roles.push(ROLES.MAFIA);
+                }
             }
             
-            roles.push(ROLES.SHERIFF);
-            roles.push(ROLES.DOCTOR);
+            // Специальные роли
+            if (selectedPlayers >= 4) {
+                roles.push(ROLES.SHERIFF);
+            }
+            if (selectedPlayers >= 5) {
+                roles.push(ROLES.DOCTOR);
+            }
             
+            // Остальные - мирные жители
             while (roles.length < selectedPlayers) {
                 roles.push(ROLES.CIVILIAN);
             }
@@ -687,6 +759,7 @@
 
         // Подключение игрока
         function connectPlayer(playerIndex) {
+            console.log('Подключение игрока:', playerIndex);
             if (gameState.players[playerIndex]) {
                 gameState.players[playerIndex].isConnected = true;
                 
@@ -706,9 +779,9 @@
                     
                     // Проверяем, все ли подключились
                     const allConnected = gameState.players.every(p => p.isConnected);
-                    if (allConnected) {
+                    if (allConnected && gameState.players.length === selectedPlayers) {
                         document.getElementById('startBtn').disabled = false;
-                        addLog('Все игроки подключены! Можно начинать.');
+                        addLog('✅ Все игроки подключены! Можно начинать.');
                     }
                 }
             }
@@ -717,10 +790,12 @@
         // Показ роли игроку
         function showRole(playerIndex) {
             const player = gameState.players[playerIndex];
-            document.getElementById('modalRoleIcon').textContent = player.avatar;
-            document.getElementById('modalRoleName').textContent = player.role;
-            document.getElementById('modalRoleDescription').textContent = ROLE_DESCRIPTIONS[player.role];
-            document.getElementById('roleModal').classList.add('show');
+            if (player) {
+                document.getElementById('modalRoleIcon').textContent = player.avatar;
+                document.getElementById('modalRoleName').textContent = player.role;
+                document.getElementById('modalRoleDescription').textContent = ROLE_DESCRIPTIONS[player.role] || 'Ваша роль.';
+                document.getElementById('roleModal').classList.add('show');
+            }
         }
 
         function closeRoleModal() {
@@ -803,6 +878,15 @@
         function copyRoomId() {
             navigator.clipboard.writeText(roomId).then(() => {
                 alert('ID скопирован!');
+            }).catch(() => {
+                // Fallback
+                const input = document.createElement('input');
+                input.value = roomId;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                alert('ID скопирован!');
             });
         }
 
@@ -823,6 +907,7 @@
             
             if (isHost) {
                 broadcast({ type: 'start-game' });
+                broadcast({ type: 'game-state', gameState: gameState });
             }
         }
 
@@ -855,10 +940,12 @@
             const civilians = alivePlayers.filter(p => p.role !== ROLES.MAFIA && p.role !== ROLES.DON);
             
             // Мафия убивает
-            const target = civilians[Math.floor(Math.random() * civilians.length)];
-            if (target) {
-                target.isAlive = false;
-                addLog('☠️ Мафия убила: ' + target.name);
+            if (mafia.length > 0 && civilians.length > 0) {
+                const target = civilians[Math.floor(Math.random() * civilians.length)];
+                if (target) {
+                    target.isAlive = false;
+                    addLog('☠️ Мафия убила: ' + target.name);
+                }
             }
             
             // Проверка победы
@@ -892,7 +979,7 @@
             document.getElementById('voteBtn').disabled = true;
             document.getElementById('nightBtn').disabled = true;
             
-            addLog('🗳️ Голосование началось!');
+            addLog('🗳️ Голосование началось! Выберите игрока');
             updatePhase();
             updatePlayers();
             
