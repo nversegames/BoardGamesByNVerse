@@ -4,7 +4,7 @@ let currentPlayerIndex = 0;
 let currentPair = null;
 let spyIndex = -1;
 let recentlyUsedPairs = [];
-const MAX_RECENT_PAIRS = 200;
+const MAX_RECENT_PAIRS = 100;
 
 // ================== СОСТОЯНИЕ КРОКОДИЛА ==================
 let recentlyUsedCrocodileWords = [];
@@ -36,135 +36,147 @@ let guessMax = 100;
 let guessCurrent = 50;
 let guessTries = 0;
 
-// ================== СОСТОЯНИЕ МАФИИ ==================
-let mafiaPlayers = 6;
-let mafiaRoles = [];
-let rolesRevealed = [];
-
 // ================== СОСТОЯНИЕ АССОЦИАЦИЙ ==================
 let recentlyUsedAssociationWords = [];
 const MAX_RECENT_ASSOCIATION_WORDS = 50;
 
-// ================== ЭЛЕМЕНТЫ ==================
-const gameMenu = document.getElementById('game-menu');
-const mafiaGame = document.getElementById('mafia-game');
-const spyGame = document.getElementById('spy-game');
-const crocodileGame = document.getElementById('crocodile-game');
-const bombGame = document.getElementById('bomb-game');
-const questionsGame = document.getElementById('questions-game');
-const truthGame = document.getElementById('truth-game');
-const diceGame = document.getElementById('dice-game');
-const guessGame = document.getElementById('guess-game');
-const leaderGame = document.getElementById('leader-game');
-const ultimatumGame = document.getElementById('ultimatum-game');
-const wordAssociationGame = document.getElementById('word-association-game');
+// ================== СОСТОЯНИЕ СМЕШНОЙ ИСТОРИИ ==================
+let storyAnswers = {};
+let storyStep = 0;
+let recentlyUsedStories = [];
+const MAX_RECENT_STORIES = 100;
 
-// Элементы Мафии
-const mafiaPlayerSelectDiv = document.getElementById('mafia-player-select');
-const mafiaRoleDisplay = document.getElementById('mafia-role-display');
-const mafiaRolesList = document.getElementById('mafia-roles-list');
-const mafiaRedistributeBtn = document.getElementById('mafia-redistribute-btn');
+// ================== СОСТОЯНИЕ ФАКТ ИЛИ ФЕЙК ==================
+let currentFact = null;
+let recentlyUsedFacts = [];
+const MAX_RECENT_FACTS = 50;
 
-// Элементы Банан Шпиона
-const screenSelect = document.getElementById('screen-select');
-const screenRole = document.getElementById('screen-role');
-const screenHidden = document.getElementById('screen-hidden');
-const screenAllDone = document.getElementById('screen-all-done');
-const screenStart = document.getElementById('screen-start');
-const playerSelectDiv = document.getElementById('player-select');
-const playerHeader = document.getElementById('player-header');
-const roleDisplay = document.getElementById('role-display');
-const hideWordBtn = document.getElementById('hide-word-btn');
-const restartFromRole = document.getElementById('restart-from-role');
-const nextPlayerHeader = document.getElementById('next-player-header');
-const passMessageHidden = document.getElementById('pass-message-hidden');
-const showWordBtn = document.getElementById('show-word-btn');
-const restartFromHidden = document.getElementById('restart-from-hidden');
-const startGameBtn = document.getElementById('start-game-btn');
-const restartFromDone = document.getElementById('restart-from-done');
-const restartFromStart = document.getElementById('restart-from-start');
-const finalWords = document.getElementById('final-words');
-const revealSpyBtn = document.getElementById('reveal-spy-btn');
+// ================== СОСТОЯНИЕ ЗВУКА ==================
+let soundEnabled = true;
+let audioContext = null;
 
-// Элементы Крокодила
-const crocodileWordDisplay = document.getElementById('crocodile-word-display');
-const nextCrocodileWordBtn = document.getElementById('next-crocodile-word');
+// ================== ФУНКЦИИ ЗВУКА ==================
+function initAudio() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
 
-// Элементы Бомбы
-const bombTimerDisplay = document.getElementById('bomb-timer');
-const bombWordDisplay = document.getElementById('bomb-word-display');
-const startBombBtn = document.getElementById('start-bomb-game');
+function playSound(type) {
+    if (!soundEnabled) return;
+    
+    try {
+        initAudio();
+        
+        let frequency = 440;
+        let duration = 0.1;
+        let volume = 0.3;
+        
+        switch(type) {
+            case 'click':
+                frequency = 600;
+                duration = 0.05;
+                volume = 0.2;
+                break;
+            case 'flip':
+                frequency = 800;
+                duration = 0.08;
+                volume = 0.25;
+                break;
+            case 'success':
+                frequency = 880;
+                duration = 0.2;
+                volume = 0.4;
+                break;
+            case 'fail':
+                frequency = 220;
+                duration = 0.3;
+                volume = 0.3;
+                break;
+            case 'tick':
+                frequency = 1000;
+                duration = 0.03;
+                volume = 0.15;
+                break;
+            case 'bomb':
+                frequency = 110;
+                duration = 0.5;
+                volume = 0.5;
+                break;
+            case 'win':
+                frequency = 1200;
+                duration = 0.4;
+                volume = 0.5;
+                break;
+            case 'roll':
+                frequency = 400;
+                duration = 0.15;
+                volume = 0.3;
+                break;
+        }
+        
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.value = frequency;
+        
+        gainNode.gain.value = volume;
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + duration);
+        
+    } catch(e) {
+        console.log('Звук недоступен');
+    }
+}
 
-// Элементы 20 вопросов
-const questionsWordDisplay = document.getElementById('questions-word-display');
-const questionsCounter = document.getElementById('questions-counter');
-const startQuestionsBtn = document.getElementById('start-questions-game');
-const resetQuestionsBtn = document.getElementById('reset-questions-game');
+function playBombTick() {
+    if (!soundEnabled) return;
+    playSound('tick');
+}
 
-// Элементы Правда или Действие
-const truthCardDisplay = document.getElementById('truth-card-display');
-const generateTruthBtn = document.getElementById('generate-truth');
-const generateActionBtn = document.getElementById('generate-action');
-
-// Элементы Кубика
-const diceDisplay = document.getElementById('dice-display');
-const rollDiceBtn = document.getElementById('roll-dice');
-
-// Элементы Угадай Число
-const guessCardDisplay = document.getElementById('guess-card-display');
-const guessHigherBtn = document.getElementById('guess-higher');
-const guessCorrectBtn = document.getElementById('guess-correct');
-const guessLowerBtn = document.getElementById('guess-lower');
-const resetGuessBtn = document.getElementById('reset-guess-game');
-
-// Элементы Тайного лидера
-const leaderRoleDisplay = document.getElementById('leader-role-display');
-const startLeaderGameBtn = document.getElementById('start-leader-game');
-
-// Элементы Ультиматума
-const ultimatumSituation = document.getElementById('ultimatum-situation');
-const ultimatumRoles = document.getElementById('ultimatum-roles');
-const startUltimatumGameBtn = document.getElementById('start-ultimatum-game');
-
-// Элементы Ассоциаций
-const associationWordDisplay = document.getElementById('association-word-display');
-const nextAssociationWordBtn = document.getElementById('next-association-word');
+function playBombExplosion() {
+    if (!soundEnabled) return;
+    
+    try {
+        initAudio();
+        
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.5);
+        
+        gainNode.gain.value = 0.5;
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5);
+        
+    } catch(e) {
+        console.log('Звук недоступен');
+    }
+}
 
 // ================== ФУНКЦИИ МЕНЮ ==================
 function showMainMenu() {
     gameMenu.classList.remove('hidden');
-    mafiaGame.classList.add('hidden');
-    spyGame.classList.add('hidden');
-    crocodileGame.classList.add('hidden');
-    bombGame.classList.add('hidden');
-    questionsGame.classList.add('hidden');
-    truthGame.classList.add('hidden');
-    diceGame.classList.add('hidden');
-    guessGame.classList.add('hidden');
-    leaderGame.classList.add('hidden');
-    ultimatumGame.classList.add('hidden');
-    wordAssociationGame.classList.add('hidden');
+    document.querySelectorAll('.game-container').forEach(el => el.classList.add('hidden'));
 }
 
 function showGame(gameElement) {
     gameMenu.classList.add('hidden');
-    mafiaGame.classList.add('hidden');
-    spyGame.classList.add('hidden');
-    crocodileGame.classList.add('hidden');
-    bombGame.classList.add('hidden');
-    questionsGame.classList.add('hidden');
-    truthGame.classList.add('hidden');
-    diceGame.classList.add('hidden');
-    guessGame.classList.add('hidden');
-    leaderGame.classList.add('hidden');
-    ultimatumGame.classList.add('hidden');
-    wordAssociationGame.classList.add('hidden');
+    document.querySelectorAll('.game-container').forEach(el => el.classList.add('hidden'));
     gameElement.classList.remove('hidden');
-}
-
-function showMafiaGame() {
-    showGame(mafiaGame);
-    showMafiaContent();
 }
 
 function showSpyGame() {
@@ -222,40 +234,39 @@ function showWordAssociationGame() {
     showNextAssociationWord();
 }
 
+function showStoryGame() {
+    showGame(storyGame);
+    showStoryContent();
+    resetStoryGame();
+}
+
+function showFactGame() {
+    showGame(factGame);
+    showFactContent();
+    showNextFact();
+}
+
 // ================== ФУНКЦИИ ПРАВИЛ ==================
 function toggleRules(type) {
     let contentId, rulesId;
     
-    if (type === 'mafia') {
-        contentId = 'mafia-content';
-        rulesId = 'rules-mafia';
-    } else if (type === 'spy') {
-        contentId = 'screen-select';
-        rulesId = 'rules-spy';
-    } else if (type === 'crocodile') {
-        contentId = 'crocodile-content';
-        rulesId = 'rules-crocodile';
-    } else if (type === 'bomb') {
-        contentId = 'bomb-content';
-        rulesId = 'rules-bomb';
-    } else if (type === 'questions') {
-        contentId = 'questions-content';
-        rulesId = 'rules-questions';
-    } else if (type === 'truth') {
-        contentId = 'truth-content';
-        rulesId = 'rules-truth';
-    } else if (type === 'leader') {
-        contentId = 'leader-content';
-        rulesId = 'rules-leader';
-    } else if (type === 'ultimatum') {
-        contentId = 'ultimatum-content';
-        rulesId = 'rules-ultimatum';
-    } else if (type === 'association') {
-        contentId = 'word-association-content';
-        rulesId = 'rules-association';
-    }
+    const rulesMap = {
+        'spy': ['screen-select', 'rules-spy'],
+        'crocodile': ['crocodile-content', 'rules-crocodile'],
+        'bomb': ['bomb-content', 'rules-bomb'],
+        'questions': ['questions-content', 'rules-questions'],
+        'truth': ['truth-content', 'rules-truth'],
+        'leader': ['leader-content', 'rules-leader'],
+        'ultimatum': ['ultimatum-content', 'rules-ultimatum'],
+        'association': ['word-association-content', 'rules-association'],
+        'story': ['story-content', 'rules-story'],
+        'fact': ['fact-content', 'rules-fact']
+    };
     
-    if (contentId && rulesId) {
+    if (rulesMap[type]) {
+        contentId = rulesMap[type][0];
+        rulesId = rulesMap[type][1];
+        
         document.getElementById(contentId).classList.add('hidden');
         document.getElementById(rulesId).classList.remove('hidden');
     }
@@ -264,135 +275,26 @@ function toggleRules(type) {
 function showContent(type) {
     let contentId, rulesId;
     
-    if (type === 'mafia') {
-        contentId = 'mafia-content';
-        rulesId = 'rules-mafia';
-    } else if (type === 'spy') {
-        contentId = 'screen-select';
-        rulesId = 'rules-spy';
-    } else if (type === 'crocodile') {
-        contentId = 'crocodile-content';
-        rulesId = 'rules-crocodile';
-    } else if (type === 'bomb') {
-        contentId = 'bomb-content';
-        rulesId = 'rules-bomb';
-    } else if (type === 'questions') {
-        contentId = 'questions-content';
-        rulesId = 'rules-questions';
-    } else if (type === 'truth') {
-        contentId = 'truth-content';
-        rulesId = 'rules-truth';
-    } else if (type === 'leader') {
-        contentId = 'leader-content';
-        rulesId = 'rules-leader';
-    } else if (type === 'ultimatum') {
-        contentId = 'ultimatum-content';
-        rulesId = 'rules-ultimatum';
-    } else if (type === 'association') {
-        contentId = 'word-association-content';
-        rulesId = 'rules-association';
-    }
+    const rulesMap = {
+        'spy': ['screen-select', 'rules-spy'],
+        'crocodile': ['crocodile-content', 'rules-crocodile'],
+        'bomb': ['bomb-content', 'rules-bomb'],
+        'questions': ['questions-content', 'rules-questions'],
+        'truth': ['truth-content', 'rules-truth'],
+        'leader': ['leader-content', 'rules-leader'],
+        'ultimatum': ['ultimatum-content', 'rules-ultimatum'],
+        'association': ['word-association-content', 'rules-association'],
+        'story': ['story-content', 'rules-story'],
+        'fact': ['fact-content', 'rules-fact']
+    };
     
-    if (contentId && rulesId) {
+    if (rulesMap[type]) {
+        contentId = rulesMap[type][0];
+        rulesId = rulesMap[type][1];
+        
         document.getElementById(rulesId).classList.add('hidden');
         document.getElementById(contentId).classList.remove('hidden');
     }
-}
-
-// ================== ФУНКЦИИ МАФИИ ==================
-function showMafiaContent() {
-    document.getElementById('mafia-content').classList.remove('hidden');
-    document.getElementById('rules-mafia').classList.add('hidden');
-    initMafiaPlayerButtons();
-}
-
-function initMafiaPlayerButtons() {
-    mafiaPlayerSelectDiv.innerHTML = '';
-    for (let i = 6; i <= 17; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = i;
-        btn.className = 'btn';
-        btn.style.minWidth = '50px';
-        btn.style.padding = '12px';
-        btn.addEventListener('click', () => {
-            mafiaPlayers = i;
-            distributeMafiaRoles();
-        });
-        mafiaPlayerSelectDiv.appendChild(btn);
-    }
-}
-
-function distributeMafiaRoles() {
-    const numPlayers = mafiaPlayers;
-    const roles = [];
-    const numMafia = Math.floor(numPlayers / 4);
-    
-    // Добавляем мафию
-    for (let i = 0; i < numMafia; i++) {
-        if (i === 0 && numPlayers >= 10) {
-            roles.push({ role: 'Дон Мафии', emoji: '🔫', type: 'don' });
-        } else {
-            roles.push({ role: 'Мафия', emoji: '🔪', type: 'mafia' });
-        }
-    }
-    
-    // Добавляем доктора и комиссара
-    roles.push({ role: 'Доктор', emoji: '💉', type: 'doctor' });
-    roles.push({ role: 'Комиссар', emoji: '🔍', type: 'commissar' });
-    
-    // Добавляем любовницу для 10+ игроков
-    if (numPlayers >= 10) {
-        roles.push({ role: 'Любовница', emoji: '💋', type: 'mistress' });
-    }
-    
-    // Добавляем мирных жителей
-    const numCiviliansFinal = numPlayers - roles.length;
-    for (let i = 0; i < numCiviliansFinal; i++) {
-        roles.push({ role: 'Мирный житель', emoji: '👤', type: 'civilian' });
-    }
-    
-    // Перемешиваем роли
-    mafiaRoles = shuffleArray(roles);
-    rolesRevealed = new Array(mafiaRoles.length).fill(false);
-    
-    // Отображаем роли
-    displayMafiaRoles();
-}
-
-function displayMafiaRoles() {
-    mafiaRoleDisplay.classList.remove('hidden');
-    
-    let rolesHTML = '<div style="font-size: 1.2rem; margin-bottom: 15px;">Нажмите на игрока, чтобы показать его роль:</div>';
-    
-    mafiaRoles.forEach((role, index) => {
-        let cardClass = 'mafia-role-card ';
-        if (role.type === 'civilian') cardClass += 'civilian';
-        else if (role.type === 'mafia' || role.type === 'don') cardClass += 'mafia';
-        else if (role.type === 'doctor') cardClass += 'doctor';
-        else if (role.type === 'commissar') cardClass += 'commissar';
-        else if (role.type === 'mistress') cardClass += 'mistress';
-        
-        const isRevealed = rolesRevealed[index];
-        
-        rolesHTML += `
-            <div class="player-role-toggle ${isRevealed ? 'role-revealed' : ''}" data-index="${index}">
-                <div style="font-size: 1.1rem; font-weight: bold;">
-                    ${isRevealed ? `${role.emoji} ${role.role}` : `🎴 Игрок ${index + 1} (нажмите, чтобы показать)`}
-                </div>
-            </div>
-        `;
-    });
-    
-    mafiaRolesList.innerHTML = rolesHTML;
-    
-    // Добавляем обработчики кликов
-    document.querySelectorAll('.player-role-toggle').forEach(element => {
-        element.addEventListener('click', function() {
-            const index = parseInt(this.dataset.index);
-            rolesRevealed[index] = !rolesRevealed[index];
-            displayMafiaRoles();
-        });
-    });
 }
 
 // ================== ФУНКЦИИ БАНАН ШПИОНА ==================
@@ -410,6 +312,7 @@ function initPlayerButtons() {
         btn.style.minWidth = '50px';
         btn.style.padding = '12px';
         btn.addEventListener('click', () => {
+            playSound('click');
             totalPlayers = i;
             startRoleAssignment();
         });
@@ -468,6 +371,7 @@ function showRoleScreen() {
 }
 
 function handleHideWord() {
+    playSound('flip');
     if (currentPlayerIndex >= totalPlayers - 1) {
         showSpyScreen(screenAllDone);
     } else {
@@ -479,12 +383,12 @@ function handleHideWord() {
 }
 
 function handleShowWord() {
+    playSound('flip');
     currentPlayerIndex++;
     showRoleScreen();
 }
 
 function showStartScreen() {
-    // Не показываем слова и шпиона до нажатия кнопки
     finalWords.innerHTML = `
         <div>🔵 Мирные: <b>${currentPair.civilian}</b></div>
         <div>🔴 Шпион: <b>${currentPair.spy}</b> (игрок №${spyIndex + 1})</div>
@@ -495,6 +399,7 @@ function showStartScreen() {
 }
 
 function revealSpy() {
+    playSound('success');
     finalWords.classList.remove('hidden');
     revealSpyBtn.classList.add('hidden');
 }
@@ -530,6 +435,7 @@ function getRandomCrocodileWord() {
 }
 
 function showNextCrocodileWord() {
+    playSound('flip');
     const word = getRandomCrocodileWord();
     crocodileWordDisplay.textContent = word;
 }
@@ -561,6 +467,7 @@ function resetBombGame() {
 
 function setBombDuration(seconds) {
     if (!bombActive) {
+        playSound('click');
         bombDuration = seconds;
         bombCountdown = seconds;
         bombTimerDisplay.textContent = bombCountdown;
@@ -569,6 +476,8 @@ function setBombDuration(seconds) {
 }
 
 function startBombGame() {
+    playSound('click');
+    
     if (bombActive) {
         // Пауза
         clearInterval(bombTimer);
@@ -577,7 +486,7 @@ function startBombGame() {
         startBombBtn.textContent = '▶️ Продолжить';
     } else {
         // Старт или рестарт
-        if (bombCountdown === 0) {
+        if (bombCountdown <= 0) {
             bombCountdown = bombDuration;
             bombTimerDisplay.textContent = bombCountdown;
             bombTimerDisplay.className = 'bomb-timer';
@@ -598,6 +507,7 @@ function startBombGame() {
             
             if (bombCountdown <= 3 && bombCountdown > 0) {
                 bombTimerDisplay.className = 'bomb-timer warning';
+                playBombTick();
             }
             
             if (bombCountdown <= 0) {
@@ -609,6 +519,7 @@ function startBombGame() {
                 bombWordDisplay.textContent = 'БОМБА ВЗОРВАЛАСЬ!';
                 bombWordDisplay.className = 'bomb-word exploded';
                 startBombBtn.textContent = '🔄 Заново';
+                playBombExplosion();
             }
         }, 1000);
     }
@@ -634,6 +545,8 @@ function resetQuestionsGame() {
 }
 
 function startQuestionsGame() {
+    playSound('click');
+    
     if (questionsCount === 0) {
         questionsWordDisplay.textContent = 'Слово загадано!';
         startQuestionsBtn.textContent = '➕ Задать вопрос';
@@ -646,6 +559,7 @@ function startQuestionsGame() {
         if (questionsCount === 20) {
             questionsWordDisplay.textContent = 'ИГРА ОКОНЧЕНА!';
             startQuestionsBtn.textContent = '🔄 Заново';
+            playSound('win');
         }
     } else {
         resetQuestionsGame();
@@ -704,16 +618,21 @@ function getRandomAction() {
     return ACTION_TASKS[actionIndex];
 }
 
-function generateTruth() {
-    truthCardDisplay.textContent = `🎭 ПРАВДА: ${getRandomTruth()}`;
-    truthCardDisplay.style.background = '#fff9c4';
-    truthCardDisplay.style.color = '#333';
-}
-
-function generateAction() {
-    truthCardDisplay.textContent = `🎯 ДЕЙСТВИЕ: ${getRandomAction()}`;
-    truthCardDisplay.style.background = '#e3f2fd';
-    truthCardDisplay.style.color = '#333';
+function generateTruthOrAction() {
+    playSound('flip');
+    
+    // Случайный выбор: правда или действие (50/50)
+    const isTruth = Math.random() < 0.5;
+    
+    if (isTruth) {
+        truthCardDisplay.textContent = `🎭 ПРАВДА: ${getRandomTruth()}`;
+        truthCardDisplay.style.background = '#fff9c4';
+        truthCardDisplay.style.color = '#333';
+    } else {
+        truthCardDisplay.textContent = `🎯 ДЕЙСТВИЕ: ${getRandomAction()}`;
+        truthCardDisplay.style.background = '#e3f2fd';
+        truthCardDisplay.style.color = '#333';
+    }
 }
 
 // ================== ФУНКЦИИ КУБИКА ==================
@@ -722,12 +641,15 @@ function showDiceContent() {
 }
 
 function rollDice() {
+    playSound('roll');
     diceDisplay.classList.add('rolling');
+    
     const randomResult = Math.floor(Math.random() * 6) + 1;
     
     setTimeout(() => {
         diceDisplay.textContent = randomResult;
         diceDisplay.classList.remove('rolling');
+        playSound('success');
     }, 500);
 }
 
@@ -746,6 +668,7 @@ function resetGuessGame() {
 }
 
 function makeGuess(response) {
+    playSound('click');
     guessTries++;
     
     if (response === 'higher') {
@@ -755,12 +678,14 @@ function makeGuess(response) {
     } else if (response === 'correct') {
         guessCardDisplay.textContent = `🎉 Я угадал за ${guessTries} попыток!`;
         document.getElementById('guess-buttons').classList.add('hidden');
+        playSound('win');
         return;
     }
     
     if (guessMin > guessMax) {
         guessCardDisplay.textContent = 'Ты меня обманул! Начнём заново.';
         document.getElementById('guess-buttons').classList.add('hidden');
+        playSound('fail');
         return;
     }
     
@@ -770,6 +695,8 @@ function makeGuess(response) {
 
 // ================== ФУНКЦИИ ТАЙНОГО ЛИДЕРА ==================
 function startLeaderGame() {
+    playSound('click');
+    
     const roles = ['Лидер', 'Подражатель', 'Шпион'];
     const shuffled = shuffleArray(roles);
     
@@ -820,6 +747,8 @@ function getRandomSituationIndex() {
 }
 
 function startUltimatumGame() {
+    playSound('click');
+    
     const situationIndex = getRandomSituationIndex();
     currentSituationIndex = situationIndex;
     
@@ -874,6 +803,7 @@ function getRandomAssociationWord() {
 }
 
 function showNextAssociationWord() {
+    playSound('flip');
     const word = getRandomAssociationWord();
     associationWordDisplay.textContent = word;
 }
@@ -883,8 +813,177 @@ function showWordAssociationContent() {
     document.getElementById('rules-association').classList.add('hidden');
 }
 
+// ================== ФУНКЦИИ СМЕШНОЙ ИСТОРИИ ==================
+function showStoryContent() {
+    document.getElementById('story-content').classList.remove('hidden');
+    document.getElementById('rules-story').classList.add('hidden');
+}
+
+function resetStoryGame() {
+    storyAnswers = {};
+    storyStep = 0;
+    storyQuestionDisplay.textContent = STORY_QUESTIONS[0].question;
+    storyAnswerInput.value = '';
+    storyStoryDisplay.classList.add('hidden');
+    storyStartBtn.classList.remove('hidden');
+    storyAnswerInput.classList.remove('hidden');
+    storyNextBtn.classList.remove('hidden');
+}
+
+function submitStoryAnswer() {
+    const answer = storyAnswerInput.value.trim();
+    if (!answer) return;
+    
+    playSound('click');
+    
+    const currentQuestion = STORY_QUESTIONS[storyStep];
+    storyAnswers[currentQuestion.placeholder] = answer;
+    
+    storyStep++;
+    storyAnswerInput.value = '';
+    
+    if (storyStep < STORY_QUESTIONS.length) {
+        storyQuestionDisplay.textContent = STORY_QUESTIONS[storyStep].question;
+    } else {
+        showStoryResult();
+    }
+}
+
+function showStoryResult() {
+    playSound('win');
+    
+    // Выбираем случайный шаблон истории
+    let availableStories = [];
+    for (let i = 0; i < STORY_TEMPLATES.length; i++) {
+        if (!recentlyUsedStories.includes(i)) {
+            availableStories.push(i);
+        }
+    }
+    
+    if (availableStories.length === 0) {
+        availableStories = STORY_TEMPLATES.map((_, index) => index);
+    }
+    
+    const storyIndex = availableStories[Math.floor(Math.random() * availableStories.length)];
+    
+    recentlyUsedStories.push(storyIndex);
+    while (recentlyUsedStories.length > MAX_RECENT_STORIES) {
+        recentlyUsedStories.shift();
+    }
+    
+    // Заполняем шаблон ответами
+    let story = STORY_TEMPLATES[storyIndex];
+    
+    // Склоняем животное (добавляем окончания)
+    const animal = storyAnswers['животное'] || 'животное';
+    const animal2 = storyAnswers['животное2'] || 'животное';
+    const name = storyAnswers['имя'] || 'Алекс';
+    const name2 = storyAnswers['имя2'] || 'Саша';
+    
+    // Простая склонения для женского рода (если имя заканчивается на "а" или "я")
+    const isFeminine1 = name.endsWith('а') || name.endsWith('я');
+    const isFeminine2 = name2.endsWith('а') || name2.endsWith('я');
+    
+    // Заменяем окончания для действий
+    let action = storyAnswers['действие'] || 'бегать';
+    let action2 = storyAnswers['действие2'] || 'прыгать';
+    let action3 = storyAnswers['действие3'] || 'танцевать';
+    
+    // Формируем историю
+    story = story.replace(/{животное}/g, animal);
+    story = story.replace(/{животное2}/g, animal2);
+    story = story.replace(/{имя}/g, name);
+    story = story.replace(/{имя2}/g, name2);
+    story = story.replace(/{место}/g, storyAnswers['место'] || 'парк');
+    story = story.replace(/{еда}/g, storyAnswers['еда'] || 'пицца');
+    story = story.replace(/{предмет}/g, storyAnswers['предмет'] || 'мяч');
+    story = story.replace(/{предмет2}/g, storyAnswers['предмет2'] || 'зонт');
+    story = story.replace(/{действие}/g, action);
+    story = story.replace(/{действие2}/g, action2);
+    story = story.replace(/{действие3}/g, action3);
+    
+    // Исправляем склонения
+    story = story.replace(/он\(а\)/g, isFeminine1 ? 'она' : 'он');
+    story = story.replace(/его\(её\)/g, isFeminine1 ? 'её' : 'его');
+    story = story.replace(/ему\(ей\)/g, isFeminine1 ? 'ей' : 'ему');
+    story = story.replace(/\(ла\)/g, isFeminine1 ? 'ла' : 'л');
+    story = story.replace(/\(лась\)/g, isFeminine1 ? 'лась' : 'лся');
+    story = story.replace(/\(ась\)/g, isFeminine1 ? 'ась' : 'ся');
+    story = story.replace(/\(ла\)/g, isFeminine1 ? 'ла' : 'л');
+    story = story.replace(/\(лся\)/g, isFeminine1 ? 'лась' : 'лся');
+    story = story.replace(/\(ой\)/g, isFeminine1 ? 'ой' : 'ый');
+    story = story.replace(/\(ая\)/g, isFeminine1 ? 'ая' : 'ой');
+    
+    // Очищаем оставшиеся скобки
+    story = story.replace(/\([^)]*\)/g, 'л');
+    
+    storyStoryDisplay.textContent = story;
+    storyStoryDisplay.classList.remove('hidden');
+    storyQuestionDisplay.textContent = 'Вот твоя история!';
+    storyAnswerInput.classList.add('hidden');
+    storyNextBtn.classList.add('hidden');
+    storyStartBtn.textContent = '🔄 Ещё раз';
+}
+
+// ================== ФУНКЦИИ ФАКТ ИЛИ ФЕЙК ==================
+function showFactContent() {
+    document.getElementById('fact-content').classList.remove('hidden');
+    document.getElementById('rules-fact').classList.add('hidden');
+}
+
+function getRandomFact() {
+    let availableFacts = [];
+    for (let i = 0; i < FACTS.length; i++) {
+        if (!recentlyUsedFacts.includes(i)) {
+            availableFacts.push(i);
+        }
+    }
+    
+    if (availableFacts.length === 0) {
+        availableFacts = FACTS.map((_, index) => index);
+    }
+    
+    const factIndex = availableFacts[Math.floor(Math.random() * availableFacts.length)];
+    
+    recentlyUsedFacts.push(factIndex);
+    while (recentlyUsedFacts.length > MAX_RECENT_FACTS) {
+        recentlyUsedFacts.shift();
+    }
+    
+    return FACTS[factIndex];
+}
+
+function showNextFact() {
+    playSound('flip');
+    
+    currentFact = getRandomFact();
+    factFactDisplay.textContent = currentFact.fact;
+    factAnswerDisplay.classList.add('hidden');
+    factTrueBtn.classList.remove('hidden');
+    factFalseBtn.classList.remove('hidden');
+    factNextBtn.classList.add('hidden');
+}
+
+function checkFact(answer) {
+    playSound('click');
+    
+    const isCorrect = (answer === currentFact.isTrue);
+    
+    if (isCorrect) {
+        factAnswerDisplay.textContent = '✅ Верно!';
+        playSound('success');
+    } else {
+        factAnswerDisplay.textContent = `❌ Неверно! ${currentFact.isTrue ? 'Это ФАКТ!' : 'Это ФЕЙК!'}`;
+        playSound('fail');
+    }
+    
+    factAnswerDisplay.classList.remove('hidden');
+    factTrueBtn.classList.add('hidden');
+    factFalseBtn.classList.add('hidden');
+    factNextBtn.classList.remove('hidden');
+}
+
 // ================== ОБРАБОТЧИКИ МЕНЮ ==================
-document.getElementById('mafia-game-btn').addEventListener('click', showMafiaGame);
 document.getElementById('spy-game-btn').addEventListener('click', showSpyGame);
 document.getElementById('crocodile-game-btn').addEventListener('click', showCrocodileGame);
 document.getElementById('bomb-game-btn').addEventListener('click', showBombGame);
@@ -895,26 +994,37 @@ document.getElementById('guess-game-btn').addEventListener('click', showGuessGam
 document.getElementById('leader-game-btn').addEventListener('click', showLeaderGame);
 document.getElementById('ultimatum-game-btn').addEventListener('click', showUltimatumGame);
 document.getElementById('word-association-btn').addEventListener('click', showWordAssociationGame);
+document.getElementById('story-game-btn').addEventListener('click', showStoryGame);
+document.getElementById('fact-game-btn').addEventListener('click', showFactGame);
+
+// Кнопка звука
+document.getElementById('sound-toggle-btn').addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    document.getElementById('sound-toggle-btn').textContent = soundEnabled ? '🔊 Звук: ВКЛ' : '🔇 Звук: ВЫКЛ';
+    playSound('click');
+});
 
 // Обработчики "Назад в меню"
 const backButtons = [
-    'back-to-menu-mafia', 'back-to-menu-1', 'back-to-menu-2', 
-    'back-to-menu-3', 'back-to-menu-4', 'back-to-menu-5',
-    'back-to-menu-crocodile', 'back-to-menu-bomb', 'back-to-menu-questions',
-    'back-to-menu-truth', 'back-to-menu-dice', 'back-to-menu-guess',
-    'back-to-menu-leader', 'back-to-menu-ultimatum', 'back-to-menu-association'
+    'back-to-menu-1', 'back-to-menu-2', 'back-to-menu-3', 
+    'back-to-menu-4', 'back-to-menu-5', 'back-to-menu-crocodile',
+    'back-to-menu-bomb', 'back-to-menu-questions', 'back-to-menu-truth',
+    'back-to-menu-dice', 'back-to-menu-guess', 'back-to-menu-leader',
+    'back-to-menu-ultimatum', 'back-to-menu-association',
+    'back-to-menu-story', 'back-to-menu-fact'
 ];
 
 backButtons.forEach(id => {
     const element = document.getElementById(id);
     if (element) {
-        element.addEventListener('click', showMainMenu);
+        element.addEventListener('click', () => {
+            playSound('click');
+            showMainMenu();
+        });
     }
 });
 
 // Обработчики правил
-document.getElementById('show-rules-mafia').addEventListener('click', () => toggleRules('mafia'));
-document.getElementById('back-from-rules-mafia').addEventListener('click', () => showContent('mafia'));
 document.getElementById('show-rules-spy').addEventListener('click', () => toggleRules('spy'));
 document.getElementById('back-from-rules-spy').addEventListener('click', () => showContent('spy'));
 document.getElementById('show-rules-crocodile').addEventListener('click', () => toggleRules('crocodile'));
@@ -931,9 +1041,10 @@ document.getElementById('show-rules-ultimatum').addEventListener('click', () => 
 document.getElementById('back-from-rules-ultimatum').addEventListener('click', () => showContent('ultimatum'));
 document.getElementById('show-rules-association').addEventListener('click', () => toggleRules('association'));
 document.getElementById('back-from-rules-association').addEventListener('click', () => showContent('association'));
-
-// Обработчики Мафии
-mafiaRedistributeBtn.addEventListener('click', distributeMafiaRoles);
+document.getElementById('show-rules-story').addEventListener('click', () => toggleRules('story'));
+document.getElementById('back-from-rules-story').addEventListener('click', () => showContent('story'));
+document.getElementById('show-rules-fact').addEventListener('click', () => toggleRules('fact'));
+document.getElementById('back-from-rules-fact').addEventListener('click', () => showContent('fact'));
 
 // Обработчики Банан Шпиона
 hideWordBtn.addEventListener('click', handleHideWord);
@@ -960,8 +1071,8 @@ startQuestionsBtn.addEventListener('click', startQuestionsGame);
 resetQuestionsBtn.addEventListener('click', resetQuestionsGame);
 
 // Обработчики Правда или Действие
-generateTruthBtn.addEventListener('click', generateTruth);
-generateActionBtn.addEventListener('click', generateAction);
+generateTruthBtn.addEventListener('click', generateTruthOrAction);
+generateActionBtn.addEventListener('click', generateTruthOrAction);
 
 // Обработчики Кубика
 rollDiceBtn.addEventListener('click', rollDice);
@@ -980,6 +1091,20 @@ startUltimatumGameBtn.addEventListener('click', startUltimatumGame);
 
 // Обработчики Ассоциаций
 nextAssociationWordBtn.addEventListener('click', showNextAssociationWord);
+
+// Обработчики Смешной истории
+storyNextBtn.addEventListener('click', submitStoryAnswer);
+storyAnswerInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        submitStoryAnswer();
+    }
+});
+storyStartBtn.addEventListener('click', resetStoryGame);
+
+// Обработчики Факт или Фейк
+factTrueBtn.addEventListener('click', () => checkFact(true));
+factFalseBtn.addEventListener('click', () => checkFact(false));
+factNextBtn.addEventListener('click', showNextFact);
 
 // ================== ЗАПУСК ==================
 initPlayerButtons();
