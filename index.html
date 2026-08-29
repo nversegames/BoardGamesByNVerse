@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Шпион — Мега версия 400+</title>
+    <title>Игровой портал - Шпион и Крокодил</title>
     <style>
         * {
             box-sizing: border-box;
@@ -20,6 +20,195 @@
             justify-content: center;
             padding: 16px;
         }
+        
+        /* СТИЛИ ДЛЯ МЕНЮ ИГР */
+        .menu-container {
+            background: #16213e;
+            border-radius: 32px;
+            padding: 24px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            text-align: center;
+            color: white;
+        }
+        .menu-title {
+            margin: 0 0 30px;
+            font-size: 2rem;
+            letter-spacing: 2px;
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        .game-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .game-card {
+            background: #0f3460;
+            border-radius: 24px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 5px 0 #0a2540;
+        }
+        .game-card:active {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 #0a2540;
+        }
+        .game-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .spy-avatar {
+            background: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .spy-avatar::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.2) 100%);
+        }
+        .crocodile-avatar {
+            background: #ff8c00;
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .crocodile-avatar::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.3), transparent);
+            animation: rotate-rays 10s linear infinite;
+        }
+        @keyframes rotate-rays {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .game-info {
+            flex: 1;
+            text-align: left;
+        }
+        .game-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .game-description {
+            font-size: 0.9rem;
+            color: #a0a0b0;
+        }
+        
+        /* СТИЛИ ДЛЯ ИГРЫ КРОКОДИЛ */
+        .crocodile-container {
+            background: linear-gradient(135deg, #ff8c00 0%, #ffa500 25%, #ffd700 50%, #ff8c00 75%, #ffa500 100%);
+            border-radius: 32px;
+            padding: 24px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(255, 140, 0, 0.3);
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .crocodile-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: pulse-background 3s ease-in-out infinite;
+        }
+        @keyframes pulse-background {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .crocodile-title {
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .crocodile-word {
+            background: white;
+            color: #333;
+            font-size: 3rem;
+            font-weight: bold;
+            padding: 40px 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+        }
+        .btn {
+            background: #333;
+            border: none;
+            color: white;
+            padding: 18px 24px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            min-width: 80px;
+            box-shadow: 0 5px 0 #000;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #000;
+        }
+        .btn-primary {
+            background: #e94560;
+            box-shadow: 0 5px 0 #a02040;
+            width: 100%;
+            margin-top: 8px;
+            font-size: 1.5rem;
+            padding: 20px;
+        }
+        .btn-secondary {
+            background: #2d4059;
+            box-shadow: 0 5px 0 #1a2533;
+            font-size: 1rem;
+            padding: 12px 20px;
+        }
+        .btn-success {
+            background: #4caf50;
+            box-shadow: 0 5px 0 #388e3c;
+        }
+        .hidden {
+            display: none !important;
+        }
+        
+        /* ОРИГИНАЛЬНЫЕ СТИЛИ ШПИОНА */
         .container {
             background: #16213e;
             border-radius: 32px;
@@ -126,9 +315,6 @@
             font-size: 1rem;
             padding: 12px 20px;
         }
-        .hidden {
-            display: none !important;
-        }
         .info-text {
             color: #aaa;
             font-size: 0.85rem;
@@ -150,7 +336,29 @@
     </style>
 </head>
 <body>
-    <div class="container" id="app">
+    <!-- МЕНЮ ВЫБОРА ИГРЫ -->
+    <div id="game-menu" class="menu-container">
+        <h1 class="menu-title">🎮 ИГРЫ</h1>
+        <div class="game-cards">
+            <div class="game-card" id="spy-game-btn">
+                <div class="game-avatar spy-avatar">🍌</div>
+                <div class="game-info">
+                    <div class="game-name">ШПИОН</div>
+                    <div class="game-description">Найди шпиона среди игроков</div>
+                </div>
+            </div>
+            <div class="game-card" id="crocodile-game-btn">
+                <div class="game-avatar crocodile-avatar">🐊</div>
+                <div class="game-info">
+                    <div class="game-name">КРОКОДИЛ</div>
+                    <div class="game-description">Покажи слово без слов</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ИГРА ШПИОН -->
+    <div class="container hidden" id="spy-game">
         <!-- ЭКРАН 1: ВЫБОР КОЛИЧЕСТВА ИГРОКОВ -->
         <div id="screen-select">
             <h1>🕵️ ШПИОН</h1>
@@ -160,6 +368,7 @@
                 <!-- Кнопки добавятся из JS -->
             </div>
             <div class="info-text">Минимум 3, максимум 10</div>
+            <button class="secondary" id="back-to-menu-1">← В меню</button>
         </div>
 
         <!-- ЭКРАН 2: ПОКАЗ СЛОВА -->
@@ -169,6 +378,7 @@
             <div id="role-display" class="role-card">СЛОВО</div>
             <button class="primary" id="hide-word-btn">🙈 Скрыть и передать</button>
             <button class="secondary" id="restart-from-role">🔄 Заново</button>
+            <button class="secondary" id="back-to-menu-2">← В меню</button>
         </div>
 
         <!-- ЭКРАН 3: ЗАГЛУШКА МЕЖДУ ИГРОКАМИ -->
@@ -179,6 +389,7 @@
             <div class="pass-text" id="pass-message-hidden">📱 Телефон у Игрока 2?</div>
             <button class="primary" id="show-word-btn">👁️ Показать слово</button>
             <button class="secondary" id="restart-from-hidden">🔄 Заново</button>
+            <button class="secondary" id="back-to-menu-3">← В меню</button>
         </div>
 
         <!-- ЭКРАН 4: ВСЕ ПОСМОТРЕЛИ -->
@@ -188,6 +399,7 @@
             <div class="pass-text">Готовы начать обсуждение?</div>
             <button class="primary" id="start-game-btn">🏁 Начать игру</button>
             <button class="secondary" id="restart-from-done">🔄 Заново</button>
+            <button class="secondary" id="back-to-menu-4">← В меню</button>
         </div>
 
         <!-- ЭКРАН 5: НАЧАЛО ИГРЫ -->
@@ -196,14 +408,24 @@
             <div class="step-title">Роли розданы. Обсуждайте и найдите шпиона!</div>
             <div class="word-pair" id="final-words"></div>
             <button class="primary" id="restart-from-start">🔄 Играть ещё раз</button>
+            <button class="secondary" id="back-to-menu-5">← В меню</button>
         </div>
+    </div>
+
+    <!-- ИГРА КРОКОДИЛ -->
+    <div id="crocodile-game" class="crocodile-container hidden">
+        <h2 class="crocodile-title">🐊 КРОКОДИЛ</h2>
+        <div class="step-title" style="color: white; text-shadow: 2px 2px 0 #000;">Покажи слово жестами!</div>
+        <div class="crocodile-word" id="crocodile-word-display">НАЖМИ НАЧАТЬ</div>
+        <button class="btn btn-primary" id="next-crocodile-word">🎲 Следующее слово</button>
+        <button class="btn btn-secondary" id="back-to-menu-crocodile">← В меню</button>
     </div>
 
     <script>
         (function(){
-            // ================== 400+ ПАР СЛОВ ==================
+            // ================== ДАННЫЕ ДЛЯ ШПИОНА ==================
             const WORD_PAIRS = [
-                // --- ЕДА И НАПИТКИ (60 пар) ---
+                // ... (весь массив WORD_PAIRS остаётся без изменений)
                 { civilian: "Арбуз", spy: "Дыня" },
                 { civilian: "Банан", spy: "Киви" },
                 { civilian: "Яблоко", spy: "Груша" },
@@ -265,8 +487,7 @@
                 { civilian: "Сок", spy: "Морс" },
                 { civilian: "Квас", spy: "Пиво" },
                 { civilian: "Водка", spy: "Коньяк" },
-
-                // --- ЖИВОТНЫЕ (45 пар) ---
+                // Животные
                 { civilian: "Собака", spy: "Волк" },
                 { civilian: "Кошка", spy: "Рысь" },
                 { civilian: "Лев", spy: "Тигр" },
@@ -312,8 +533,7 @@
                 { civilian: "Воробей", spy: "Синица" },
                 { civilian: "Голубь", spy: "Чайка" },
                 { civilian: "Утка", spy: "Гусь" },
-
-                // --- ПРИРОДА (35 пар) ---
+                // Природа
                 { civilian: "Цветок", spy: "Дерево" },
                 { civilian: "Роза", spy: "Тюльпан" },
                 { civilian: "Ромашка", spy: "Одуванчик" },
@@ -349,8 +569,7 @@
                 { civilian: "Волна", spy: "Прибой" },
                 { civilian: "Песок", spy: "Глина" },
                 { civilian: "Янтарь", spy: "Жемчуг" },
-
-                // --- ПРОФЕССИИ (35 пар) ---
+                // Профессии
                 { civilian: "Врач", spy: "Ветеринар" },
                 { civilian: "Хирург", spy: "Стоматолог" },
                 { civilian: "Медсестра", spy: "Фельдшер" },
@@ -386,8 +605,7 @@
                 { civilian: "Модель", spy: "Стилист" },
                 { civilian: "Бармен", spy: "Официант" },
                 { civilian: "Продавец", spy: "Кассир" },
-
-                // --- ТЕХНИКА (30 пар) ---
+                // Техника
                 { civilian: "Телефон", spy: "Планшет" },
                 { civilian: "Компьютер", spy: "Ноутбук" },
                 { civilian: "Телевизор", spy: "Монитор" },
@@ -418,8 +636,7 @@
                 { civilian: "Обогреватель", spy: "Камин" },
                 { civilian: "Робот", spy: "Дрон" },
                 { civilian: "Антенна", spy: "Тарелка" },
-
-                // --- ТРАНСПОРТ (30 пар) ---
+                // Транспорт
                 { civilian: "Машина", spy: "Мотоцикл" },
                 { civilian: "Автобус", spy: "Троллейбус" },
                 { civilian: "Трамвай", spy: "Электричка" },
@@ -450,8 +667,7 @@
                 { civilian: "Багажник", spy: "Капот" },
                 { civilian: "Ремень безопасности", spy: "Подушка безопасности" },
                 { civilian: "Навигатор", spy: "Карта" },
-
-                // --- ОДЕЖДА И ОБУВЬ (30 пар) ---
+                // Одежда
                 { civilian: "Футболка", spy: "Рубашка" },
                 { civilian: "Кофта", spy: "Свитер" },
                 { civilian: "Куртка", spy: "Пальто" },
@@ -482,8 +698,7 @@
                 { civilian: "Чемодан", spy: "Саквояж" },
                 { civilian: "Кошелёк", spy: "Барсетка" },
                 { civilian: "Заколка", spy: "Резинка" },
-
-                // --- ДОМ И БЫТ (35 пар) ---
+                // Дом и быт
                 { civilian: "Квартира", spy: "Дом" },
                 { civilian: "Комната", spy: "Зал" },
                 { civilian: "Кухня", spy: "Столовая" },
@@ -519,8 +734,7 @@
                 { civilian: "Плед", spy: "Покрывало" },
                 { civilian: "Свеча", spy: "Лампа" },
                 { civilian: "Календарь", spy: "Часы" },
-
-                // --- СПОРТ (30 пар) ---
+                // Спорт
                 { civilian: "Футбол", spy: "Баскетбол" },
                 { civilian: "Волейбол", spy: "Гандбол" },
                 { civilian: "Теннис", spy: "Бадминтон" },
@@ -551,8 +765,7 @@
                 { civilian: "Ворота", spy: "Кольцо" },
                 { civilian: "Стадион", spy: "Спортзал" },
                 { civilian: "Чемпионат", spy: "Олимпиада" },
-
-                // --- МУЗЫКА И ИСКУССТВО (25 пар) ---
+                // Музыка и искусство
                 { civilian: "Гитара", spy: "Скрипка" },
                 { civilian: "Пианино", spy: "Рояль" },
                 { civilian: "Синтезатор", spy: "Орган" },
@@ -578,8 +791,7 @@
                 { civilian: "Палитра", spy: "Краски" },
                 { civilian: "Мольберт", spy: "Холст" },
                 { civilian: "Ноты", spy: "Партитура" },
-
-                // --- ГОРОД И МЕСТА (30 пар) ---
+                // Город и места
                 { civilian: "Школа", spy: "Университет" },
                 { civilian: "Детский сад", spy: "Школа" },
                 { civilian: "Больница", spy: "Аптека" },
@@ -610,8 +822,7 @@
                 { civilian: "Дача", spy: "Деревня" },
                 { civilian: "Ферма", spy: "Поле" },
                 { civilian: "Завод", spy: "Фабрика" },
-
-                // --- НАСЕКОМЫЕ (15 пар) ---
+                // Насекомые
                 { civilian: "Пчела", spy: "Оса" },
                 { civilian: "Шмель", spy: "Шершень" },
                 { civilian: "Муха", spy: "Комар" },
@@ -627,8 +838,7 @@
                 { civilian: "Божья коровка", spy: "Колорадский жук" },
                 { civilian: "Светлячок", spy: "Сверчок" },
                 { civilian: "Цикада", spy: "Кузнечик" },
-
-                // --- РЫБЫ И МОРСКИЕ ОБИТАТЕЛИ (15 пар) ---
+                // Рыбы
                 { civilian: "Акула", spy: "Дельфин" },
                 { civilian: "Кит", spy: "Кашалот" },
                 { civilian: "Скат", spy: "Медуза" },
@@ -644,8 +854,7 @@
                 { civilian: "Краб", spy: "Омар" },
                 { civilian: "Морская звезда", spy: "Морской ёж" },
                 { civilian: "Коралл", spy: "Губка" },
-
-                // --- ПТИЦЫ (15 пар) ---
+                // Птицы
                 { civilian: "Воробей", spy: "Синица" },
                 { civilian: "Голубь", spy: "Чайка" },
                 { civilian: "Ворон", spy: "Ворона" },
@@ -661,8 +870,7 @@
                 { civilian: "Фламинго", spy: "Цапля" },
                 { civilian: "Пеликан", spy: "Лебедь" },
                 { civilian: "Утка", spy: "Гусь" },
-
-                // --- ГРИБЫ И ЯГОДЫ (15 пар) ---
+                // Грибы и ягоды
                 { civilian: "Белый гриб", spy: "Подберёзовик" },
                 { civilian: "Подосиновик", spy: "Маслёнок" },
                 { civilian: "Лисичка", spy: "Рыжик" },
@@ -678,8 +886,7 @@
                 { civilian: "Арбуз", spy: "Дыня" },
                 { civilian: "Виноград", spy: "Изюм" },
                 { civilian: "Калина", spy: "Рябина" },
-
-                // --- ИНСТРУМЕНТЫ (15 пар) ---
+                // Инструменты
                 { civilian: "Молоток", spy: "Отвёртка" },
                 { civilian: "Пила", spy: "Лобзик" },
                 { civilian: "Дрель", spy: "Шуруповёрт" },
@@ -695,8 +902,7 @@
                 { civilian: "Ведро", spy: "Лейка" },
                 { civilian: "Кисть", spy: "Валик" },
                 { civilian: "Лестница", spy: "Стремянка" },
-
-                // --- КОСМОС (10 пар) ---
+                // Космос
                 { civilian: "Звезда", spy: "Планета" },
                 { civilian: "Комета", spy: "Астероид" },
                 { civilian: "Метеорит", spy: "Метеор" },
@@ -707,8 +913,7 @@
                 { civilian: "Галактика", spy: "Вселенная" },
                 { civilian: "Чёрная дыра", spy: "Туманность" },
                 { civilian: "Марс", spy: "Венера" },
-
-                // --- МЕДИЦИНА (10 пар) ---
+                // Медицина
                 { civilian: "Таблетка", spy: "Витамин" },
                 { civilian: "Укол", spy: "Прививка" },
                 { civilian: "Градусник", spy: "Тонометр" },
@@ -719,8 +924,7 @@
                 { civilian: "Стетоскоп", spy: "Скальпель" },
                 { civilian: "Скорая помощь", spy: "Больница" },
                 { civilian: "Рецепт", spy: "Справка" },
-
-                // --- МАГАЗИНЫ (10 пар) ---
+                // Магазины
                 { civilian: "Супермаркет", spy: "Гипермаркет" },
                 { civilian: "Рынок", spy: "Ярмарка" },
                 { civilian: "Булочная", spy: "Кондитерская" },
@@ -731,8 +935,7 @@
                 { civilian: "Мебельный", spy: "Стройматериалы" },
                 { civilian: "Одежда", spy: "Обувь" },
                 { civilian: "Ювелирный", spy: "Часовая мастерская" },
-
-                // --- ПРАЗДНИКИ (10 пар) ---
+                // Праздники
                 { civilian: "Новый год", spy: "Рождество" },
                 { civilian: "День рождения", spy: "Юбилей" },
                 { civilian: "Свадьба", spy: "Помолвка" },
@@ -743,8 +946,7 @@
                 { civilian: "23 февраля", spy: "День Победы" },
                 { civilian: "Подарок", spy: "Сюрприз" },
                 { civilian: "Салют", spy: "Фейерверк" },
-
-                // --- ЭМОЦИИ (10 пар) ---
+                // Эмоции
                 { civilian: "Радость", spy: "Счастье" },
                 { civilian: "Грусть", spy: "Печаль" },
                 { civilian: "Злость", spy: "Ярость" },
@@ -755,8 +957,7 @@
                 { civilian: "Ненависть", spy: "Отвращение" },
                 { civilian: "Зависть", spy: "Ревность" },
                 { civilian: "Волнение", spy: "Тревога" },
-
-                // --- СТРАНЫ И ГОРОДА (15 пар) ---
+                // Страны и города
                 { civilian: "Россия", spy: "Беларусь" },
                 { civilian: "Москва", spy: "Санкт-Петербург" },
                 { civilian: "Париж", spy: "Лондон" },
@@ -774,17 +975,53 @@
                 { civilian: "Швеция", spy: "Норвегия" }
             ];
 
-            // --- СОСТОЯНИЕ ---
+            // Слова для игры "Крокодил"
+            const CROCODILE_WORDS = [
+                "Крокодил", "Обезьяна", "Слон", "Жираф", "Пингвин", "Бабочка", "Пчела", "Змея",
+                "Кошка", "Собака", "Заяц", "Медведь", "Лиса", "Волк", "Тигр", "Лев",
+                "Рыба", "Птица", "Лягушка", "Черепаха", "Улитка", "Паук", "Муравей", "Кузнечик",
+                "Плавать", "Бегать", "Прыгать", "Танцевать", "Петь", "Рисовать", "Читать", "Писать",
+                "Спать", "Есть", "Пить", "Летать", "Копать", "Строить", "Ломать", "Прятаться",
+                "Улыбаться", "Плакать", "Смеяться", "Злиться", "Удивляться", "Бояться", "Любить", "Ненавидеть",
+                "Солнце", "Луна", "Звезда", "Дождь", "Снег", "Ветер", "Гроза", "Радуга",
+                "Дерево", "Цветок", "Гора", "Море", "Река", "Огонь", "Вода", "Земля",
+                "Машина", "Самолет", "Поезд", "Корабль", "Велосипед", "Ракета", "Танк", "Вертолет",
+                "Врач", "Повар", "Учитель", "Полицейский", "Пожарный", "Художник", "Музыкант", "Спортсмен",
+                "Банан", "Яблоко", "Арбуз", "Мороженое", "Пицца", "Торт", "Конфета", "Лимон",
+                "Телефон", "Компьютер", "Телевизор", "Холодильник", "Пылесос", "Микроволновка", "Чайник", "Утюг",
+                "Шляпа", "Очки", "Часы", "Кольцо", "Зонт", "Рюкзак", "Чемодан", "Ключ",
+                "Футбол", "Баскетбол", "Теннис", "Плавание", "Бокс", "Гимнастика", "Лыжи", "Коньки",
+                "Стул", "Стол", "Кровать", "Шкаф", "Зеркало", "Лампа", "Ковер", "Подушка",
+                "Дед Мороз", "Снегурочка", "Пират", "Принцесса", "Рыцарь", "Клоун", "Волшебник", "Робот",
+                "Готовить", "Стирать", "Гладить", "Подметать", "Мыть", "Красить", "Пилить", "Забивать",
+                "Целовать", "Обнимать", "Махать", "Кланяться", "Хлопать", "Топать", "Щекотать", "Шептать",
+                "Автобус", "Трамвай", "Метро", "Такси", "Грузовик", "Трактор", "Экскаватор", "Мотоцикл",
+                "Школа", "Больница", "Магазин", "Ресторан", "Банк", "Почта", "Аптека", "Библиотека",
+                "Снеговик", "Ангел", "Дьявол", "Зомби", "Вампир", "Оборотень", "Привидение", "Дракон",
+                "Лопата", "Молоток", "Пила", "Топор", "Дрель", "Отвертка", "Ножницы", "Игла",
+                "Играть", "Смотреть", "Слушать", "Нюхать", "Пробовать", "Трогать", "Ловить", "Бросать",
+                "Свадьба", "День рождения", "Новый год", "Пасха", "Масленица", "Хэллоуин", "8 марта", "23 февраля"
+            ];
+
+            // ================== СОСТОЯНИЕ ШПИОНА ==================
             let totalPlayers = 3;
             let currentPlayerIndex = 0;
             let currentPair = null;
             let spyIndex = -1;
-            
-            // Вместо lastPairIndex теперь используем массив последних 100 использованных пар
-            let recentlyUsedPairs = []; // Хранит индексы последних 100 использованных пар
-            const MAX_RECENT_PAIRS = 100; // Сколько пар не должны повторяться
+            let recentlyUsedPairs = [];
+            const MAX_RECENT_PAIRS = 100;
 
-            // --- ЭЛЕМЕНТЫ ---
+            // ================== СОСТОЯНИЕ КРОКОДИЛА ==================
+            let recentlyUsedCrocodileWords = [];
+            const MAX_RECENT_CROCODILE_WORDS = 50;
+
+            // ================== ЭЛЕМЕНТЫ ==================
+            // Меню
+            const gameMenu = document.getElementById('game-menu');
+            const spyGame = document.getElementById('spy-game');
+            const crocodileGame = document.getElementById('crocodile-game');
+            
+            // Шпион
             const screenSelect = document.getElementById('screen-select');
             const screenRole = document.getElementById('screen-role');
             const screenHidden = document.getElementById('screen-hidden');
@@ -808,7 +1045,32 @@
             const restartFromStart = document.getElementById('restart-from-start');
             const finalWords = document.getElementById('final-words');
 
-            // --- ФУНКЦИИ ---
+            // Крокодил
+            const crocodileWordDisplay = document.getElementById('crocodile-word-display');
+            const nextCrocodileWordBtn = document.getElementById('next-crocodile-word');
+
+            // ================== ФУНКЦИИ МЕНЮ ==================
+            function showMainMenu() {
+                gameMenu.classList.remove('hidden');
+                spyGame.classList.add('hidden');
+                crocodileGame.classList.add('hidden');
+            }
+
+            function showSpyGame() {
+                gameMenu.classList.add('hidden');
+                spyGame.classList.remove('hidden');
+                crocodileGame.classList.add('hidden');
+                resetToMenu();
+            }
+
+            function showCrocodileGame() {
+                gameMenu.classList.add('hidden');
+                spyGame.classList.add('hidden');
+                crocodileGame.classList.remove('hidden');
+                showNextCrocodileWord();
+            }
+
+            // ================== ФУНКЦИИ ШПИОНА ==================
             function showScreen(screen) {
                 [screenSelect, screenRole, screenHidden, screenAllDone, screenStart].forEach(s => s.classList.add('hidden'));
                 screen.classList.remove('hidden');
@@ -827,9 +1089,7 @@
                 }
             }
 
-            // Выбирает случайную пару слов, избегая недавних повторов
             function getRandomPairIndex() {
-                // Создаём массив доступных индексов (все, кроме недавних)
                 let availableIndices = [];
                 for (let i = 0; i < WORD_PAIRS.length; i++) {
                     if (!recentlyUsedPairs.includes(i)) {
@@ -837,21 +1097,16 @@
                     }
                 }
                 
-                // Если доступных нет (все в списке недавних), берём из всех
                 if (availableIndices.length === 0) {
                     availableIndices = WORD_PAIRS.map((_, index) => index);
                 }
                 
-                // Выбираем случайный индекс из доступных
                 const randomIndex = Math.floor(Math.random() * availableIndices.length);
                 return availableIndices[randomIndex];
             }
 
-            // Добавляет индекс в список недавних и обрезает до MAX_RECENT_PAIRS
             function addToRecentlyUsed(index) {
                 recentlyUsedPairs.push(index);
-                
-                // Если превысили лимит, удаляем самые старые
                 while (recentlyUsedPairs.length > MAX_RECENT_PAIRS) {
                     recentlyUsedPairs.shift();
                 }
@@ -860,14 +1115,10 @@
             function startRoleAssignment() {
                 currentPlayerIndex = 0;
                 
-                // Получаем случайный индекс пары
                 const pairIndex = getRandomPairIndex();
                 currentPair = WORD_PAIRS[pairIndex];
                 
-                // Добавляем в список недавних
                 addToRecentlyUsed(pairIndex);
-                
-                // Выбираем случайного шпиона
                 spyIndex = Math.floor(Math.random() * totalPlayers);
                 
                 showRoleScreen();
@@ -884,8 +1135,6 @@
                 } else {
                     roleDisplay.textContent = currentPair.civilian;
                 }
-                
-                roleDisplay.classList.remove('spy');
                 
                 showScreen(screenRole);
             }
@@ -918,7 +1167,55 @@
                 showScreen(screenSelect);
             }
 
-            // --- ОБРАБОТЧИКИ ---
+            // ================== ФУНКЦИИ КРОКОДИЛА ==================
+            function getRandomCrocodileWord() {
+                let availableWords = [];
+                for (let i = 0; i < CROCODILE_WORDS.length; i++) {
+                    if (!recentlyUsedCrocodileWords.includes(i)) {
+                        availableWords.push(i);
+                    }
+                }
+                
+                if (availableWords.length === 0) {
+                    availableWords = CROCODILE_WORDS.map((_, index) => index);
+                }
+                
+                const randomIndex = Math.floor(Math.random() * availableWords.length);
+                const wordIndex = availableWords[randomIndex];
+                
+                recentlyUsedCrocodileWords.push(wordIndex);
+                while (recentlyUsedCrocodileWords.length > MAX_RECENT_CROCODILE_WORDS) {
+                    recentlyUsedCrocodileWords.shift();
+                }
+                
+                return CROCODILE_WORDS[wordIndex];
+            }
+
+            function showNextCrocodileWord() {
+                const word = getRandomCrocodileWord();
+                crocodileWordDisplay.textContent = word;
+            }
+
+            // ================== ОБРАБОТЧИКИ ==================
+            // Меню
+            document.getElementById('spy-game-btn').addEventListener('click', showSpyGame);
+            document.getElementById('crocodile-game-btn').addEventListener('click', showCrocodileGame);
+            
+            // Кнопки "В меню"
+            const backButtons = [
+                'back-to-menu-1',
+                'back-to-menu-2',
+                'back-to-menu-3',
+                'back-to-menu-4',
+                'back-to-menu-5',
+                'back-to-menu-crocodile'
+            ];
+            
+            backButtons.forEach(id => {
+                document.getElementById(id).addEventListener('click', showMainMenu);
+            });
+
+            // Шпион
             hideWordBtn.addEventListener('click', handleHideWord);
             showWordBtn.addEventListener('click', handleShowWord);
             startGameBtn.addEventListener('click', showStartScreen);
@@ -928,9 +1225,12 @@
             restartFromDone.addEventListener('click', resetToMenu);
             restartFromStart.addEventListener('click', resetToMenu);
 
-            // --- ЗАПУСК ---
+            // Крокодил
+            nextCrocodileWordBtn.addEventListener('click', showNextCrocodileWord);
+
+            // ================== ЗАПУСК ==================
             initPlayerButtons();
-            showScreen(screenSelect);
+            showMainMenu();
         })();
     </script>
 </body>
