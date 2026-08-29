@@ -1,3 +1,100 @@
+// ================== DOM ЭЛЕМЕНТЫ ==================
+// Меню
+const gameMenu = document.getElementById('game-menu');
+
+// Контейнеры игр
+const spyGame = document.getElementById('spy-game');
+const crocodileGame = document.getElementById('crocodile-game');
+const bombGame = document.getElementById('bomb-game');
+const questionsGame = document.getElementById('questions-game');
+const truthGame = document.getElementById('truth-game');
+const diceGame = document.getElementById('dice-game');
+const guessGame = document.getElementById('guess-game');
+const leaderGame = document.getElementById('leader-game');
+const ultimatumGame = document.getElementById('ultimatum-game');
+const wordAssociationGame = document.getElementById('word-association-game');
+const storyGame = document.getElementById('story-game');
+const factGame = document.getElementById('fact-game');
+
+// Элементы игры "Банан Шпион"
+const screenSelect = document.getElementById('screen-select');
+const screenRole = document.getElementById('screen-role');
+const screenHidden = document.getElementById('screen-hidden');
+const screenAllDone = document.getElementById('screen-all-done');
+const screenStart = document.getElementById('screen-start');
+const playerSelectDiv = document.getElementById('player-select');
+const playerHeader = document.getElementById('player-header');
+const roleDisplay = document.getElementById('role-display');
+const hideWordBtn = document.getElementById('hide-word-btn');
+const showWordBtn = document.getElementById('show-word-btn');
+const startGameBtn = document.getElementById('start-game-btn');
+const revealSpyBtn = document.getElementById('reveal-spy-btn');
+const restartFromRole = document.getElementById('restart-from-role');
+const restartFromHidden = document.getElementById('restart-from-hidden');
+const restartFromDone = document.getElementById('restart-from-done');
+const restartFromStart = document.getElementById('restart-from-start');
+const nextPlayerHeader = document.getElementById('next-player-header');
+const passMessageHidden = document.getElementById('pass-message-hidden');
+const finalWords = document.getElementById('final-words');
+
+// Элементы игры "Крокодил"
+const crocodileWordDisplay = document.getElementById('crocodile-word-display');
+const nextCrocodileWordBtn = document.getElementById('next-crocodile-word');
+
+// Элементы игры "Бомба"
+const bombTimerDisplay = document.getElementById('bomb-timer');
+const bombWordDisplay = document.getElementById('bomb-word-display');
+const startBombBtn = document.getElementById('start-bomb-game');
+
+// Элементы игры "20 вопросов"
+const questionsWordDisplay = document.getElementById('questions-word-display');
+const questionsCounter = document.getElementById('questions-counter');
+const startQuestionsBtn = document.getElementById('start-questions-game');
+const resetQuestionsBtn = document.getElementById('reset-questions-game');
+
+// Элементы игры "Правда или Действие"
+const truthCardDisplay = document.getElementById('truth-card-display');
+const generateTruthBtn = document.getElementById('generate-truth');
+const generateActionBtn = document.getElementById('generate-action');
+
+// Элементы игры "Кубик"
+const diceDisplay = document.getElementById('dice-display');
+const rollDiceBtn = document.getElementById('roll-dice');
+
+// Элементы игры "Угадай число"
+const guessCardDisplay = document.getElementById('guess-card-display');
+const guessHigherBtn = document.getElementById('guess-higher');
+const guessCorrectBtn = document.getElementById('guess-correct');
+const guessLowerBtn = document.getElementById('guess-lower');
+const resetGuessBtn = document.getElementById('reset-guess-game');
+
+// Элементы игры "Тайный лидер"
+const leaderRoleDisplay = document.getElementById('leader-role-display');
+const startLeaderGameBtn = document.getElementById('start-leader-game');
+
+// Элементы игры "Ультиматум"
+const ultimatumSituation = document.getElementById('ultimatum-situation');
+const ultimatumRoles = document.getElementById('ultimatum-roles');
+const startUltimatumGameBtn = document.getElementById('start-ultimatum-game');
+
+// Элементы игры "Ассоциации"
+const associationWordDisplay = document.getElementById('association-word-display');
+const nextAssociationWordBtn = document.getElementById('next-association-word');
+
+// Элементы игры "Смешная история"
+const storyQuestionDisplay = document.getElementById('story-question-display');
+const storyAnswerInput = document.getElementById('story-answer-input');
+const storyNextBtn = document.getElementById('story-next-btn');
+const storyStoryDisplay = document.getElementById('story-story-display');
+const storyStartBtn = document.getElementById('story-start-btn');
+
+// Элементы игры "Факт или Фейк"
+const factFactDisplay = document.getElementById('fact-fact-display');
+const factAnswerDisplay = document.getElementById('fact-answer-display');
+const factTrueBtn = document.getElementById('fact-true-btn');
+const factFalseBtn = document.getElementById('fact-false-btn');
+const factNextBtn = document.getElementById('fact-next-btn');
+
 // ================== СОСТОЯНИЕ БАНАН ШПИОНА ==================
 let totalPlayers = 3;
 let currentPlayerIndex = 0;
