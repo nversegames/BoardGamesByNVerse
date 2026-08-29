@@ -161,10 +161,12 @@
             background: radial-gradient(circle, #f3e5f5 0%, #8e24aa 50%, #4a148c 100%);
         }
         
-        .mafia-avatar {
-            background: radial-gradient(circle, #212121 0%, #424242 50%, #000000 100%);
-            border: 2px solid #e94560;
-            box-shadow: 0 0 20px rgba(233, 69, 96, 0.8);
+        .story-avatar {
+            background: radial-gradient(circle, #fff8e1 0%, #ff8f00 50%, #e65100 100%);
+        }
+        
+        .fact-avatar {
+            background: radial-gradient(circle, #e8f5e9 0%, #66bb6a 50%, #2e7d32 100%);
         }
         
         .game-info {
@@ -464,72 +466,97 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
         }
         
-        .mafia-container {
-            background: linear-gradient(135deg, #1a1a2e 0%, #2c3e50 50%, #000000 100%);
+        .story-container {
+            background: linear-gradient(135deg, #ff8f00 0%, #ffa000 25%, #ff6f00 50%, #ff8f00 75%, #ffa000 100%);
         }
-        .mafia-card {
-            background: #0f3460;
+        .story-question {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 15px 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .story-input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 10px 0;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+        }
+        .story-result {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+        
+        .fact-container {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 50%, #2e7d32 100%);
+        }
+        .fact-card {
+            background: white;
+            color: #333;
             padding: 20px;
             border-radius: 20px;
             margin: 15px 0;
             font-size: 1.2rem;
+            line-height: 1.5;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fact-answer {
+            background: #0f3460;
+            color: #ffd700;
+            padding: 15px;
+            border-radius: 20px;
+            margin: 15px 0;
+            font-size: 1.3rem;
+            font-weight: bold;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
         }
-        .mafia-role-card {
-            background: #1a1a2e;
-            padding: 15px;
-            border-radius: 15px;
-            margin: 10px 0;
-            border: 2px solid #e94560;
-        }
-        .mafia-role-card.civilian {
-            border-color: #4caf50;
-        }
-        .mafia-role-card.mafia {
-            border-color: #e94560;
-        }
-        .mafia-role-card.doctor {
-            border-color: #2196f3;
-        }
-        .mafia-role-card.commissar {
-            border-color: #ffd700;
-        }
-        .mafia-role-card.mistress {
-            border-color: #9c27b0;
-        }
-        .mafia-role-card.don {
-            border-color: #ff5722;
-        }
-        .player-role-toggle {
+        
+        .sound-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: #533483;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
             cursor: pointer;
-            margin: 5px;
-            padding: 10px;
-            background: #2d4059;
-            border-radius: 10px;
-            transition: background 0.3s;
+            box-shadow: 0 5px 0 #3b1f5e;
         }
-        .player-role-toggle:hover {
-            background: #3d5069;
-        }
-        .role-revealed {
-            background: #4caf50 !important;
+        .sound-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #3b1f5e;
         }
     </style>
 </head>
 <body>
+    <!-- КНОПКА ЗВУКА -->
+    <button id="sound-toggle-btn" class="sound-btn">🔊 Звук: ВКЛ</button>
+
     <!-- МЕНЮ ВЫБОРА ИГРЫ -->
     <div id="game-menu" class="menu-container">
         <h1 class="menu-title">🎮 ИГРЫ</h1>
         <div class="game-cards">
-            <div class="game-card" id="mafia-game-btn">
-                <div class="game-avatar mafia-avatar">🕵️</div>
-                <div class="game-info">
-                    <div class="game-name">МАФИЯ</div>
-                    <div class="game-description">Классическая игра с ролями</div>
-                    <div class="game-players">👥 6-17 игроков</div>
-                </div>
-            </div>
-            
             <div class="game-card" id="spy-game-btn">
                 <div class="game-avatar banana-spy-avatar">
                     <div class="banana-emoji">🍌</div>
@@ -622,46 +649,24 @@
                     <div class="game-players">👥 2+ игроков</div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- ИГРА МАФИЯ -->
-    <div id="mafia-game" class="game-container mafia-container hidden">
-        <h1 class="game-title">🕵️ МАФИЯ</h1>
-        <p class="subtitle">Раздача ролей для игры</p>
-        
-        <div id="mafia-content">
-            <div class="step-title" style="font-size: 1.2rem; margin-bottom: 15px;">Выберите количество игроков:</div>
-            <div id="mafia-player-select" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px;">
-                <!-- Кнопки добавятся из JS -->
+            
+            <div class="game-card" id="story-game-btn">
+                <div class="game-avatar story-avatar">📖</div>
+                <div class="game-info">
+                    <div class="game-name">СМЕШНАЯ ИСТОРИЯ</div>
+                    <div class="game-description">Заполни пропуски и получи историю</div>
+                    <div class="game-players">👤 1+ игроков</div>
+                </div>
             </div>
             
-            <div id="mafia-role-display" class="mafia-card hidden">
-                <div style="font-size: 1.5rem; margin-bottom: 10px;">Нажмите на игрока, чтобы показать его роль:</div>
-                <div id="mafia-roles-list"></div>
-                <button class="btn btn-primary" id="mafia-redistribute-btn">🔄 Перераздать роли</button>
+            <div class="game-card" id="fact-game-btn">
+                <div class="game-avatar fact-avatar">🤔</div>
+                <div class="game-info">
+                    <div class="game-name">ФАКТ ИЛИ ФЕЙК</div>
+                    <div class="game-description">Угадай, правда это или нет</div>
+                    <div class="game-players">👤 1+ игроков</div>
+                </div>
             </div>
-            
-            <button class="btn btn-secondary" id="show-rules-mafia">📖 Правила</button>
-            <button class="btn btn-secondary" id="back-to-menu-mafia">← В меню</button>
-        </div>
-        
-        <div id="rules-mafia" class="hidden">
-            <div class="rules-container">
-                <div class="rules-title">📖 Правила игры "МАФИЯ"</div>
-                <ol class="rules-text">
-                    <li>Выберите количество игроков (от 6 до 17).</li>
-                    <li>Раздайте роли в соответствии с экраном.</li>
-                    <li>Игра делится на день и ночь.</li>
-                    <li>Ночью мафия выбирает жертву, доктор лечит, комиссар проверяет.</li>
-                    <li>Днем все обсуждают и голосуют, кого исключить.</li>
-                    <li>Цель мафии - убить всех мирных жителей.</li>
-                    <li>Цель мирных - найти и исключить всех мафиози.</li>
-                    <li>Дон мафии может проверять (только при 10+ игроках).</li>
-                    <li>Любовница может блокировать игрока (только при 10+ игроках).</li>
-                </ol>
-            </div>
-            <button class="btn btn-primary" id="back-from-rules-mafia">✅ Понятно</button>
         </div>
     </div>
 
@@ -833,12 +838,12 @@
     <!-- ИГРА ПРАВДА ИЛИ ДЕЙСТВИЕ -->
     <div id="truth-game" class="game-container truth-container hidden">
         <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🎭 ПРАВДА ИЛИ ДЕЙСТВИЕ</h1>
-        <p class="subtitle" style="color: #ccc;">Генератор заданий</p>
+        <p class="subtitle" style="color: #ccc;">Нажми и узнай своё задание</p>
         
         <div id="truth-content">
-            <div class="truth-card" id="truth-card-display">НАЖМИ ГЕНЕРИРОВАТЬ</div>
-            <button class="btn btn-primary" id="generate-truth">🎲 Правда</button>
-            <button class="btn btn-primary" id="generate-action">🎯 Действие</button>
+            <div class="truth-card" id="truth-card-display">НАЖМИ УЗНАТЬ</div>
+            <button class="btn btn-primary" id="generate-truth">🎲 Узнать задание</button>
+            <button class="btn btn-primary" id="generate-action" style="display: none;">🎯 Ещё раз</button>
             <button class="btn btn-secondary" id="show-rules-truth">📖 Правила</button>
             <button class="btn btn-secondary" id="back-to-menu-truth">← В меню</button>
         </div>
@@ -847,10 +852,11 @@
             <div class="rules-container" style="background: rgba(0,0,0,0.5);">
                 <div class="rules-title" style="color: #ffd700;">📖 Правила игры "ПРАВДА ИЛИ ДЕЙСТВИЕ"</div>
                 <ol class="rules-text" style="color: white;">
-                    <li>Игрок выбирает: Правда или Действие?</li>
+                    <li>Игрок нажимает кнопку "Узнать задание".</li>
+                    <li>Система случайно выбирает: Правда или Действие.</li>
                     <li>Если Правда - игрок должен честно ответить на вопрос.</li>
                     <li>Если Действие - игрок должен выполнить задание.</li>
-                    <li>Нельзя отказываться от выполнения!</li>
+                    <li>Передайте телефон следующему игроку.</li>
                     <li>Играйте по кругу, пока не надоест!</li>
                 </ol>
             </div>
@@ -975,6 +981,67 @@
                 </ol>
             </div>
             <button class="btn btn-primary" id="back-from-rules-association">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА СМЕШНАЯ ИСТОРИЯ -->
+    <div id="story-game" class="game-container story-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">📖 СМЕШНАЯ ИСТОРИЯ</h1>
+        <p class="subtitle" style="color: #ccc;">Заполни пропуски и получи историю</p>
+        
+        <div id="story-content">
+            <div class="story-question" id="story-question-display">Назови любое животное</div>
+            <input type="text" id="story-answer-input" class="story-input" placeholder="Введи ответ...">
+            <button class="btn btn-primary" id="story-next-btn">➡️ Дальше</button>
+            <div class="story-result hidden" id="story-story-display"></div>
+            <button class="btn btn-secondary" id="story-start-btn">🔄 Заново</button>
+            <button class="btn btn-secondary" id="show-rules-story">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-story">← В меню</button>
+        </div>
+        
+        <div id="rules-story" class="hidden">
+            <div class="rules-container" style="background: rgba(0,0,0,0.5);">
+                <div class="rules-title" style="color: #ffd700;">📖 Правила игры "СМЕШНАЯ ИСТОРИЯ"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>Отвечай на вопросы, вводя любые слова.</li>
+                    <li>Можно играть одному или с друзьями.</li>
+                    <li>Если играешь с друзьями - спрашивай слова у них по очереди.</li>
+                    <li>В конце получится смешная история с твоими словами!</li>
+                    <li>Чем смешнее слова, тем веселее история!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-story">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА ФАКТ ИЛИ ФЕЙК -->
+    <div id="fact-game" class="game-container fact-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🤔 ФАКТ ИЛИ ФЕЙК</h1>
+        <p class="subtitle" style="color: #ccc;">Угадай, правда это или нет</p>
+        
+        <div id="fact-content">
+            <div class="fact-card" id="fact-fact-display">НАЖМИ НАЧАТЬ</div>
+            <div class="fact-answer hidden" id="fact-answer-display"></div>
+            <button class="btn btn-success" id="fact-true-btn">✅ Правда</button>
+            <button class="btn btn-danger" id="fact-false-btn">❌ Фейк</button>
+            <button class="btn btn-primary hidden" id="fact-next-btn">🎲 Следующий факт</button>
+            <button class="btn btn-secondary" id="show-rules-fact">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-fact">← В меню</button>
+        </div>
+        
+        <div id="rules-fact" class="hidden">
+            <div class="rules-container" style="background: rgba(0,0,0,0.5);">
+                <div class="rules-title" style="color: #ffd700;">📖 Правила игры "ФАКТ ИЛИ ФЕЙК"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>На экране появляется утверждение.</li>
+                    <li>Угадай: это правда или выдумка?</li>
+                    <li>Нажми соответствующую кнопку.</li>
+                    <li>Узнай правильный ответ!</li>
+                    <li>Можно играть одному или с друзьями.</li>
+                    <li>Кто больше угадает - тот и победил!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-fact">✅ Понятно</button>
         </div>
     </div>
 
