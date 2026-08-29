@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Игровой портал - Банан Шпион и Крокодил</title>
+    <title>Игровой портал - Семейные игры</title>
     <style>
         * {
             box-sizing: border-box;
@@ -31,6 +31,8 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             text-align: center;
             color: white;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .menu-title {
             margin: 0 0 30px;
@@ -42,17 +44,17 @@
         .game-cards {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
         .game-card {
             background: #0f3460;
             border-radius: 24px;
-            padding: 20px;
+            padding: 15px;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             box-shadow: 0 5px 0 #0a2540;
         }
         .game-card:active {
@@ -60,19 +62,22 @@
             box-shadow: 0 0 0 #0a2540;
         }
         
-        /* АВАТАРКА БАНАНА ШПИОНА С МАСКОЙ БАНДИТА */
-        .banana-spy-avatar {
-            width: 80px;
-            height: 80px;
+        .game-avatar {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background: radial-gradient(circle, #fff9c4 0%, #ffd700 50%, #ffc107 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 2rem;
             flex-shrink: 0;
             position: relative;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.5);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+        
+        .banana-spy-avatar {
+            background: radial-gradient(circle, #fff9c4 0%, #ffd700 50%, #ffc107 100%);
+            position: relative;
             overflow: hidden;
         }
         .banana-spy-avatar::before {
@@ -91,65 +96,45 @@
             position: relative;
             z-index: 1;
             transform: rotate(-15deg);
-            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
         }
         .bandit-mask {
             position: absolute;
-            top: 25px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40px;
-            height: 20px;
+            width: 30px;
+            height: 15px;
             background: #000;
             border-radius: 3px;
             z-index: 2;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
         .bandit-mask::before,
         .bandit-mask::after {
             content: '';
             position: absolute;
-            top: 5px;
-            width: 10px;
-            height: 10px;
+            top: 3px;
+            width: 7px;
+            height: 7px;
             background: #fff;
             border-radius: 50%;
-            box-shadow: inset 0 0 3px #000;
         }
         .bandit-mask::before {
-            left: 8px;
+            left: 5px;
         }
         .bandit-mask::after {
-            right: 8px;
+            right: 5px;
         }
         
-        /* АВАТАРКА КРОКОДИЛА */
         .crocodile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
             background: radial-gradient(circle, #fff3e0 0%, #ff8c00 50%, #ff6f00 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            flex-shrink: 0;
-            position: relative;
-            box-shadow: 0 0 20px rgba(255, 140, 0, 0.6);
-            overflow: hidden;
         }
-        .crocodile-avatar::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.3), transparent);
-            animation: rotate-rays 10s linear infinite;
+        
+        .leader-avatar {
+            background: radial-gradient(circle, #e0f7fa 0%, #00bcd4 50%, #0097a7 100%);
         }
-        .crocodile-emoji {
-            position: relative;
-            z-index: 1;
-            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+        
+        .ultimatum-avatar {
+            background: radial-gradient(circle, #f3e5f5 0%, #9c27b0 50%, #6a1b9a 100%);
         }
         
         .game-info {
@@ -157,102 +142,86 @@
             text-align: left;
         }
         .game-name {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
             margin-bottom: 5px;
             color: #fff;
         }
         .game-description {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #a0a0b0;
         }
+        .game-players {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 5px;
+        }
         
-        /* СТИЛИ ДЛЯ ИГРЫ КРОКОДИЛ */
-        .crocodile-container {
-            background: linear-gradient(135deg, #ff8c00 0%, #ffa500 25%, #ffd700 50%, #ff8c00 75%, #ffa500 100%);
+        /* ОБЩИЕ СТИЛИ ДЛЯ ИГР */
+        .game-container {
+            background: #16213e;
             border-radius: 32px;
             padding: 24px;
             width: 100%;
             max-width: 480px;
-            box-shadow: 0 20px 40px rgba(255, 140, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             text-align: center;
             color: white;
-            position: relative;
-            overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .crocodile-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
-            animation: pulse-background 3s ease-in-out infinite;
+        .game-title {
+            margin: 0 0 8px;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
-        @keyframes pulse-background {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        .crocodile-title {
-            font-size: 2.5rem;
-            color: white;
-            text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-        .crocodile-word {
-            background: white;
-            color: #333;
-            font-size: 2.5rem;
-            font-weight: bold;
-            padding: 40px 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
-            min-height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            word-break: break-word;
+        .subtitle {
+            margin: 0 0 20px;
+            color: #a0a0b0;
+            font-size: 0.9rem;
         }
         .btn {
-            background: #333;
+            background: #533483;
             border: none;
             color: white;
-            padding: 18px 24px;
+            padding: 15px 20px;
             border-radius: 50px;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.1s, background 0.2s;
             min-width: 80px;
-            box-shadow: 0 5px 0 #000;
+            box-shadow: 0 5px 0 #3b1f5e;
             letter-spacing: 1px;
-            position: relative;
-            z-index: 1;
+            margin: 5px;
         }
         .btn:active {
             transform: translateY(4px);
-            box-shadow: 0 1px 0 #000;
+            box-shadow: 0 1px 0 #3b1f5e;
         }
         .btn-primary {
             background: #e94560;
             box-shadow: 0 5px 0 #a02040;
             width: 100%;
             margin-top: 8px;
-            font-size: 1.5rem;
-            padding: 20px;
+            font-size: 1.3rem;
+            padding: 18px;
+        }
+        .btn-primary:active {
+            box-shadow: 0 1px 0 #a02040;
         }
         .btn-secondary {
             background: #2d4059;
             box-shadow: 0 5px 0 #1a2533;
-            font-size: 1rem;
-            padding: 12px 20px;
-            margin-top: 10px;
+            font-size: 0.9rem;
+            padding: 10px 15px;
+            margin-top: 5px;
         }
         .btn-success {
             background: #4caf50;
@@ -262,131 +231,79 @@
             display: none !important;
         }
         
-        /* ОРИГИНАЛЬНЫЕ СТИЛИ ШПИОНА */
-        .container {
-            background: #16213e;
-            border-radius: 32px;
-            padding: 24px;
-            width: 100%;
-            max-width: 480px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            text-align: center;
-            color: white;
-            transition: all 0.2s ease;
-        }
-        h1 {
-            margin: 0 0 8px;
-            font-size: 2rem;
-            letter-spacing: 2px;
-            color: #ffd700;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-        }
-        .subtitle {
-            margin: 0 0 24px;
-            color: #a0a0b0;
-            font-size: 0.9rem;
-        }
-        .step-title {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: #f5f5f5;
-            min-height: 2em;
-        }
-        .role-card {
+        /* СТИЛИ ДЛЯ ПРАВИЛ */
+        .rules-container {
             background: #0f3460;
-            padding: 30px 20px;
-            border-radius: 24px;
-            margin: 20px 0;
+            border-radius: 20px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .rules-title {
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .rules-text {
+            color: #ccc;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .rules-text li {
+            margin-bottom: 8px;
+        }
+        
+        /* СПЕЦИФИЧЕСКИЕ СТИЛИ ДЛЯ ИГР */
+        .crocodile-container {
+            background: linear-gradient(135deg, #ff8c00 0%, #ffa500 25%, #ffd700 50%, #ff8c00 75%, #ffa500 100%);
+        }
+        .crocodile-word {
+            background: white;
+            color: #333;
             font-size: 2rem;
             font-weight: bold;
-            letter-spacing: 1px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
-            transition: transform 0.1s;
+            padding: 30px 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             word-break: break-word;
-            color: white;
         }
-        .player-badge {
+        
+        .leader-card {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 15px 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        .ultimatum-card {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 15px 0;
+            font-size: 1.2rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        .role-badge {
             display: inline-block;
             background: #e94560;
             color: white;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-size: 1rem;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        .pass-text {
-            font-size: 1.2rem;
-            color: #ffd700;
-            font-weight: bold;
-            margin: 12px 0;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; }
-            100% { opacity: 0.7; }
-        }
-        .btn-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        button {
-            background: #533483;
-            border: none;
-            color: white;
-            padding: 18px 24px;
-            border-radius: 50px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            min-width: 80px;
-            box-shadow: 0 5px 0 #3b1f5e;
-            letter-spacing: 1px;
-        }
-        button:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px 0 #3b1f5e;
-        }
-        button.primary {
-            background: #e94560;
-            box-shadow: 0 5px 0 #a02040;
-            width: 100%;
-            margin-top: 8px;
-            font-size: 1.5rem;
-            padding: 20px;
-        }
-        button.primary:active {
-            box-shadow: 0 1px 0 #a02040;
-        }
-        button.secondary {
-            background: #2d4059;
-            box-shadow: 0 5px 0 #1a2533;
-            font-size: 1rem;
-            padding: 12px 20px;
-            margin-top: 5px;
-        }
-        .info-text {
-            color: #aaa;
-            font-size: 0.85rem;
-            margin-top: 12px;
-        }
-        .word-pair {
-            background: #222;
-            border-radius: 16px;
-            padding: 8px;
-            margin: 8px 0;
+            padding: 5px 15px;
+            border-radius: 20px;
             font-size: 0.9rem;
-            color: #ccc;
-        }
-        .lock-icon {
-            font-size: 5rem;
-            margin: 20px 0;
-            animation: pulse 2s infinite;
+            margin: 5px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -396,89 +313,212 @@
         <h1 class="menu-title">🎮 ИГРЫ</h1>
         <div class="game-cards">
             <div class="game-card" id="spy-game-btn">
-                <div class="banana-spy-avatar">
+                <div class="game-avatar banana-spy-avatar">
                     <div class="banana-emoji">🍌</div>
                     <div class="bandit-mask"></div>
                 </div>
                 <div class="game-info">
                     <div class="game-name">БАНАН ШПИОН</div>
                     <div class="game-description">Найди шпиона среди игроков</div>
+                    <div class="game-players">👥 3-10 игроков</div>
                 </div>
             </div>
+            
             <div class="game-card" id="crocodile-game-btn">
-                <div class="crocodile-avatar">
-                    <div class="crocodile-emoji">🐊</div>
-                </div>
+                <div class="game-avatar crocodile-avatar">🐊</div>
                 <div class="game-info">
                     <div class="game-name">КРОКОДИЛ</div>
                     <div class="game-description">Покажи слово без слов</div>
+                    <div class="game-players">👥 2+ игроков</div>
+                </div>
+            </div>
+            
+            <div class="game-card" id="leader-game-btn">
+                <div class="game-avatar leader-avatar">👁️</div>
+                <div class="game-info">
+                    <div class="game-name">ТАЙНЫЙ ЛИДЕР</div>
+                    <div class="game-description">Найди того, кто задаёт движения</div>
+                    <div class="game-players">👥 3-6 игроков</div>
+                </div>
+            </div>
+            
+            <div class="game-card" id="ultimatum-game-btn">
+                <div class="game-avatar ultimatum-avatar">⚖️</div>
+                <div class="game-info">
+                    <div class="game-name">УЛЬТИМАТУМ</div>
+                    <div class="game-description">Договоритесь и разделите приз</div>
+                    <div class="game-players">👥 3 игрока</div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ИГРА БАНАН ШПИОН -->
-    <div class="container hidden" id="spy-game">
-        <!-- ЭКРАН 1: ВЫБОР КОЛИЧЕСТВА ИГРОКОВ -->
-        <div id="screen-select">
-            <h1>🍌 БАНАН ШПИОН</h1>
+    <div class="game-container hidden" id="spy-game">
+        <div id="spy-game-content">
+            <h1 class="game-title">🍌 БАНАН ШПИОН</h1>
             <p class="subtitle">Мега версия • 1000+ пар слов</p>
-            <div class="step-title">На сколько человек играем?</div>
-            <div class="btn-grid" id="player-select">
-                <!-- Кнопки добавятся из JS -->
+            
+            <!-- ЭКРАН 1: ВЫБОР КОЛИЧЕСТВА ИГРОКОВ -->
+            <div id="screen-select">
+                <div class="step-title" style="font-size: 1.2rem; margin-bottom: 15px;">На сколько человек играем?</div>
+                <div class="btn-grid" id="player-select" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                    <!-- Кнопки добавятся из JS -->
+                </div>
+                <div class="info-text" style="color: #aaa; font-size: 0.8rem; margin-top: 10px;">Минимум 3, максимум 10</div>
+                <button class="btn btn-secondary" id="show-rules-spy">📖 Правила</button>
+                <button class="btn btn-secondary" id="back-to-menu-1">← В меню</button>
             </div>
-            <div class="info-text">Минимум 3, максимум 10</div>
-            <button class="secondary" id="back-to-menu-1">← В меню</button>
-        </div>
+            
+            <!-- ПРАВИЛА ШПИОНА -->
+            <div id="rules-spy" class="hidden">
+                <div class="rules-container">
+                    <div class="rules-title">📖 Правила игры "БАНАН ШПИОН"</div>
+                    <ol class="rules-text">
+                        <li>Выберите количество игроков (от 3 до 10).</li>
+                        <li>Каждый игрок по очереди смотрит на экран и запоминает слово.</li>
+                        <li>Один из игроков - ШПИОН. У него другое слово, похожее по смыслу.</li>
+                        <li>После того как все посмотрели слова, начните обсуждение.</li>
+                        <li>Игроки задают друг другу вопросы о слове, не называя его прямо.</li>
+                        <li>Задача мирных жителей - найти шпиона.</li>
+                        <li>Задача шпиона - понять слово мирных и не попасться.</li>
+                        <li>В конце обсуждения проголосуйте, кто шпион.</li>
+                    </ol>
+                </div>
+                <button class="btn btn-primary" id="back-from-rules-spy">✅ Понятно</button>
+            </div>
 
-        <!-- ЭКРАН 2: ПОКАЗ СЛОВА -->
-        <div id="screen-role" class="hidden">
-            <div id="player-header" class="player-badge">Игрок 1</div>
-            <div class="step-title">Запомни слово и нажми "Скрыть"</div>
-            <div id="role-display" class="role-card">СЛОВО</div>
-            <button class="primary" id="hide-word-btn">🙈 Скрыть и передать</button>
-            <button class="secondary" id="restart-from-role">🔄 Заново</button>
-            <button class="secondary" id="back-to-menu-2">← В меню</button>
-        </div>
+            <!-- ЭКРАН 2: ПОКАЗ СЛОВА -->
+            <div id="screen-role" class="hidden">
+                <div id="player-header" class="role-badge">Игрок 1</div>
+                <div class="step-title" style="font-size: 1rem; margin: 10px 0;">Запомни слово и нажми "Скрыть"</div>
+                <div id="role-display" style="background: #0f3460; padding: 30px; border-radius: 20px; margin: 15px 0; font-size: 2rem; font-weight: bold;">СЛОВО</div>
+                <button class="btn btn-primary" id="hide-word-btn">🙈 Скрыть и передать</button>
+                <button class="btn btn-secondary" id="restart-from-role">🔄 Заново</button>
+                <button class="btn btn-secondary" id="back-to-menu-2">← В меню</button>
+            </div>
 
-        <!-- ЭКРАН 3: ЗАГЛУШКА МЕЖДУ ИГРОКАМИ -->
-        <div id="screen-hidden" class="hidden">
-            <div id="next-player-header" class="player-badge">Игрок 2</div>
-            <div class="lock-icon">🔒</div>
-            <div class="step-title">Передай телефон следующему игроку</div>
-            <div class="pass-text" id="pass-message-hidden">📱 Телефон у Игрока 2?</div>
-            <button class="primary" id="show-word-btn">👁️ Показать слово</button>
-            <button class="secondary" id="restart-from-hidden">🔄 Заново</button>
-            <button class="secondary" id="back-to-menu-3">← В меню</button>
-        </div>
+            <!-- ЭКРАН 3: ЗАГЛУШКА МЕЖДУ ИГРОКАМИ -->
+            <div id="screen-hidden" class="hidden">
+                <div id="next-player-header" class="role-badge">Игрок 2</div>
+                <div style="font-size: 4rem; margin: 20px 0;">🔒</div>
+                <div class="step-title" style="font-size: 1rem;">Передай телефон следующему игроку</div>
+                <div style="color: #ffd700; font-weight: bold; margin: 10px 0;" id="pass-message-hidden">📱 Телефон у Игрока 2?</div>
+                <button class="btn btn-primary" id="show-word-btn">👁️ Показать слово</button>
+                <button class="btn btn-secondary" id="restart-from-hidden">🔄 Заново</button>
+                <button class="btn btn-secondary" id="back-to-menu-3">← В меню</button>
+            </div>
 
-        <!-- ЭКРАН 4: ВСЕ ПОСМОТРЕЛИ -->
-        <div id="screen-all-done" class="hidden">
-            <div class="lock-icon">🎉</div>
-            <div class="step-title">Все игроки посмотрели свои слова!</div>
-            <div class="pass-text">Готовы начать обсуждение?</div>
-            <button class="primary" id="start-game-btn">🏁 Начать игру</button>
-            <button class="secondary" id="restart-from-done">🔄 Заново</button>
-            <button class="secondary" id="back-to-menu-4">← В меню</button>
-        </div>
+            <!-- ЭКРАН 4: ВСЕ ПОСМОТРЕЛИ -->
+            <div id="screen-all-done" class="hidden">
+                <div style="font-size: 4rem; margin: 20px 0;">🎉</div>
+                <div class="step-title" style="font-size: 1rem;">Все игроки посмотрели свои слова!</div>
+                <div style="color: #ffd700; font-weight: bold; margin: 10px 0;">Готовы начать обсуждение?</div>
+                <button class="btn btn-primary" id="start-game-btn">🏁 Начать игру</button>
+                <button class="btn btn-secondary" id="restart-from-done">🔄 Заново</button>
+                <button class="btn btn-secondary" id="back-to-menu-4">← В меню</button>
+            </div>
 
-        <!-- ЭКРАН 5: НАЧАЛО ИГРЫ -->
-        <div id="screen-start" class="hidden">
-            <h1>🎉 ВСЁ!</h1>
-            <div class="step-title">Роли розданы. Обсуждайте и найдите шпиона!</div>
-            <div class="word-pair" id="final-words"></div>
-            <button class="primary" id="restart-from-start">🔄 Играть ещё раз</button>
-            <button class="secondary" id="back-to-menu-5">← В меню</button>
+            <!-- ЭКРАН 5: НАЧАЛО ИГРЫ -->
+            <div id="screen-start" class="hidden">
+                <h1 class="game-title">🎉 ВСЁ!</h1>
+                <div class="step-title" style="font-size: 1rem; margin: 10px 0;">Роли розданы. Обсуждайте и найдите шпиона!</div>
+                <div id="final-words" style="background: #222; border-radius: 15px; padding: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc;"></div>
+                <button class="btn btn-primary" id="restart-from-start">🔄 Играть ещё раз</button>
+                <button class="btn btn-secondary" id="back-to-menu-5">← В меню</button>
+            </div>
         </div>
     </div>
 
     <!-- ИГРА КРОКОДИЛ -->
-    <div id="crocodile-game" class="crocodile-container hidden">
-        <h2 class="crocodile-title">🐊 КРОКОДИЛ</h2>
-        <div class="step-title" style="color: white; text-shadow: 2px 2px 0 #000;">Покажи слово жестами!</div>
-        <div class="crocodile-word" id="crocodile-word-display">НАЖМИ НАЧАТЬ</div>
-        <button class="btn btn-primary" id="next-crocodile-word">🎲 Следующее слово</button>
-        <button class="btn btn-secondary" id="back-to-menu-crocodile">← В меню</button>
+    <div id="crocodile-game" class="game-container crocodile-container hidden">
+        <h2 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🐊 КРОКОДИЛ</h2>
+        <div class="step-title" style="color: white; text-shadow: 2px 2px 0 #000; font-size: 1rem;">Покажи слово жестами!</div>
+        
+        <div id="crocodile-content">
+            <div class="crocodile-word" id="crocodile-word-display">НАЖМИ НАЧАТЬ</div>
+            <button class="btn btn-primary" id="next-crocodile-word">🎲 Следующее слово</button>
+            <button class="btn btn-secondary" id="show-rules-crocodile">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-crocodile">← В меню</button>
+        </div>
+        
+        <div id="rules-crocodile" class="hidden">
+            <div class="rules-container" style="background: rgba(255,255,255,0.2);">
+                <div class="rules-title" style="color: white;">📖 Правила игры "КРОКОДИЛ"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>Один игрок смотрит на слово и показывает его жестами.</li>
+                    <li>Нельзя произносить звуки, шевелить губами или показывать буквы.</li>
+                    <li>Остальные игроки должны угадать слово.</li>
+                    <li>Тот, кто угадал, становится следующим показывающим.</li>
+                    <li>Можно использовать категории: животные, действия, предметы, профессии.</li>
+                    <li>Играйте на время - кто быстрее угадает, тот и победил!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-crocodile">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА ТАЙНЫЙ ЛИДЕР -->
+    <div id="leader-game" class="game-container hidden">
+        <h1 class="game-title">👁️ ТАЙНЫЙ ЛИДЕР</h1>
+        <p class="subtitle">Найди того, кто задаёт движения</p>
+        
+        <div id="leader-content">
+            <div class="leader-card" id="leader-role-display">НАЖМИ НАЧАТЬ</div>
+            <button class="btn btn-primary" id="start-leader-game">🎯 Раздать роли</button>
+            <button class="btn btn-secondary" id="show-rules-leader">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-leader">← В меню</button>
+        </div>
+        
+        <div id="rules-leader" class="hidden">
+            <div class="rules-container">
+                <div class="rules-title">📖 Правила игры "ТАЙНЫЙ ЛИДЕР"</div>
+                <ol class="rules-text">
+                    <li>Игроки садятся в круг, чтобы видеть друг друга.</li>
+                    <li>Один игрок - Лидер, второй - Подражатель, третий - Шпион.</li>
+                    <li>Лидер начинает делать повторяющиеся движения (хлопки, щелчки, жесты).</li>
+                    <li>Подражатель копирует движения Лидера с задержкой 1-2 секунды.</li>
+                    <li>Шпион не знает, кто Лидер. Его задача - вычислить его за 1 минуту.</li>
+                    <li>Лидер должен менять движения примерно каждые 10-15 секунд.</li>
+                    <li>Если Шпион угадал - он победил. Если нет - победили Лидер и Подражатель.</li>
+                    <li>Меняйтесь ролями каждый раунд!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-leader">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА УЛЬТИМАТУМ -->
+    <div id="ultimatum-game" class="game-container hidden">
+        <h1 class="game-title">⚖️ УЛЬТИМАТУМ</h1>
+        <p class="subtitle">Договоритесь и разделите приз</p>
+        
+        <div id="ultimatum-content">
+            <div class="ultimatum-card" id="ultimatum-situation">НАЖМИ НАЧАТЬ</div>
+            <div id="ultimatum-roles" style="margin: 10px 0;"></div>
+            <button class="btn btn-primary" id="start-ultimatum-game">🎲 Новая ситуация</button>
+            <button class="btn btn-secondary" id="show-rules-ultimatum">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-ultimatum">← В меню</button>
+        </div>
+        
+        <div id="rules-ultimatum" class="hidden">
+            <div class="rules-container">
+                <div class="rules-title">📖 Правила игры "УЛЬТИМАТУМ"</div>
+                <ol class="rules-text">
+                    <li>Игра для ровно 3 игроков.</li>
+                    <li>Каждый раунд раздаются роли: Капитан, Дипломат, Бунтарь.</li>
+                    <li>На столе лежит "Приз" (конфета, фишка и т.д.).</li>
+                    <li>Зачитывается абсурдная ситуация для обсуждения.</li>
+                    <li>Игроки 60 секунд спорят и пытаются договориться.</li>
+                    <li>В конце - тайное голосование.</li>
+                    <li>Если решение единогласное - все получают по 1 очку.</li>
+                    <li>Если 2 против 1 - большинство получает 2 очка, одиночка забирает Приз.</li>
+                    <li>Если все проголосовали по-разному - Приз сгорает, очки никто не получает.</li>
+                    <li>Играйте 5 раундов. Побеждает тот, у кого больше очков!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-ultimatum">✅ Понятно</button>
+        </div>
     </div>
 
     <script>
@@ -545,9 +585,7 @@
                 { civilian: "Кофе", spy: "Какао" },
                 { civilian: "Чай", spy: "Компот" },
                 { civilian: "Сок", spy: "Морс" },
-                { civilian: "Квас", spy: "Пиво" },
-                { civilian: "Водка", spy: "Коньяк" },
-                { civilian: "Шампанское", spy: "Вино" },
+                { civilian: "Квас", spy: "Лимонад" },
                 { civilian: "Сырники", spy: "Запеканка" },
                 { civilian: "Гамбургер", spy: "Чизбургер" },
                 { civilian: "Пельмень", spy: "Мант" },
@@ -1236,12 +1274,12 @@
                 
                 // ПЕРСОНАЖИ (50 слов)
                 "Дед Мороз", "Снегурочка", "Пират", "Принцесса", "Рыцарь", "Клоун", "Волшебник", "Робот",
-                "Снеговик", "Ангел", "Дьявол", "Зомби", "Вампир", "Оборотень", "Привидение", "Дракон",
-                "Фея", "Эльф", "Гном", "Великан", "Карлик", "Русалка", "Кентавр", "Пегас",
-                "Единорог", "Грифон", "Феникс", "Василиск", "Медуза", "Циклоп", "Минотавр", "Кентавр",
-                "Супермен", "Бэтмен", "Человек-паук", "Халк", "Тор", "Железный человек", "Капитан Америка", "Ведьма",
-                "Колдун", "Маг", "Чародей", "Заклинатель", "Шаман", "Друид", "Некромант", "Алхимик",
-                "Паладин", "Варвар",
+                "Снеговик", "Ангел", "Дракон", "Фея", "Эльф", "Гном", "Великан", "Русалка",
+                "Единорог", "Феникс", "Супермен", "Бэтмен", "Человек-паук", "Халк", "Тор", "Железный человек",
+                "Капитан Америка", "Ведьма", "Колдун", "Маг", "Чародей", "Заклинатель", "Шаман", "Друид",
+                "Алхимик", "Паладин", "Варвар", "Зомби", "Вампир", "Оборотень", "Привидение", "Дракон",
+                "Медуза", "Циклоп", "Минотавр", "Кентавр", "Пегас", "Грифон", "Василиск", "Некромант",
+                "Карлик", "Великан",
                 
                 // СПОРТ (30 слов)
                 "Футбол", "Баскетбол", "Волейбол", "Теннис", "Хоккей", "Бокс", "Борьба", "Плавание",
@@ -1270,6 +1308,37 @@
                 "Лень", "Активность", "Любопытство", "Гордость"
             ];
 
+            // Ситуации для игры "Ультиматум"
+            const ULTIMATUM_SITUATIONS = [
+                "Вы нашли волшебную лампу с джинном. Он исполнит одно желание, но только если вы единогласно решите, какое. Капитан хочет богатства, Дипломат - здоровья для всех, Бунтарь - суперспособности.",
+                "Вы выиграли в лотерею путёвку на необитаемый остров. Капитан хочет взять с собой еду, Дипломат - аптечку, Бунтарь - телефон с играми.",
+                "Ваш класс выиграл конкурс и может выбрать приз: поход в кино, пиццу или экскурсию. Капитан за кино, Дипломат за пиццу, Бунтарь за экскурсию.",
+                "Вы нашли машину времени. Можно отправиться в прошлое, будущее или остаться в настоящем. Капитан хочет в будущее, Дипломат - в прошлое, Бунтарь - остаться.",
+                "У вас есть волшебная палочка, но она может исполнить только одно желание: мир во всём мире, бесконечные сладости или отличные оценки. Капитан за мир, Дипломат за сладости, Бунтарь за оценки.",
+                "Вы собираетесь в поход и можете взять только одну вещь: палатку, еду или компас. Капитан за палатку, Дипломат за еду, Бунтарь за компас.",
+                "Вы можете выбрать суперспособность: летать, становиться невидимым или читать мысли. Капитан хочет летать, Дипломат - невидимость, Бунтарь - читать мысли.",
+                "Вы нашли клад, но в нём только один предмет: золотая монета, старинная книга или волшебный амулет. Капитан за монету, Дипломат за книгу, Бунтарь за амулет.",
+                "Ваша семья переезжает в новый дом, но комнат только три: с видом на море, с игровой приставкой или с большой библиотекой. Капитан за море, Дипломат за библиотеку, Бунтарь за приставку.",
+                "Вы можете завести только одного питомца: собаку, кошку или попугая. Капитан за собаку, Дипломат за кошку, Бунтарь за попугая.",
+                "В школе отменили один предмет навсегда. Какой? Математику, физкультуру или рисование? Капитан за отмену математики, Дипломат за рисование, Бунтарь за физкультуру.",
+                "Вы можете добавить в расписание один новый предмет: кулинарию, программирование или актёрское мастерство. Капитан за кулинарию, Дипломат за программирование, Бунтарь за актёрское мастерство.",
+                "Вы нашли волшебный сад, но можете сорвать только один фрукт: яблоко вечной молодости, грушу мудрости или апельсин силы. Капитан за силу, Дипломат за мудрость, Бунтарь за молодость.",
+                "Вам нужно выбрать фильм для семейного просмотра: комедию, фантастику или приключения. Капитан за фантастику, Дипломат за комедию, Бунтарь за приключения.",
+                "Вы можете отправиться в путешествие только в одно место: горы, море или большой город. Капитан за горы, Дипломат за море, Бунтарь за город.",
+                "У вас есть волшебная книга, но можно прочитать только одну главу: как стать богатым, как стать умным или как стать счастливым. Капитан за богатство, Дипломат за счастье, Бунтарь за ум.",
+                "Вы можете выбрать один праздник, который будет длиться целую неделю: Новый год, День рождения или Хэллоуин. Капитан за Новый год, Дипломат за День рождения, Бунтарь за Хэллоуин.",
+                "Вам нужно выбрать один вид спорта для всей семьи: футбол, плавание или шахматы. Капитан за футбол, Дипломат за плавание, Бунтарь за шахматы.",
+                "Вы можете получить только один подарок на всех: игровую приставку, велосипед или набор для творчества. Капитан за приставку, Дипломат за творчество, Бунтарь за велосипед.",
+                "Вы нашли волшебный лес, но можете пройти только по одной тропинке: тропинка приключений, тропинка знаний или тропинка дружбы. Капитан за приключения, Дипломат за дружбу, Бунтарь за знания."
+            ];
+
+            // Роли для игры "Ультиматум"
+            const ULTIMATUM_ROLES = [
+                { role: "Капитан", emoji: "👨‍✈️", description: "Главный, хочет контролировать ситуацию" },
+                { role: "Дипломат", emoji: "🤝", description: "Хитрый, умеет договариваться" },
+                { role: "Бунтарь", emoji: "🔥", description: "Жадный, хочет всё себе" }
+            ];
+
             // ================== СОСТОЯНИЕ БАНАН ШПИОНА ==================
             let totalPlayers = 3;
             let currentPlayerIndex = 0;
@@ -1282,60 +1351,142 @@
             let recentlyUsedCrocodileWords = [];
             const MAX_RECENT_CROCODILE_WORDS = 100;
 
+            // ================== СОСТОЯНИЕ УЛЬТИМАТУМА ==================
+            let currentSituationIndex = -1;
+            let recentlyUsedSituations = [];
+            const MAX_RECENT_SITUATIONS = 10;
+
             // ================== ЭЛЕМЕНТЫ ==================
             const gameMenu = document.getElementById('game-menu');
             const spyGame = document.getElementById('spy-game');
             const crocodileGame = document.getElementById('crocodile-game');
+            const leaderGame = document.getElementById('leader-game');
+            const ultimatumGame = document.getElementById('ultimatum-game');
             
+            // Элементы Банан Шпиона
             const screenSelect = document.getElementById('screen-select');
             const screenRole = document.getElementById('screen-role');
             const screenHidden = document.getElementById('screen-hidden');
             const screenAllDone = document.getElementById('screen-all-done');
             const screenStart = document.getElementById('screen-start');
-            
             const playerSelectDiv = document.getElementById('player-select');
             const playerHeader = document.getElementById('player-header');
             const roleDisplay = document.getElementById('role-display');
             const hideWordBtn = document.getElementById('hide-word-btn');
             const restartFromRole = document.getElementById('restart-from-role');
-            
             const nextPlayerHeader = document.getElementById('next-player-header');
             const passMessageHidden = document.getElementById('pass-message-hidden');
             const showWordBtn = document.getElementById('show-word-btn');
             const restartFromHidden = document.getElementById('restart-from-hidden');
-            
             const startGameBtn = document.getElementById('start-game-btn');
             const restartFromDone = document.getElementById('restart-from-done');
-            
             const restartFromStart = document.getElementById('restart-from-start');
             const finalWords = document.getElementById('final-words');
-
+            
+            // Элементы Крокодила
             const crocodileWordDisplay = document.getElementById('crocodile-word-display');
             const nextCrocodileWordBtn = document.getElementById('next-crocodile-word');
+            
+            // Элементы Тайного лидера
+            const leaderRoleDisplay = document.getElementById('leader-role-display');
+            const startLeaderGameBtn = document.getElementById('start-leader-game');
+            
+            // Элементы Ультиматума
+            const ultimatumSituation = document.getElementById('ultimatum-situation');
+            const ultimatumRoles = document.getElementById('ultimatum-roles');
+            const startUltimatumGameBtn = document.getElementById('start-ultimatum-game');
 
             // ================== ФУНКЦИИ МЕНЮ ==================
             function showMainMenu() {
                 gameMenu.classList.remove('hidden');
                 spyGame.classList.add('hidden');
                 crocodileGame.classList.add('hidden');
+                leaderGame.classList.add('hidden');
+                ultimatumGame.classList.add('hidden');
             }
 
             function showSpyGame() {
                 gameMenu.classList.add('hidden');
                 spyGame.classList.remove('hidden');
                 crocodileGame.classList.add('hidden');
-                resetToMenu();
+                leaderGame.classList.add('hidden');
+                ultimatumGame.classList.add('hidden');
+                resetSpyGame();
             }
 
             function showCrocodileGame() {
                 gameMenu.classList.add('hidden');
                 spyGame.classList.add('hidden');
                 crocodileGame.classList.remove('hidden');
+                leaderGame.classList.add('hidden');
+                ultimatumGame.classList.add('hidden');
+                showCrocodileContent();
                 showNextCrocodileWord();
             }
 
+            function showLeaderGame() {
+                gameMenu.classList.add('hidden');
+                spyGame.classList.add('hidden');
+                crocodileGame.classList.add('hidden');
+                leaderGame.classList.remove('hidden');
+                ultimatumGame.classList.add('hidden');
+                showLeaderContent();
+            }
+
+            function showUltimatumGame() {
+                gameMenu.classList.add('hidden');
+                spyGame.classList.add('hidden');
+                crocodileGame.classList.add('hidden');
+                leaderGame.classList.add('hidden');
+                ultimatumGame.classList.remove('hidden');
+                showUltimatumContent();
+            }
+
+            // ================== ФУНКЦИИ ПРАВИЛ ==================
+            function toggleRules(type) {
+                let contentId, rulesId;
+                
+                if (type === 'spy') {
+                    contentId = 'screen-select';
+                    rulesId = 'rules-spy';
+                } else if (type === 'crocodile') {
+                    contentId = 'crocodile-content';
+                    rulesId = 'rules-crocodile';
+                } else if (type === 'leader') {
+                    contentId = 'leader-content';
+                    rulesId = 'rules-leader';
+                } else if (type === 'ultimatum') {
+                    contentId = 'ultimatum-content';
+                    rulesId = 'rules-ultimatum';
+                }
+                
+                document.getElementById(contentId).classList.add('hidden');
+                document.getElementById(rulesId).classList.remove('hidden');
+            }
+
+            function showContent(type) {
+                let contentId, rulesId;
+                
+                if (type === 'spy') {
+                    contentId = 'screen-select';
+                    rulesId = 'rules-spy';
+                } else if (type === 'crocodile') {
+                    contentId = 'crocodile-content';
+                    rulesId = 'rules-crocodile';
+                } else if (type === 'leader') {
+                    contentId = 'leader-content';
+                    rulesId = 'rules-leader';
+                } else if (type === 'ultimatum') {
+                    contentId = 'ultimatum-content';
+                    rulesId = 'rules-ultimatum';
+                }
+                
+                document.getElementById(rulesId).classList.add('hidden');
+                document.getElementById(contentId).classList.remove('hidden');
+            }
+
             // ================== ФУНКЦИИ БАНАН ШПИОНА ==================
-            function showScreen(screen) {
+            function showSpyScreen(screen) {
                 [screenSelect, screenRole, screenHidden, screenAllDone, screenStart].forEach(s => s.classList.add('hidden'));
                 screen.classList.remove('hidden');
             }
@@ -1345,6 +1496,9 @@
                 for (let i = 3; i <= 10; i++) {
                     const btn = document.createElement('button');
                     btn.textContent = i;
+                    btn.className = 'btn';
+                    btn.style.minWidth = '50px';
+                    btn.style.padding = '12px';
                     btn.addEventListener('click', () => {
                         totalPlayers = i;
                         startRoleAssignment();
@@ -1400,17 +1554,17 @@
                     roleDisplay.textContent = currentPair.civilian;
                 }
                 
-                showScreen(screenRole);
+                showSpyScreen(screenRole);
             }
 
             function handleHideWord() {
                 if (currentPlayerIndex >= totalPlayers - 1) {
-                    showScreen(screenAllDone);
+                    showSpyScreen(screenAllDone);
                 } else {
                     const nextPlayerNum = currentPlayerIndex + 2;
                     nextPlayerHeader.textContent = `Игрок ${nextPlayerNum}`;
                     passMessageHidden.textContent = `📱 Телефон у Игрока ${nextPlayerNum}?`;
-                    showScreen(screenHidden);
+                    showSpyScreen(screenHidden);
                 }
             }
 
@@ -1424,11 +1578,11 @@
                     <div>🔵 Мирные: <b>${currentPair.civilian}</b></div>
                     <div>🔴 Шпион: <b>${currentPair.spy}</b> (игрок №${spyIndex + 1})</div>
                 `;
-                showScreen(screenStart);
+                showSpyScreen(screenStart);
             }
 
-            function resetToMenu() {
-                showScreen(screenSelect);
+            function resetSpyGame() {
+                showSpyScreen(screenSelect);
             }
 
             // ================== ФУНКЦИИ КРОКОДИЛА ==================
@@ -1460,33 +1614,136 @@
                 crocodileWordDisplay.textContent = word;
             }
 
-            // ================== ОБРАБОТЧИКИ ==================
+            function showCrocodileContent() {
+                document.getElementById('crocodile-content').classList.remove('hidden');
+                document.getElementById('rules-crocodile').classList.add('hidden');
+            }
+
+            // ================== ФУНКЦИИ ТАЙНОГО ЛИДЕРА ==================
+            function startLeaderGame() {
+                const roles = ['Лидер', 'Подражатель', 'Шпион'];
+                const shuffled = shuffleArray(roles);
+                
+                leaderRoleDisplay.innerHTML = `
+                    <div style="margin: 10px 0;">
+                        <div style="font-size: 1.5rem; margin-bottom: 15px;">Раздайте роли:</div>
+                        <div style="font-size: 1.2rem; margin: 10px 0;">
+                            Игрок 1: <b>${shuffled[0]}</b><br>
+                            Игрок 2: <b>${shuffled[1]}</b><br>
+                            Игрок 3: <b>${shuffled[2]}</b>
+                        </div>
+                        <div style="color: #ffd700; margin-top: 15px;">
+                            Лидер задаёт движения, Подражатель копирует, Шпион угадывает!
+                        </div>
+                    </div>
+                `;
+            }
+
+            function showLeaderContent() {
+                document.getElementById('leader-content').classList.remove('hidden');
+                document.getElementById('rules-leader').classList.add('hidden');
+            }
+
+            function shuffleArray(array) {
+                const newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            }
+
+            // ================== ФУНКЦИИ УЛЬТИМАТУМА ==================
+            function getRandomSituationIndex() {
+                let availableIndices = [];
+                for (let i = 0; i < ULTIMATUM_SITUATIONS.length; i++) {
+                    if (!recentlyUsedSituations.includes(i)) {
+                        availableIndices.push(i);
+                    }
+                }
+                
+                if (availableIndices.length === 0) {
+                    availableIndices = ULTIMATUM_SITUATIONS.map((_, index) => index);
+                }
+                
+                const randomIndex = Math.floor(Math.random() * availableIndices.length);
+                return availableIndices[randomIndex];
+            }
+
+            function startUltimatumGame() {
+                const situationIndex = getRandomSituationIndex();
+                currentSituationIndex = situationIndex;
+                
+                recentlyUsedSituations.push(situationIndex);
+                while (recentlyUsedSituations.length > MAX_RECENT_SITUATIONS) {
+                    recentlyUsedSituations.shift();
+                }
+                
+                const shuffledRoles = shuffleArray(ULTIMATUM_ROLES);
+                
+                ultimatumSituation.textContent = ULTIMATUM_SITUATIONS[situationIndex];
+                
+                ultimatumRoles.innerHTML = `
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <div class="role-badge">${shuffledRoles[0].emoji} Игрок 1: ${shuffledRoles[0].role}</div>
+                        <div class="role-badge">${shuffledRoles[1].emoji} Игрок 2: ${shuffledRoles[1].role}</div>
+                        <div class="role-badge">${shuffledRoles[2].emoji} Игрок 3: ${shuffledRoles[2].role}</div>
+                    </div>
+                    <div style="margin-top: 15px; color: #a0a0b0; font-size: 0.9rem;">
+                        Обсуждайте 60 секунд, затем голосуйте!
+                    </div>
+                `;
+            }
+
+            function showUltimatumContent() {
+                document.getElementById('ultimatum-content').classList.remove('hidden');
+                document.getElementById('rules-ultimatum').classList.add('hidden');
+            }
+
+            // ================== ОБРАБОТЧИКИ МЕНЮ ==================
             document.getElementById('spy-game-btn').addEventListener('click', showSpyGame);
             document.getElementById('crocodile-game-btn').addEventListener('click', showCrocodileGame);
+            document.getElementById('leader-game-btn').addEventListener('click', showLeaderGame);
+            document.getElementById('ultimatum-game-btn').addEventListener('click', showUltimatumGame);
             
+            // Обработчики "Назад в меню"
             const backButtons = [
-                'back-to-menu-1',
-                'back-to-menu-2',
-                'back-to-menu-3',
-                'back-to-menu-4',
-                'back-to-menu-5',
-                'back-to-menu-crocodile'
+                'back-to-menu-1', 'back-to-menu-2', 'back-to-menu-3', 
+                'back-to-menu-4', 'back-to-menu-5', 'back-to-menu-crocodile',
+                'back-to-menu-leader', 'back-to-menu-ultimatum'
             ];
             
             backButtons.forEach(id => {
                 document.getElementById(id).addEventListener('click', showMainMenu);
             });
 
+            // Обработчики правил
+            document.getElementById('show-rules-spy').addEventListener('click', () => toggleRules('spy'));
+            document.getElementById('back-from-rules-spy').addEventListener('click', () => showContent('spy'));
+            document.getElementById('show-rules-crocodile').addEventListener('click', () => toggleRules('crocodile'));
+            document.getElementById('back-from-rules-crocodile').addEventListener('click', () => showContent('crocodile'));
+            document.getElementById('show-rules-leader').addEventListener('click', () => toggleRules('leader'));
+            document.getElementById('back-from-rules-leader').addEventListener('click', () => showContent('leader'));
+            document.getElementById('show-rules-ultimatum').addEventListener('click', () => toggleRules('ultimatum'));
+            document.getElementById('back-from-rules-ultimatum').addEventListener('click', () => showContent('ultimatum'));
+
+            // Обработчики Банан Шпиона
             hideWordBtn.addEventListener('click', handleHideWord);
             showWordBtn.addEventListener('click', handleShowWord);
             startGameBtn.addEventListener('click', showStartScreen);
+            restartFromRole.addEventListener('click', resetSpyGame);
+            restartFromHidden.addEventListener('click', resetSpyGame);
+            restartFromDone.addEventListener('click', resetSpyGame);
+            restartFromStart.addEventListener('click', resetSpyGame);
 
-            restartFromRole.addEventListener('click', resetToMenu);
-            restartFromHidden.addEventListener('click', resetToMenu);
-            restartFromDone.addEventListener('click', resetToMenu);
-            restartFromStart.addEventListener('click', resetToMenu);
-
+            // Обработчики Крокодила
             nextCrocodileWordBtn.addEventListener('click', showNextCrocodileWord);
+
+            // Обработчики Тайного лидера
+            startLeaderGameBtn.addEventListener('click', startLeaderGame);
+
+            // Обработчики Ультиматума
+            startUltimatumGameBtn.addEventListener('click', startUltimatumGame);
 
             // ================== ЗАПУСК ==================
             initPlayerButtons();
