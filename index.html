@@ -494,6 +494,23 @@
         .mafia-role-card.don {
             border-color: #ff5722;
         }
+        .role-hidden {
+            display: none;
+        }
+        .player-role-toggle {
+            cursor: pointer;
+            margin: 5px;
+            padding: 10px;
+            background: #2d4059;
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        .player-role-toggle:hover {
+            background: #3d5069;
+        }
+        .role-revealed {
+            background: #4caf50 !important;
+        }
     </style>
 </head>
 <body>
@@ -608,8 +625,9 @@
             </div>
             
             <div id="mafia-role-display" class="mafia-card hidden">
-                <div style="font-size: 1.5rem; margin-bottom: 10px;">Раздайте роли:</div>
+                <div style="font-size: 1.5rem; margin-bottom: 10px;">Нажмите на игрока, чтобы показать его роль:</div>
                 <div id="mafia-roles-list"></div>
+                <button class="btn btn-primary" id="mafia-start-night-btn">🌙 Начать ночь</button>
             </div>
             
             <div id="mafia-night-screen" class="hidden">
@@ -714,6 +732,7 @@
                 <h1 class="game-title">🎉 ВСЁ!</h1>
                 <div class="step-title" style="font-size: 1rem; margin: 10px 0;">Роли розданы. Обсуждайте и найдите шпиона!</div>
                 <div id="final-words" style="background: #222; border-radius: 15px; padding: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc;"></div>
+                <button class="btn btn-primary" id="reveal-spy-btn">🔍 Показать шпиона</button>
                 <button class="btn btn-primary" id="restart-from-start">🔄 Играть ещё раз</button>
                 <button class="btn btn-secondary" id="back-to-menu-5">← В меню</button>
             </div>
@@ -1852,6 +1871,8 @@
             // ================== СОСТОЯНИЕ МАФИИ ==================
             let mafiaPlayers = 6;
             let mafiaRoles = [];
+            let mafiaNightStep = 0;
+            let rolesRevealed = [];
 
             // ================== ЭЛЕМЕНТЫ ==================
             const gameMenu = document.getElementById('game-menu');
@@ -1873,6 +1894,7 @@
             const mafiaNightScreen = document.getElementById('mafia-night-screen');
             const mafiaNightActions = document.getElementById('mafia-night-actions');
             const mafiaNextActionBtn = document.getElementById('mafia-next-action-btn');
+            const mafiaStartNightBtn = document.getElementById('mafia-start-night-btn');
             
             // Элементы Банан Шпиона
             const screenSelect = document.getElementById('screen-select');
@@ -1893,6 +1915,7 @@
             const restartFromDone = document.getElementById('restart-from-done');
             const restartFromStart = document.getElementById('restart-from-start');
             const finalWords = document.getElementById('final-words');
+            const revealSpyBtn = document.getElementById('reveal-spy-btn');
             
             // Элементы Крокодила
             const crocodileWordDisplay = document.getElementById('crocodile-word-display');
@@ -2116,7 +2139,6 @@
                 const numPlayers = mafiaPlayers;
                 const roles = [];
                 const numMafia = Math.floor(numPlayers / 4);
-                const numCivilians = numPlayers - numMafia - 2; // Минус доктор и комиссар
                 
                 // Добавляем мафию
                 for (let i = 0; i < numMafia; i++) {
@@ -2144,6 +2166,7 @@
                 
                 // Перемешиваем роли
                 mafiaRoles = shuffleArray(roles);
+                rolesRevealed = new Array(mafiaRoles.length).fill(false);
                 
                 // Отображаем роли
                 displayMafiaRoles();
@@ -2153,7 +2176,7 @@
                 mafiaRoleDisplay.classList.remove('hidden');
                 mafiaNightScreen.classList.add('hidden');
                 
-                let rolesHTML = '<div style="font-size: 1.2rem; margin-bottom: 15px;">Раздайте роли:</div>';
+                let rolesHTML = '<div style="font-size: 1.2rem; margin-bottom: 15px;">Нажмите на игрока, чтобы показать его роль:</div>';
                 
                 mafiaRoles.forEach((role, index) => {
                     let cardClass = 'mafia-role-card ';
@@ -2163,10 +2186,12 @@
                     else if (role.type === 'commissar') cardClass += 'commissar';
                     else if (role.type === 'mistress') cardClass += 'mistress';
                     
+                    const isRevealed = rolesRevealed[index];
+                    
                     rolesHTML += `
-                        <div class="${cardClass}">
+                        <div class="player-role-toggle ${isRevealed ? 'role-revealed' : ''}" data-index="${index}">
                             <div style="font-size: 1.1rem; font-weight: bold;">
-                                ${role.emoji} Игрок ${index + 1}: ${role.role}
+                                ${isRevealed ? `${role.emoji} ${role.role}` : `🎴 Игрок ${index + 1} (нажмите, чтобы показать)`}
                             </div>
                         </div>
                     `;
@@ -2174,15 +2199,16 @@
                 
                 mafiaRolesList.innerHTML = rolesHTML;
                 
-                // Добавляем кнопку для начала ночи
-                const startNightBtn = document.createElement('button');
-                startNightBtn.className = 'btn btn-primary';
-                startNightBtn.textContent = '🌙 Начать ночь';
-                startNightBtn.addEventListener('click', startMafiaNight);
-                mafiaRolesList.appendChild(startNightBtn);
+                // Добавляем обработчики кликов
+                document.querySelectorAll('.player-role-toggle').forEach(element => {
+                    element.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        rolesRevealed[index] = !rolesRevealed[index];
+                        displayMafiaRoles();
+                    });
+                });
             }
 
-            let mafiaNightStep = 0;
             const mafiaNightSteps = [
                 'Все закрывают глаза',
                 'Мафия просыпается и выбирает жертву',
@@ -2211,6 +2237,8 @@
                 `;
             }
 
+            mafiaStartNightBtn.addEventListener('click', startMafiaNight);
+
             mafiaNextActionBtn.addEventListener('click', () => {
                 mafiaNightStep++;
                 if (mafiaNightStep >= mafiaNightSteps.length) {
@@ -2224,10 +2252,11 @@
                         <div style="color: #ffd700; font-size: 1rem; margin-bottom: 15px;">
                             Обсудите и проголосуйте, кого исключить
                         </div>
-                        <button class="btn btn-primary" onclick="this.closest('#mafia-game').querySelector('#mafia-role-display').classList.add('hidden'); this.closest('#mafia-game').querySelector('#mafia-night-screen').classList.remove('hidden'); mafiaNightStep = 0; updateMafiaNightAction();">
+                        <button class="btn btn-primary" id="mafia-next-night-btn">
                             🌙 Следующая ночь
                         </button>
                     `;
+                    document.getElementById('mafia-next-night-btn').addEventListener('click', startMafiaNight);
                 } else {
                     updateMafiaNightAction();
                 }
@@ -2322,15 +2351,25 @@
             }
 
             function showStartScreen() {
+                // Не показываем слова и шпиона до нажатия кнопки
                 finalWords.innerHTML = `
                     <div>🔵 Мирные: <b>${currentPair.civilian}</b></div>
                     <div>🔴 Шпион: <b>${currentPair.spy}</b> (игрок №${spyIndex + 1})</div>
                 `;
+                finalWords.classList.add('hidden');
+                revealSpyBtn.classList.remove('hidden');
                 showSpyScreen(screenStart);
+            }
+
+            function revealSpy() {
+                finalWords.classList.remove('hidden');
+                revealSpyBtn.classList.add('hidden');
             }
 
             function resetSpyGame() {
                 showSpyScreen(screenSelect);
+                finalWords.classList.add('hidden');
+                revealSpyBtn.classList.add('hidden');
             }
 
             // ================== ФУНКЦИИ КРОКОДИЛА ==================
@@ -2382,6 +2421,10 @@
                 bombActive = false;
                 bombTimerDisplay.textContent = bombCountdown;
                 bombWordDisplay.textContent = 'НАЖМИ СТАРТ';
+                bombWordDisplay.style.background = 'white';
+                bombWordDisplay.style.color = '#333';
+                bombTimerDisplay.style.color = '#ffd700';
+                bombTimerDisplay.style.animation = 'none';
                 startBombBtn.textContent = '🎯 Старт';
             }
 
@@ -2395,7 +2438,9 @@
                 } else {
                     // Старт
                     if (bombCountdown === 0) {
+                        resetBombGame();
                         bombCountdown = 10;
+                        bombTimerDisplay.textContent = bombCountdown;
                     }
                     bombActive = true;
                     startBombBtn.textContent = '⏸️ Пауза';
@@ -2409,12 +2454,9 @@
                         bombCountdown--;
                         bombTimerDisplay.textContent = bombCountdown;
                         
-                        if (bombCountdown <= 3) {
+                        if (bombCountdown <= 3 && bombCountdown > 0) {
                             bombTimerDisplay.style.color = '#e94560';
                             bombTimerDisplay.style.animation = 'bomb-pulse 0.5s infinite';
-                        } else {
-                            bombTimerDisplay.style.color = '#ffd700';
-                            bombTimerDisplay.style.animation = 'none';
                         }
                         
                         if (bombCountdown <= 0) {
@@ -2422,6 +2464,7 @@
                             bombTimer = null;
                             bombActive = false;
                             bombTimerDisplay.textContent = '💥';
+                            bombTimerDisplay.style.animation = 'none';
                             bombWordDisplay.textContent = 'БОМБА ВЗОРВАЛАСЬ!';
                             bombWordDisplay.style.background = '#e94560';
                             bombWordDisplay.style.color = 'white';
@@ -2713,13 +2756,11 @@
             document.getElementById('show-rules-ultimatum').addEventListener('click', () => toggleRules('ultimatum'));
             document.getElementById('back-from-rules-ultimatum').addEventListener('click', () => showContent('ultimatum'));
 
-            // Обработчики Мафии
-            // (уже настроены в функциях)
-
             // Обработчики Банан Шпиона
             hideWordBtn.addEventListener('click', handleHideWord);
             showWordBtn.addEventListener('click', handleShowWord);
             startGameBtn.addEventListener('click', showStartScreen);
+            revealSpyBtn.addEventListener('click', revealSpy);
             restartFromRole.addEventListener('click', resetSpyGame);
             restartFromHidden.addEventListener('click', resetSpyGame);
             restartFromDone.addEventListener('click', resetSpyGame);
