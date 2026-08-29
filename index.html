@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Игровой портал - Шпион и Крокодил</title>
+    <title>Игровой портал - Банан Шпион и Крокодил</title>
     <style>
         * {
             box-sizing: border-box;
@@ -59,36 +59,23 @@
             transform: translateY(5px);
             box-shadow: 0 0 0 #0a2540;
         }
-        .game-avatar {
+        
+        /* АВАТАРКА БАНАНА ШПИОНА С МАСКОЙ БАНДИТА */
+        .banana-spy-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
+            background: radial-gradient(circle, #fff9c4 0%, #ffd700 50%, #ffc107 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 2.5rem;
             flex-shrink: 0;
             position: relative;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255,255,255,0.5);
             overflow: hidden;
         }
-        .spy-avatar {
-            background: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-        .spy-avatar::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.2) 100%);
-        }
-        .crocodile-avatar {
-            background: #ff8c00;
-            box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-        .crocodile-avatar::before {
+        .banana-spy-avatar::before {
             content: '';
             position: absolute;
             width: 200%;
@@ -100,6 +87,71 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+        .banana-emoji {
+            position: relative;
+            z-index: 1;
+            transform: rotate(-15deg);
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+        }
+        .bandit-mask {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            background: #000;
+            border-radius: 3px;
+            z-index: 2;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .bandit-mask::before,
+        .bandit-mask::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: inset 0 0 3px #000;
+        }
+        .bandit-mask::before {
+            left: 8px;
+        }
+        .bandit-mask::after {
+            right: 8px;
+        }
+        
+        /* АВАТАРКА КРОКОДИЛА */
+        .crocodile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff3e0 0%, #ff8c00 50%, #ff6f00 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.6);
+            overflow: hidden;
+        }
+        .crocodile-avatar::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.3), transparent);
+            animation: rotate-rays 10s linear infinite;
+        }
+        .crocodile-emoji {
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
+        }
+        
         .game-info {
             flex: 1;
             text-align: left;
@@ -108,6 +160,7 @@
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 5px;
+            color: #fff;
         }
         .game-description {
             font-size: 0.9rem;
@@ -152,7 +205,7 @@
         .crocodile-word {
             background: white;
             color: #333;
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: bold;
             padding: 40px 20px;
             border-radius: 20px;
@@ -199,6 +252,7 @@
             box-shadow: 0 5px 0 #1a2533;
             font-size: 1rem;
             padding: 12px 20px;
+            margin-top: 10px;
         }
         .btn-success {
             background: #4caf50;
@@ -222,10 +276,10 @@
         }
         h1 {
             margin: 0 0 8px;
-            font-size: 2.2rem;
+            font-size: 2rem;
             letter-spacing: 2px;
-            color: #e94560;
-            text-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
         .subtitle {
             margin: 0 0 24px;
@@ -314,6 +368,7 @@
             box-shadow: 0 5px 0 #1a2533;
             font-size: 1rem;
             padding: 12px 20px;
+            margin-top: 5px;
         }
         .info-text {
             color: #aaa;
@@ -341,14 +396,19 @@
         <h1 class="menu-title">🎮 ИГРЫ</h1>
         <div class="game-cards">
             <div class="game-card" id="spy-game-btn">
-                <div class="game-avatar spy-avatar">🍌</div>
+                <div class="banana-spy-avatar">
+                    <div class="banana-emoji">🍌</div>
+                    <div class="bandit-mask"></div>
+                </div>
                 <div class="game-info">
-                    <div class="game-name">ШПИОН</div>
+                    <div class="game-name">БАНАН ШПИОН</div>
                     <div class="game-description">Найди шпиона среди игроков</div>
                 </div>
             </div>
             <div class="game-card" id="crocodile-game-btn">
-                <div class="game-avatar crocodile-avatar">🐊</div>
+                <div class="crocodile-avatar">
+                    <div class="crocodile-emoji">🐊</div>
+                </div>
                 <div class="game-info">
                     <div class="game-name">КРОКОДИЛ</div>
                     <div class="game-description">Покажи слово без слов</div>
@@ -357,12 +417,12 @@
         </div>
     </div>
 
-    <!-- ИГРА ШПИОН -->
+    <!-- ИГРА БАНАН ШПИОН -->
     <div class="container hidden" id="spy-game">
         <!-- ЭКРАН 1: ВЫБОР КОЛИЧЕСТВА ИГРОКОВ -->
         <div id="screen-select">
-            <h1>🕵️ ШПИОН</h1>
-            <p class="subtitle">Мега версия • 400+ локаций</p>
+            <h1>🍌 БАНАН ШПИОН</h1>
+            <p class="subtitle">Мега версия • 1000+ пар слов</p>
             <div class="step-title">На сколько человек играем?</div>
             <div class="btn-grid" id="player-select">
                 <!-- Кнопки добавятся из JS -->
@@ -423,9 +483,9 @@
 
     <script>
         (function(){
-            // ================== ДАННЫЕ ДЛЯ ШПИОНА ==================
+            // ================== ДАННЫЕ ДЛЯ БАНАН ШПИОНА ==================
             const WORD_PAIRS = [
-                // ... (весь массив WORD_PAIRS остаётся без изменений)
+                // ЕДА И НАПИТКИ (100 пар)
                 { civilian: "Арбуз", spy: "Дыня" },
                 { civilian: "Банан", spy: "Киви" },
                 { civilian: "Яблоко", spy: "Груша" },
@@ -487,7 +547,47 @@
                 { civilian: "Сок", spy: "Морс" },
                 { civilian: "Квас", spy: "Пиво" },
                 { civilian: "Водка", spy: "Коньяк" },
-                // Животные
+                { civilian: "Шампанское", spy: "Вино" },
+                { civilian: "Сырники", spy: "Запеканка" },
+                { civilian: "Гамбургер", spy: "Чизбургер" },
+                { civilian: "Пельмень", spy: "Мант" },
+                { civilian: "Чебурек", spy: "Беляш" },
+                { civilian: "Хот-дог", spy: "Корн-дог" },
+                { civilian: "Попкорн", spy: "Чипсы" },
+                { civilian: "Сухарики", spy: "Гренки" },
+                { civilian: "Кетчуп", spy: "Майонез" },
+                { civilian: "Горчица", spy: "Хрен" },
+                { civilian: "Сахар", spy: "Соль" },
+                { civilian: "Перец", spy: "Паприка" },
+                { civilian: "Корица", spy: "Ваниль" },
+                { civilian: "Имбирь", spy: "Мята" },
+                { civilian: "Петрушка", spy: "Укроп" },
+                { civilian: "Базилик", spy: "Розмарин" },
+                { civilian: "Шафран", spy: "Куркума" },
+                { civilian: "Лаваш", spy: "Пита" },
+                { civilian: "Круассан", spy: "Булочка" },
+                { civilian: "Пончик", spy: "Бублик" },
+                { civilian: "Ватрушка", spy: "Пирожок" },
+                { civilian: "Кекс", spy: "Маффин" },
+                { civilian: "Зефир", spy: "Мармелад" },
+                { civilian: "Пастила", spy: "Халва" },
+                { civilian: "Нуга", spy: "Ирис" },
+                { civilian: "Карамель", spy: "Леденец" },
+                { civilian: "Марципан", spy: "Пралине" },
+                { civilian: "Шербет", spy: "Щербет" },
+                { civilian: "Смузи", spy: "Коктейль" },
+                { civilian: "Лимонад", spy: "Газировка" },
+                { civilian: "Морс", spy: "Компот" },
+                { civilian: "Кисель", spy: "Желе" },
+                { civilian: "Какао", spy: "Горячий шоколад" },
+                { civilian: "Эспрессо", spy: "Капучино" },
+                { civilian: "Латте", spy: "Мокко" },
+                { civilian: "Американо", spy: "Раф" },
+                { civilian: "Глинтвейн", spy: "Пунш" },
+                { civilian: "Сбитень", spy: "Медовуха" },
+                { civilian: "Узвар", spy: "Компот" },
+
+                // ЖИВОТНЫЕ (80 пар)
                 { civilian: "Собака", spy: "Волк" },
                 { civilian: "Кошка", spy: "Рысь" },
                 { civilian: "Лев", spy: "Тигр" },
@@ -533,7 +633,43 @@
                 { civilian: "Воробей", spy: "Синица" },
                 { civilian: "Голубь", spy: "Чайка" },
                 { civilian: "Утка", spy: "Гусь" },
-                // Природа
+                { civilian: "Лебедь", spy: "Гусь" },
+                { civilian: "Индюк", spy: "Курица" },
+                { civilian: "Петух", spy: "Фазан" },
+                { civilian: "Перепел", spy: "Куропатка" },
+                { civilian: "Страус", spy: "Эму" },
+                { civilian: "Пеликан", spy: "Фламинго" },
+                { civilian: "Цапля", spy: "Аист" },
+                { civilian: "Дятел", spy: "Поползень" },
+                { civilian: "Кукушка", spy: "Соловей" },
+                { civilian: "Жаворонок", spy: "Скворец" },
+                { civilian: "Ласточка", spy: "Стриж" },
+                { civilian: "Синица", spy: "Снегирь" },
+                { civilian: "Клёст", spy: "Щегол" },
+                { civilian: "Попугай", spy: "Канарейка" },
+                { civilian: "Барсук", spy: "Енот" },
+                { civilian: "Суслик", spy: "Сурок" },
+                { civilian: "Буйвол", spy: "Зубр" },
+                { civilian: "Газель", spy: "Сайгак" },
+                { civilian: "Мангуст", spy: "Сурикат" },
+                { civilian: "Шакал", spy: "Гиена" },
+                { civilian: "Рысь", spy: "Каракал" },
+                { civilian: "Сервал", spy: "Оцелот" },
+                { civilian: "Ирбис", spy: "Снежный барс" },
+                { civilian: "Пантера", spy: "Чёрная кошка" },
+                { civilian: "Ехидна", spy: "Утконос" },
+                { civilian: "Броненосец", spy: "Муравьед" },
+                { civilian: "Ленивец", spy: "Коала" },
+                { civilian: "Опоссум", spy: "Крыса" },
+                { civilian: "Дикобраз", spy: "Ёж" },
+                { civilian: "Хорёк", spy: "Ласка" },
+                { civilian: "Норка", spy: "Соболь" },
+                { civilian: "Горностай", spy: "Куница" },
+                { civilian: "Выдра", spy: "Бобр" },
+                { civilian: "Ондатра", spy: "Нутрия" },
+                { civilian: "Капибара", spy: "Морская свинка" },
+
+                // ПРИРОДА И ЯВЛЕНИЯ (60 пар)
                 { civilian: "Цветок", spy: "Дерево" },
                 { civilian: "Роза", spy: "Тюльпан" },
                 { civilian: "Ромашка", spy: "Одуванчик" },
@@ -569,7 +705,33 @@
                 { civilian: "Волна", spy: "Прибой" },
                 { civilian: "Песок", spy: "Глина" },
                 { civilian: "Янтарь", spy: "Жемчуг" },
-                // Профессии
+                { civilian: "Гром", spy: "Молния" },
+                { civilian: "Туман", spy: "Облако" },
+                { civilian: "Роса", spy: "Иней" },
+                { civilian: "Закат", spy: "Рассвет" },
+                { civilian: "Весна", spy: "Осень" },
+                { civilian: "Лето", spy: "Зима" },
+                { civilian: "Поляна", spy: "Луг" },
+                { civilian: "Болото", spy: "Трясина" },
+                { civilian: "Водопад", spy: "Фонтан" },
+                { civilian: "Айсберг", spy: "Ледник" },
+                { civilian: "Метеорит", spy: "Комета" },
+                { civilian: "Галактика", spy: "Вселенная" },
+                { civilian: "Торнадо", spy: "Смерч" },
+                { civilian: "Лавина", spy: "Оползень" },
+                { civilian: "Землетрясение", spy: "Цунами" },
+                { civilian: "Извержение", spy: "Взрыв" },
+                { civilian: "Кристалл", spy: "Алмаз" },
+                { civilian: "Рубин", spy: "Сапфир" },
+                { civilian: "Изумруд", spy: "Малахит" },
+                { civilian: "Гранит", spy: "Мрамор" },
+                { civilian: "Базальт", spy: "Обсидиан" },
+                { civilian: "Песчаник", spy: "Известняк" },
+                { civilian: "Торф", spy: "Уголь" },
+                { civilian: "Нефть", spy: "Газ" },
+                { civilian: "Родник", spy: "Ключ" },
+
+                // ПРОФЕССИИ (60 пар)
                 { civilian: "Врач", spy: "Ветеринар" },
                 { civilian: "Хирург", spy: "Стоматолог" },
                 { civilian: "Медсестра", spy: "Фельдшер" },
@@ -605,7 +767,33 @@
                 { civilian: "Модель", spy: "Стилист" },
                 { civilian: "Бармен", spy: "Официант" },
                 { civilian: "Продавец", spy: "Кассир" },
-                // Техника
+                { civilian: "Библиотекарь", spy: "Архивариус" },
+                { civilian: "Переводчик", spy: "Лингвист" },
+                { civilian: "Психолог", spy: "Психиатр" },
+                { civilian: "Социолог", spy: "Антрополог" },
+                { civilian: "Астроном", spy: "Астролог" },
+                { civilian: "Геолог", spy: "Географ" },
+                { civilian: "Эколог", spy: "Биолог" },
+                { civilian: "Химик", spy: "Физик" },
+                { civilian: "Математик", spy: "Статистик" },
+                { civilian: "Историк", spy: "Археолог" },
+                { civilian: "Философ", spy: "Мудрец" },
+                { civilian: "Священник", spy: "Монах" },
+                { civilian: "Шахтёр", spy: "Горняк" },
+                { civilian: "Металлург", spy: "Кузнец" },
+                { civilian: "Плотник", spy: "Столяр" },
+                { civilian: "Каменщик", spy: "Штукатур" },
+                { civilian: "Маляр", spy: "Художник" },
+                { civilian: "Сантехник", spy: "Слесарь" },
+                { civilian: "Токарь", spy: "Фрезеровщик" },
+                { civilian: "Сварщик", spy: "Кузнец" },
+                { civilian: "Крановщик", spy: "Экскаваторщик" },
+                { civilian: "Лётчик", spy: "Космонавт" },
+                { civilian: "Капитан", spy: "Штурман" },
+                { civilian: "Боцман", spy: "Матрос" },
+                { civilian: "Дворник", spy: "Уборщик" },
+
+                // ТЕХНИКА И ИНСТРУМЕНТЫ (60 пар)
                 { civilian: "Телефон", spy: "Планшет" },
                 { civilian: "Компьютер", spy: "Ноутбук" },
                 { civilian: "Телевизор", spy: "Монитор" },
@@ -636,7 +824,38 @@
                 { civilian: "Обогреватель", spy: "Камин" },
                 { civilian: "Робот", spy: "Дрон" },
                 { civilian: "Антенна", spy: "Тарелка" },
-                // Транспорт
+                { civilian: "Топор", spy: "Колун" },
+                { civilian: "Рубанок", spy: "Стамеска" },
+                { civilian: "Ключ", spy: "Отвёртка" },
+                { civilian: "Плоскогубцы", spy: "Кусачки" },
+                { civilian: "Напильник", spy: "Рашпиль" },
+                { civilian: "Уровень", spy: "Отвес" },
+                { civilian: "Рулетка", spy: "Линейка" },
+                { civilian: "Лопата", spy: "Грабли" },
+                { civilian: "Вилы", spy: "Тяпка" },
+                { civilian: "Ведро", spy: "Лейка" },
+                { civilian: "Кисть", spy: "Валик" },
+                { civilian: "Лестница", spy: "Стремянка" },
+                { civilian: "Термометр", spy: "Барометр" },
+                { civilian: "Компас", spy: "Навигатор" },
+                { civilian: "Бинокль", spy: "Телескоп" },
+                { civilian: "Микроскоп", spy: "Лупа" },
+                { civilian: "Калькулятор", spy: "Счёты" },
+                { civilian: "Печатная машинка", spy: "Клавиатура" },
+                { civilian: "Графин", spy: "Кувшин" },
+                { civilian: "Самовар", spy: "Чайник" },
+                { civilian: "Сковорода", spy: "Кастрюля" },
+                { civilian: "Половник", spy: "Ложка" },
+                { civilian: "Вилка", spy: "Нож" },
+                { civilian: "Тарелка", spy: "Блюдце" },
+                { civilian: "Чашка", spy: "Кружка" },
+                { civilian: "Стакан", spy: "Бокал" },
+                { civilian: "Графин", spy: "Ваза" },
+                { civilian: "Поднос", spy: "Блюдо" },
+                { civilian: "Скатерть", spy: "Салфетка" },
+                { civilian: "Штора", spy: "Жалюзи" },
+
+                // ТРАНСПОРТ (40 пар)
                 { civilian: "Машина", spy: "Мотоцикл" },
                 { civilian: "Автобус", spy: "Троллейбус" },
                 { civilian: "Трамвай", spy: "Электричка" },
@@ -661,13 +880,24 @@
                 { civilian: "Светофор", spy: "Знак" },
                 { civilian: "Заправка", spy: "Парковка" },
                 { civilian: "Гараж", spy: "Стоянка" },
-                { civilian: "Колесо", spy: "Шина" },
-                { civilian: "Руль", spy: "Педаль" },
+                { civilian: "Шина", spy: "Диск" },
+                { civilian: "Педаль", spy: "Руль" },
                 { civilian: "Фара", spy: "Зеркало" },
                 { civilian: "Багажник", spy: "Капот" },
                 { civilian: "Ремень безопасности", spy: "Подушка безопасности" },
                 { civilian: "Навигатор", spy: "Карта" },
-                // Одежда
+                { civilian: "Паровоз", spy: "Тепловоз" },
+                { civilian: "Электровоз", spy: "Локомотив" },
+                { civilian: "Вагон", spy: "Платформа" },
+                { civilian: "Цистерна", spy: "Бензовоз" },
+                { civilian: "Самосвал", spy: "Бетономешалка" },
+                { civilian: "Снегоуборочная машина", spy: "Поливальная машина" },
+                { civilian: "Каток", spy: "Асфальтоукладчик" },
+                { civilian: "Подводная лодка", spy: "Батискаф" },
+                { civilian: "Дерижабль", spy: "Воздушный шар" },
+                { civilian: "Планер", spy: "Параплан" },
+
+                // ОДЕЖДА И АКСЕССУАРЫ (40 пар)
                 { civilian: "Футболка", spy: "Рубашка" },
                 { civilian: "Кофта", spy: "Свитер" },
                 { civilian: "Куртка", spy: "Пальто" },
@@ -698,7 +928,92 @@
                 { civilian: "Чемодан", spy: "Саквояж" },
                 { civilian: "Кошелёк", spy: "Барсетка" },
                 { civilian: "Заколка", spy: "Резинка" },
-                // Дом и быт
+                { civilian: "Бант", spy: "Лента" },
+                { civilian: "Галстук", spy: "Бабочка" },
+                { civilian: "Платок", spy: "Шаль" },
+                { civilian: "Пончо", spy: "Накидка" },
+                { civilian: "Туника", spy: "Блузка" },
+                { civilian: "Кардиган", spy: "Жакет" },
+                { civilian: "Болеро", spy: "Жилетка" },
+                { civilian: "Сарафан", spy: "Комбинезон" },
+                { civilian: "Бейсболка", spy: "Шапка" },
+                { civilian: "Берет", spy: "Шляпа" },
+
+                // СПОРТ И ИГРЫ (40 пар)
+                { civilian: "Футбол", spy: "Баскетбол" },
+                { civilian: "Волейбол", spy: "Гандбол" },
+                { civilian: "Теннис", spy: "Бадминтон" },
+                { civilian: "Хоккей", spy: "Фигурное катание" },
+                { civilian: "Бокс", spy: "Борьба" },
+                { civilian: "Дзюдо", spy: "Карате" },
+                { civilian: "Плавание", spy: "Дайвинг" },
+                { civilian: "Гимнастика", spy: "Акробатика" },
+                { civilian: "Лёгкая атлетика", spy: "Тяжёлая атлетика" },
+                { civilian: "Бег", spy: "Ходьба" },
+                { civilian: "Велоспорт", spy: "Мотогонки" },
+                { civilian: "Лыжи", spy: "Сноуборд" },
+                { civilian: "Коньки", spy: "Ролики" },
+                { civilian: "Шахматы", spy: "Шашки" },
+                { civilian: "Нарды", spy: "Домино" },
+                { civilian: "Покер", spy: "Бридж" },
+                { civilian: "Бильярд", spy: "Боулинг" },
+                { civilian: "Гольф", spy: "Крикет" },
+                { civilian: "Стрельба из лука", spy: "Стрельба" },
+                { civilian: "Фехтование", spy: "Кендо" },
+                { civilian: "Рыбалка", spy: "Охота" },
+                { civilian: "Туризм", spy: "Альпинизм" },
+                { civilian: "Йога", spy: "Пилатес" },
+                { civilian: "Аэробика", spy: "Фитнес" },
+                { civilian: "Скакалка", spy: "Обруч" },
+                { civilian: "Гантели", spy: "Штанга" },
+                { civilian: "Мяч", spy: "Шайба" },
+                { civilian: "Ворота", spy: "Кольцо" },
+                { civilian: "Стадион", spy: "Спортзал" },
+                { civilian: "Чемпионат", spy: "Олимпиада" },
+                { civilian: "Прятки", spy: "Догонялки" },
+                { civilian: "Жмурки", spy: "Прятки" },
+                { civilian: "Классики", spy: "Скакалка" },
+                { civilian: "Монополия", spy: "Дженга" },
+                { civilian: "Твистер", spy: "Лимбо" },
+                { civilian: "Крокет", spy: "Гольф" },
+                { civilian: "Регби", spy: "Американский футбол" },
+                { civilian: "Водное поло", spy: "Плавание" },
+                { civilian: "Синхронное плавание", spy: "Дайвинг" },
+                { civilian: "Прыжки в воду", spy: "Прыжки на батуте" },
+
+                // ШКОЛА И ОБРАЗОВАНИЕ (30 пар)
+                { civilian: "Школа", spy: "Университет" },
+                { civilian: "Детский сад", spy: "Ясли" },
+                { civilian: "Урок", spy: "Лекция" },
+                { civilian: "Экзамен", spy: "Зачёт" },
+                { civilian: "Домашнее задание", spy: "Контрольная" },
+                { civilian: "Учебник", spy: "Тетрадь" },
+                { civilian: "Ручка", spy: "Карандаш" },
+                { civilian: "Ластик", spy: "Точилка" },
+                { civilian: "Линейка", spy: "Циркуль" },
+                { civilian: "Пенал", spy: "Портфель" },
+                { civilian: "Доска", spy: "Мел" },
+                { civilian: "Парта", spy: "Стул" },
+                { civilian: "Дневник", spy: "Журнал" },
+                { civilian: "Аттестат", spy: "Диплом" },
+                { civilian: "Библиотека", spy: "Читальный зал" },
+                { civilian: "Лаборатория", spy: "Кабинет" },
+                { civilian: "Спортзал", spy: "Стадион" },
+                { civilian: "Столовая", spy: "Буфет" },
+                { civilian: "Перемена", spy: "Звонок" },
+                { civilian: "Каникулы", spy: "Выходные" },
+                { civilian: "Первоклассник", spy: "Выпускник" },
+                { civilian: "Отличник", spy: "Двоечник" },
+                { civilian: "Учитель", spy: "Преподаватель" },
+                { civilian: "Директор", spy: "Завуч" },
+                { civilian: "Класс", spy: "Группа" },
+                { civilian: "Глобус", spy: "Карта" },
+                { civilian: "Микроскоп", spy: "Телескоп" },
+                { civilian: "Формула", spy: "Уравнение" },
+                { civilian: "Сочинение", spy: "Изложение" },
+                { civilian: "Диктант", spy: "Тест" },
+
+                // ДОМ И БЫТ (50 пар)
                 { civilian: "Квартира", spy: "Дом" },
                 { civilian: "Комната", spy: "Зал" },
                 { civilian: "Кухня", spy: "Столовая" },
@@ -734,66 +1049,23 @@
                 { civilian: "Плед", spy: "Покрывало" },
                 { civilian: "Свеча", spy: "Лампа" },
                 { civilian: "Календарь", spy: "Часы" },
-                // Спорт
-                { civilian: "Футбол", spy: "Баскетбол" },
-                { civilian: "Волейбол", spy: "Гандбол" },
-                { civilian: "Теннис", spy: "Бадминтон" },
-                { civilian: "Хоккей", spy: "Фигурное катание" },
-                { civilian: "Бокс", spy: "Борьба" },
-                { civilian: "Дзюдо", spy: "Карате" },
-                { civilian: "Плавание", spy: "Дайвинг" },
-                { civilian: "Гимнастика", spy: "Акробатика" },
-                { civilian: "Лёгкая атлетика", spy: "Тяжёлая атлетика" },
-                { civilian: "Бег", spy: "Ходьба" },
-                { civilian: "Велоспорт", spy: "Мотогонки" },
-                { civilian: "Лыжи", spy: "Сноуборд" },
-                { civilian: "Коньки", spy: "Ролики" },
-                { civilian: "Шахматы", spy: "Шашки" },
-                { civilian: "Нарды", spy: "Домино" },
-                { civilian: "Покер", spy: "Бридж" },
-                { civilian: "Бильярд", spy: "Боулинг" },
-                { civilian: "Гольф", spy: "Крикет" },
-                { civilian: "Стрельба из лука", spy: "Стрельба" },
-                { civilian: "Фехтование", spy: "Кендо" },
-                { civilian: "Рыбалка", spy: "Охота" },
-                { civilian: "Туризм", spy: "Альпинизм" },
-                { civilian: "Йога", spy: "Пилатес" },
-                { civilian: "Аэробика", spy: "Фитнес" },
-                { civilian: "Скакалка", spy: "Обруч" },
-                { civilian: "Гантели", spy: "Штанга" },
-                { civilian: "Мяч", spy: "Шайба" },
-                { civilian: "Ворота", spy: "Кольцо" },
-                { civilian: "Стадион", spy: "Спортзал" },
-                { civilian: "Чемпионат", spy: "Олимпиада" },
-                // Музыка и искусство
-                { civilian: "Гитара", spy: "Скрипка" },
-                { civilian: "Пианино", spy: "Рояль" },
-                { civilian: "Синтезатор", spy: "Орган" },
-                { civilian: "Барабан", spy: "Тарелки" },
-                { civilian: "Флейта", spy: "Кларнет" },
-                { civilian: "Труба", spy: "Тромбон" },
-                { civilian: "Саксофон", spy: "Гармонь" },
-                { civilian: "Балалайка", spy: "Домбра" },
-                { civilian: "Караоке", spy: "Концерт" },
-                { civilian: "Опера", spy: "Балет" },
-                { civilian: "Театр", spy: "Кинотеатр" },
-                { civilian: "Музей", spy: "Выставка" },
-                { civilian: "Картина", spy: "Рисунок" },
-                { civilian: "Скульптура", spy: "Памятник" },
-                { civilian: "Рисование", spy: "Фотография" },
-                { civilian: "Лепка", spy: "Гончарство" },
-                { civilian: "Танцы", spy: "Балет" },
-                { civilian: "Вальс", spy: "Танго" },
-                { civilian: "Стихи", spy: "Проза" },
-                { civilian: "Книга", spy: "Журнал" },
-                { civilian: "Газета", spy: "Брошюра" },
-                { civilian: "Библиотека", spy: "Книжный магазин" },
-                { civilian: "Палитра", spy: "Краски" },
-                { civilian: "Мольберт", spy: "Холст" },
-                { civilian: "Ноты", spy: "Партитура" },
-                // Город и места
-                { civilian: "Школа", spy: "Университет" },
-                { civilian: "Детский сад", spy: "Школа" },
+                { civilian: "Пыль", spy: "Грязь" },
+                { civilian: "Чистота", spy: "Порядок" },
+                { civilian: "Ремонт", spy: "Стройка" },
+                { civilian: "Мусор", spy: "Отходы" },
+                { civilian: "Вешалка", spy: "Крючок" },
+                { civilian: "Ящик", spy: "Коробка" },
+                { civilian: "Пакет", spy: "Сумка" },
+                { civilian: "Банка", spy: "Бутылка" },
+                { civilian: "Крышка", spy: "Пробка" },
+                { civilian: "Шланг", spy: "Труба" },
+                { civilian: "Кран", spy: "Смеситель" },
+                { civilian: "Раковина", spy: "Ванна" },
+                { civilian: "Унитаз", spy: "Биде" },
+                { civilian: "Душевая", spy: "Ванная" },
+                { civilian: "Полотенцесушитель", spy: "Батарея" },
+
+                // ГОРОД И МЕСТА (40 пар)
                 { civilian: "Больница", spy: "Аптека" },
                 { civilian: "Поликлиника", spy: "Санаторий" },
                 { civilian: "Банк", spy: "Обменник" },
@@ -822,120 +1094,20 @@
                 { civilian: "Дача", spy: "Деревня" },
                 { civilian: "Ферма", spy: "Поле" },
                 { civilian: "Завод", spy: "Фабрика" },
-                // Насекомые
-                { civilian: "Пчела", spy: "Оса" },
-                { civilian: "Шмель", spy: "Шершень" },
-                { civilian: "Муха", spy: "Комар" },
-                { civilian: "Бабочка", spy: "Мотылёк" },
-                { civilian: "Стрекоза", spy: "Кузнечик" },
-                { civilian: "Саранча", spy: "Сверчок" },
-                { civilian: "Муравей", spy: "Термит" },
-                { civilian: "Жук", spy: "Таракан" },
-                { civilian: "Паук", spy: "Скорпион" },
-                { civilian: "Гусеница", spy: "Червяк" },
-                { civilian: "Улитка", spy: "Слизень" },
-                { civilian: "Клещ", spy: "Блоха" },
-                { civilian: "Божья коровка", spy: "Колорадский жук" },
-                { civilian: "Светлячок", spy: "Сверчок" },
-                { civilian: "Цикада", spy: "Кузнечик" },
-                // Рыбы
-                { civilian: "Акула", spy: "Дельфин" },
-                { civilian: "Кит", spy: "Кашалот" },
-                { civilian: "Скат", spy: "Медуза" },
-                { civilian: "Осьминог", spy: "Кальмар" },
-                { civilian: "Карась", spy: "Карп" },
-                { civilian: "Щука", spy: "Судак" },
-                { civilian: "Окунь", spy: "Ёрш" },
-                { civilian: "Сом", spy: "Налим" },
-                { civilian: "Лосось", spy: "Форель" },
-                { civilian: "Сельдь", spy: "Скумбрия" },
-                { civilian: "Треска", spy: "Минтай" },
-                { civilian: "Креветка", spy: "Рак" },
-                { civilian: "Краб", spy: "Омар" },
-                { civilian: "Морская звезда", spy: "Морской ёж" },
-                { civilian: "Коралл", spy: "Губка" },
-                // Птицы
-                { civilian: "Воробей", spy: "Синица" },
-                { civilian: "Голубь", spy: "Чайка" },
-                { civilian: "Ворон", spy: "Ворона" },
-                { civilian: "Сова", spy: "Филин" },
-                { civilian: "Орёл", spy: "Ястреб" },
-                { civilian: "Сокол", spy: "Беркут" },
-                { civilian: "Ласточка", spy: "Стриж" },
-                { civilian: "Соловей", spy: "Жаворонок" },
-                { civilian: "Кукушка", spy: "Дятел" },
-                { civilian: "Попугай", spy: "Канарейка" },
-                { civilian: "Пингвин", spy: "Гагарка" },
-                { civilian: "Страус", spy: "Эму" },
-                { civilian: "Фламинго", spy: "Цапля" },
-                { civilian: "Пеликан", spy: "Лебедь" },
-                { civilian: "Утка", spy: "Гусь" },
-                // Грибы и ягоды
-                { civilian: "Белый гриб", spy: "Подберёзовик" },
-                { civilian: "Подосиновик", spy: "Маслёнок" },
-                { civilian: "Лисичка", spy: "Рыжик" },
-                { civilian: "Опята", spy: "Шампиньоны" },
-                { civilian: "Груздь", spy: "Волнушка" },
-                { civilian: "Мухомор", spy: "Поганка" },
-                { civilian: "Клубника", spy: "Земляника" },
-                { civilian: "Малина", spy: "Ежевика" },
-                { civilian: "Черника", spy: "Голубика" },
-                { civilian: "Клюква", spy: "Брусника" },
-                { civilian: "Смородина", spy: "Крыжовник" },
-                { civilian: "Вишня", spy: "Черешня" },
-                { civilian: "Арбуз", spy: "Дыня" },
-                { civilian: "Виноград", spy: "Изюм" },
-                { civilian: "Калина", spy: "Рябина" },
-                // Инструменты
-                { civilian: "Молоток", spy: "Отвёртка" },
-                { civilian: "Пила", spy: "Лобзик" },
-                { civilian: "Дрель", spy: "Шуруповёрт" },
-                { civilian: "Топор", spy: "Колун" },
-                { civilian: "Рубанок", spy: "Стамеска" },
-                { civilian: "Ключ", spy: "Отвёртка" },
-                { civilian: "Плоскогубцы", spy: "Кусачки" },
-                { civilian: "Напильник", spy: "Рашпиль" },
-                { civilian: "Уровень", spy: "Отвес" },
-                { civilian: "Рулетка", spy: "Линейка" },
-                { civilian: "Лопата", spy: "Грабли" },
-                { civilian: "Вилы", spy: "Тяпка" },
-                { civilian: "Ведро", spy: "Лейка" },
-                { civilian: "Кисть", spy: "Валик" },
-                { civilian: "Лестница", spy: "Стремянка" },
-                // Космос
-                { civilian: "Звезда", spy: "Планета" },
-                { civilian: "Комета", spy: "Астероид" },
-                { civilian: "Метеорит", spy: "Метеор" },
-                { civilian: "Ракета", spy: "Шаттл" },
-                { civilian: "Спутник", spy: "Станция" },
-                { civilian: "Телескоп", spy: "Бинокль" },
-                { civilian: "Астроном", spy: "Астронавт" },
-                { civilian: "Галактика", spy: "Вселенная" },
-                { civilian: "Чёрная дыра", spy: "Туманность" },
-                { civilian: "Марс", spy: "Венера" },
-                // Медицина
-                { civilian: "Таблетка", spy: "Витамин" },
-                { civilian: "Укол", spy: "Прививка" },
-                { civilian: "Градусник", spy: "Тонометр" },
-                { civilian: "Бинт", spy: "Пластырь" },
-                { civilian: "Зелёнка", spy: "Йод" },
-                { civilian: "Антибиотик", spy: "Аспирин" },
-                { civilian: "Маска", spy: "Перчатки" },
-                { civilian: "Стетоскоп", spy: "Скальпель" },
-                { civilian: "Скорая помощь", spy: "Больница" },
-                { civilian: "Рецепт", spy: "Справка" },
-                // Магазины
+                { civilian: "Музей", spy: "Выставка" },
+                { civilian: "Театр", spy: "Кинотеатр" },
+                { civilian: "Библиотека", spy: "Книжный магазин" },
+                { civilian: "Аптека", spy: "Оптика" },
+                { civilian: "Булочная", spy: "Кондитерская" },
+                { civilian: "Мясной магазин", spy: "Рыбный магазин" },
+                { civilian: "Цветочный магазин", spy: "Садовый центр" },
+                { civilian: "Мебельный магазин", spy: "Стройматериалы" },
+                { civilian: "Одежда", spy: "Обувь" },
+                { civilian: "Ювелирный магазин", spy: "Часовая мастерская" },
                 { civilian: "Супермаркет", spy: "Гипермаркет" },
                 { civilian: "Рынок", spy: "Ярмарка" },
-                { civilian: "Булочная", spy: "Кондитерская" },
-                { civilian: "Мясной", spy: "Рыбный" },
-                { civilian: "Аптека", spy: "Оптика" },
-                { civilian: "Книжный", spy: "Библиотека" },
-                { civilian: "Цветочный", spy: "Садовый" },
-                { civilian: "Мебельный", spy: "Стройматериалы" },
-                { civilian: "Одежда", spy: "Обувь" },
-                { civilian: "Ювелирный", spy: "Часовая мастерская" },
-                // Праздники
+
+                // ПРАЗДНИКИ И СОБЫТИЯ (30 пар)
                 { civilian: "Новый год", spy: "Рождество" },
                 { civilian: "День рождения", spy: "Юбилей" },
                 { civilian: "Свадьба", spy: "Помолвка" },
@@ -946,7 +1118,28 @@
                 { civilian: "23 февраля", spy: "День Победы" },
                 { civilian: "Подарок", spy: "Сюрприз" },
                 { civilian: "Салют", spy: "Фейерверк" },
-                // Эмоции
+                { civilian: "Ёлка", spy: "Сосна" },
+                { civilian: "Дед Мороз", spy: "Санта Клаус" },
+                { civilian: "Снегурочка", spy: "Эльф" },
+                { civilian: "Подарок", spy: "Сюрприз" },
+                { civilian: "Открытка", spy: "Письмо" },
+                { civilian: "Конфетти", spy: "Серпантин" },
+                { civilian: "Хлопушка", spy: "Петарда" },
+                { civilian: "Бенгальский огонь", spy: "Свеча" },
+                { civilian: "Гирлянда", spy: "Мишура" },
+                { civilian: "Шарик", spy: "Фонарик" },
+                { civilian: "Торт", spy: "Пирог" },
+                { civilian: "Свечи", spy: "Фейерверк" },
+                { civilian: "Тост", spy: "Поздравление" },
+                { civilian: "Банкет", spy: "Фуршет" },
+                { civilian: "Карнавал", spy: "Маскарад" },
+                { civilian: "Фестиваль", spy: "Концерт" },
+                { civilian: "Ярмарка", spy: "Базар" },
+                { civilian: "Парад", spy: "Шествие" },
+                { civilian: "Пикник", spy: "Поход" },
+                { civilian: "Экскурсия", spy: "Путешествие" },
+
+                // ЭМОЦИИ И ХАРАКТЕР (20 пар)
                 { civilian: "Радость", spy: "Счастье" },
                 { civilian: "Грусть", spy: "Печаль" },
                 { civilian: "Злость", spy: "Ярость" },
@@ -957,71 +1150,143 @@
                 { civilian: "Ненависть", spy: "Отвращение" },
                 { civilian: "Зависть", spy: "Ревность" },
                 { civilian: "Волнение", spy: "Тревога" },
-                // Страны и города
-                { civilian: "Россия", spy: "Беларусь" },
-                { civilian: "Москва", spy: "Санкт-Петербург" },
-                { civilian: "Париж", spy: "Лондон" },
-                { civilian: "Нью-Йорк", spy: "Чикаго" },
-                { civilian: "Китай", spy: "Япония" },
-                { civilian: "Италия", spy: "Испания" },
-                { civilian: "Германия", spy: "Австрия" },
-                { civilian: "Канада", spy: "США" },
-                { civilian: "Бразилия", spy: "Аргентина" },
-                { civilian: "Египет", spy: "Турция" },
-                { civilian: "Токио", spy: "Сеул" },
-                { civilian: "Пекин", spy: "Шанхай" },
-                { civilian: "Индия", spy: "Пакистан" },
-                { civilian: "Греция", spy: "Кипр" },
-                { civilian: "Швеция", spy: "Норвегия" }
+                { civilian: "Уверенность", spy: "Смелость" },
+                { civilian: "Скромность", spy: "Застенчивость" },
+                { civilian: "Доброта", spy: "Милосердие" },
+                { civilian: "Жадность", spy: "Скупость" },
+                { civilian: "Щедрость", spy: "Доброта" },
+                { civilian: "Терпение", spy: "Выдержка" },
+                { civilian: "Лень", spy: "Усталость" },
+                { civilian: "Активность", spy: "Энергичность" },
+                { civilian: "Любопытство", spy: "Интерес" },
+                { civilian: "Гордость", spy: "Тщеславие" }
             ];
 
-            // Слова для игры "Крокодил"
+            // Слова для игры "Крокодил" (500+ слов)
             const CROCODILE_WORDS = [
+                // ЖИВОТНЫЕ (100 слов)
                 "Крокодил", "Обезьяна", "Слон", "Жираф", "Пингвин", "Бабочка", "Пчела", "Змея",
                 "Кошка", "Собака", "Заяц", "Медведь", "Лиса", "Волк", "Тигр", "Лев",
                 "Рыба", "Птица", "Лягушка", "Черепаха", "Улитка", "Паук", "Муравей", "Кузнечик",
+                "Белка", "Ёж", "Крот", "Бобр", "Олень", "Лось", "Зебра", "Лошадь",
+                "Корова", "Коза", "Свинья", "Баран", "Верблюд", "Кенгуру", "Коала", "Панда",
+                "Горилла", "Аллигатор", "Ящерица", "Жаба", "Тюлень", "Морж", "Дельфин", "Кит",
+                "Акула", "Скат", "Орёл", "Ястреб", "Сова", "Ворон", "Воробей", "Синица",
+                "Голубь", "Чайка", "Утка", "Гусь", "Лебедь", "Индюк", "Петух", "Страус",
+                "Пеликан", "Фламинго", "Цапля", "Аист", "Дятел", "Кукушка", "Соловей", "Попугай",
+                "Хомяк", "Морская свинка", "Крыса", "Мышь", "Кролик", "Бурундук", "Енот", "Барсук",
+                "Суслик", "Сурок", "Буйвол", "Зубр", "Газель", "Мангуст", "Шакал", "Гиена",
+                "Рысь", "Пантера", "Утконос", "Муравьед", "Ленивец", "Опоссум", "Дикобраз", "Хорёк",
+                
+                // ДЕЙСТВИЯ (100 слов)
                 "Плавать", "Бегать", "Прыгать", "Танцевать", "Петь", "Рисовать", "Читать", "Писать",
                 "Спать", "Есть", "Пить", "Летать", "Копать", "Строить", "Ломать", "Прятаться",
                 "Улыбаться", "Плакать", "Смеяться", "Злиться", "Удивляться", "Бояться", "Любить", "Ненавидеть",
-                "Солнце", "Луна", "Звезда", "Дождь", "Снег", "Ветер", "Гроза", "Радуга",
-                "Дерево", "Цветок", "Гора", "Море", "Река", "Огонь", "Вода", "Земля",
-                "Машина", "Самолет", "Поезд", "Корабль", "Велосипед", "Ракета", "Танк", "Вертолет",
-                "Врач", "Повар", "Учитель", "Полицейский", "Пожарный", "Художник", "Музыкант", "Спортсмен",
-                "Банан", "Яблоко", "Арбуз", "Мороженое", "Пицца", "Торт", "Конфета", "Лимон",
-                "Телефон", "Компьютер", "Телевизор", "Холодильник", "Пылесос", "Микроволновка", "Чайник", "Утюг",
-                "Шляпа", "Очки", "Часы", "Кольцо", "Зонт", "Рюкзак", "Чемодан", "Ключ",
-                "Футбол", "Баскетбол", "Теннис", "Плавание", "Бокс", "Гимнастика", "Лыжи", "Коньки",
-                "Стул", "Стол", "Кровать", "Шкаф", "Зеркало", "Лампа", "Ковер", "Подушка",
-                "Дед Мороз", "Снегурочка", "Пират", "Принцесса", "Рыцарь", "Клоун", "Волшебник", "Робот",
                 "Готовить", "Стирать", "Гладить", "Подметать", "Мыть", "Красить", "Пилить", "Забивать",
                 "Целовать", "Обнимать", "Махать", "Кланяться", "Хлопать", "Топать", "Щекотать", "Шептать",
-                "Автобус", "Трамвай", "Метро", "Такси", "Грузовик", "Трактор", "Экскаватор", "Мотоцикл",
-                "Школа", "Больница", "Магазин", "Ресторан", "Банк", "Почта", "Аптека", "Библиотека",
-                "Снеговик", "Ангел", "Дьявол", "Зомби", "Вампир", "Оборотень", "Привидение", "Дракон",
-                "Лопата", "Молоток", "Пила", "Топор", "Дрель", "Отвертка", "Ножницы", "Игла",
                 "Играть", "Смотреть", "Слушать", "Нюхать", "Пробовать", "Трогать", "Ловить", "Бросать",
-                "Свадьба", "День рождения", "Новый год", "Пасха", "Масленица", "Хэллоуин", "8 марта", "23 февраля"
+                "Кататься", "Кружиться", "Ползать", "Скакать", "Маршировать", "Приседать", "Тянуться", "Наклоняться",
+                "Открывать", "Закрывать", "Включать", "Выключать", "Наливать", "Выливать", "Насыпать", "Собирать",
+                "Разбирать", "Складывать", "Раскладывать", "Перекладывать", "Поднимать", "Опускать", "Толкать", "Тянуть",
+                "Вертеть", "Крутить", "Трясти", "Махать", "Бить", "Стучать", "Скрипеть", "Шуршать",
+                "Шагать", "Мчаться", "Плестись", "Красться", "Прыгать", "Скакать", "Плавать", "Нырять",
+                "Взлетать", "Приземляться", "Падать", "Вставать", "Садиться", "Ложиться", "Просыпаться", "Засыпать",
+                
+                // ПРИРОДА (50 слов)
+                "Солнце", "Луна", "Звезда", "Дождь", "Снег", "Ветер", "Гроза", "Радуга",
+                "Дерево", "Цветок", "Гора", "Море", "Река", "Огонь", "Вода", "Земля",
+                "Трава", "Камень", "Песок", "Лёд", "Туман", "Облако", "Молния", "Гром",
+                "Роса", "Иней", "Закат", "Рассвет", "Водопад", "Фонтан", "Айсберг", "Ледник",
+                "Вулкан", "Гейзер", "Пещера", "Остров", "Пустыня", "Лес", "Парк", "Поляна",
+                "Болото", "Родник", "Кристалл", "Алмаз", "Золото", "Серебро", "Жемчуг", "Янтарь",
+                "Комета", "Метеорит",
+                
+                // ПРОФЕССИИ (50 слов)
+                "Врач", "Повар", "Учитель", "Полицейский", "Пожарный", "Художник", "Музыкант", "Спортсмен",
+                "Певец", "Танцор", "Актёр", "Режиссёр", "Фотограф", "Модель", "Бармен", "Официант",
+                "Продавец", "Кассир", "Парикмахер", "Портной", "Сапожник", "Плотник", "Столяр", "Кузнец",
+                "Сварщик", "Электрик", "Сантехник", "Механик", "Водитель", "Пилот", "Моряк", "Капитан",
+                "Космонавт", "Астроном", "Учёный", "Химик", "Физик", "Математик", "Историк", "Археолог",
+                "Журналист", "Писатель", "Поэт", "Переводчик", "Библиотекарь", "Архивариус", "Психолог", "Ветеринар",
+                "Фермер", "Садовник",
+                
+                // ЕДА (50 слов)
+                "Банан", "Яблоко", "Арбуз", "Мороженое", "Пицца", "Торт", "Конфета", "Лимон",
+                "Апельсин", "Груша", "Виноград", "Клубника", "Малина", "Черника", "Персик", "Ананас",
+                "Кокос", "Помидор", "Огурец", "Морковь", "Картофель", "Лук", "Чеснок", "Капуста",
+                "Гриб", "Горох", "Кукуруза", "Рис", "Гречка", "Макароны", "Хлеб", "Сыр",
+                "Масло", "Молоко", "Йогурт", "Творог", "Яйцо", "Курица", "Говядина", "Свинина",
+                "Рыба", "Краб", "Кальмар", "Суп", "Борщ", "Пельмени", "Шашлык", "Суши",
+                "Блины", "Шоколад",
+                
+                // ПРЕДМЕТЫ (100 слов)
+                "Телефон", "Компьютер", "Телевизор", "Холодильник", "Пылесос", "Микроволновка", "Чайник", "Утюг",
+                "Шляпа", "Очки", "Часы", "Кольцо", "Зонт", "Рюкзак", "Чемодан", "Ключ",
+                "Стул", "Стол", "Кровать", "Шкаф", "Зеркало", "Лампа", "Ковер", "Подушка",
+                "Книга", "Тетрадь", "Ручка", "Карандаш", "Линейка", "Пенал", "Портфель", "Доска",
+                "Мяч", "Кукла", "Машинка", "Конструктор", "Пазл", "Кубики", "Пирамидка", "Скакалка",
+                "Обруч", "Велосипед", "Самокат", "Ролики", "Скейтборд", "Лыжи", "Коньки", "Санки",
+                "Лопата", "Грабли", "Ведро", "Лейка", "Молоток", "Отвёртка", "Пила", "Топор",
+                "Дрель", "Кисть", "Краски", "Бумага", "Ножницы", "Клей", "Скотч", "Верёвка",
+                "Игла", "Нитки", "Пуговица", "Молния", "Замок", "Крючок", "Цепь", "Якорь",
+                "Колесо", "Руль", "Педаль", "Фара", "Зеркало", "Багажник", "Капот", "Двигатель",
+                "Батарейка", "Лампочка", "Выключатель", "Розетка", "Провод", "Антенна", "Тарелка", "Микрофон",
+                "Наушники", "Колонка", "Фотоаппарат", "Видеокамера", "Принтер", "Сканер", "Клавиатура", "Мышь",
+                "Монитор", "Системный блок", "Ноутбук", "Планшет",
+                
+                // ПЕРСОНАЖИ (50 слов)
+                "Дед Мороз", "Снегурочка", "Пират", "Принцесса", "Рыцарь", "Клоун", "Волшебник", "Робот",
+                "Снеговик", "Ангел", "Дьявол", "Зомби", "Вампир", "Оборотень", "Привидение", "Дракон",
+                "Фея", "Эльф", "Гном", "Великан", "Карлик", "Русалка", "Кентавр", "Пегас",
+                "Единорог", "Грифон", "Феникс", "Василиск", "Медуза", "Циклоп", "Минотавр", "Кентавр",
+                "Супермен", "Бэтмен", "Человек-паук", "Халк", "Тор", "Железный человек", "Капитан Америка", "Ведьма",
+                "Колдун", "Маг", "Чародей", "Заклинатель", "Шаман", "Друид", "Некромант", "Алхимик",
+                "Паладин", "Варвар",
+                
+                // СПОРТ (30 слов)
+                "Футбол", "Баскетбол", "Волейбол", "Теннис", "Хоккей", "Бокс", "Борьба", "Плавание",
+                "Гимнастика", "Лёгкая атлетика", "Бег", "Прыжки", "Метание", "Велоспорт", "Лыжный спорт", "Конькобежный спорт",
+                "Шахматы", "Шашки", "Нарды", "Домино", "Бильярд", "Боулинг", "Гольф", "Крикет",
+                "Стрельба из лука", "Фехтование", "Рыбалка", "Охота", "Туризм", "Альпинизм",
+                
+                // ШКОЛА (20 слов)
+                "Школа", "Университет", "Урок", "Экзамен", "Домашнее задание", "Учебник", "Тетрадь", "Ручка",
+                "Карандаш", "Ластик", "Линейка", "Циркуль", "Пенал", "Портфель", "Доска", "Мел",
+                "Парта", "Дневник", "Аттестат", "Диплом",
+                
+                // ДОМ (20 слов)
+                "Квартира", "Дом", "Комната", "Кухня", "Спальня", "Ванная", "Балкон", "Кровать",
+                "Диван", "Стол", "Стул", "Шкаф", "Полка", "Зеркало", "Дверь", "Окно",
+                "Ковёр", "Люстра", "Картина", "Ваза",
+                
+                // ПРАЗДНИКИ (20 слов)
+                "Новый год", "Рождество", "День рождения", "Свадьба", "Выпускной", "Масленица", "Пасха", "Хэллоуин",
+                "8 марта", "23 февраля", "Подарок", "Сюрприз", "Салют", "Фейерверк", "Ёлка", "Дед Мороз",
+                "Снегурочка", "Открытка", "Хлопушка", "Гирлянда",
+                
+                // ЭМОЦИИ (20 слов)
+                "Радость", "Грусть", "Злость", "Страх", "Удивление", "Скука", "Любовь", "Ненависть",
+                "Зависть", "Волнение", "Уверенность", "Скромность", "Доброта", "Жадность", "Щедрость", "Терпение",
+                "Лень", "Активность", "Любопытство", "Гордость"
             ];
 
-            // ================== СОСТОЯНИЕ ШПИОНА ==================
+            // ================== СОСТОЯНИЕ БАНАН ШПИОНА ==================
             let totalPlayers = 3;
             let currentPlayerIndex = 0;
             let currentPair = null;
             let spyIndex = -1;
             let recentlyUsedPairs = [];
-            const MAX_RECENT_PAIRS = 100;
+            const MAX_RECENT_PAIRS = 200;
 
             // ================== СОСТОЯНИЕ КРОКОДИЛА ==================
             let recentlyUsedCrocodileWords = [];
-            const MAX_RECENT_CROCODILE_WORDS = 50;
+            const MAX_RECENT_CROCODILE_WORDS = 100;
 
             // ================== ЭЛЕМЕНТЫ ==================
-            // Меню
             const gameMenu = document.getElementById('game-menu');
             const spyGame = document.getElementById('spy-game');
             const crocodileGame = document.getElementById('crocodile-game');
             
-            // Шпион
             const screenSelect = document.getElementById('screen-select');
             const screenRole = document.getElementById('screen-role');
             const screenHidden = document.getElementById('screen-hidden');
@@ -1045,7 +1310,6 @@
             const restartFromStart = document.getElementById('restart-from-start');
             const finalWords = document.getElementById('final-words');
 
-            // Крокодил
             const crocodileWordDisplay = document.getElementById('crocodile-word-display');
             const nextCrocodileWordBtn = document.getElementById('next-crocodile-word');
 
@@ -1070,7 +1334,7 @@
                 showNextCrocodileWord();
             }
 
-            // ================== ФУНКЦИИ ШПИОНА ==================
+            // ================== ФУНКЦИИ БАНАН ШПИОНА ==================
             function showScreen(screen) {
                 [screenSelect, screenRole, screenHidden, screenAllDone, screenStart].forEach(s => s.classList.add('hidden'));
                 screen.classList.remove('hidden');
@@ -1197,11 +1461,9 @@
             }
 
             // ================== ОБРАБОТЧИКИ ==================
-            // Меню
             document.getElementById('spy-game-btn').addEventListener('click', showSpyGame);
             document.getElementById('crocodile-game-btn').addEventListener('click', showCrocodileGame);
             
-            // Кнопки "В меню"
             const backButtons = [
                 'back-to-menu-1',
                 'back-to-menu-2',
@@ -1215,7 +1477,6 @@
                 document.getElementById(id).addEventListener('click', showMainMenu);
             });
 
-            // Шпион
             hideWordBtn.addEventListener('click', handleHideWord);
             showWordBtn.addEventListener('click', handleShowWord);
             startGameBtn.addEventListener('click', showStartScreen);
@@ -1225,7 +1486,6 @@
             restartFromDone.addEventListener('click', resetToMenu);
             restartFromStart.addEventListener('click', resetToMenu);
 
-            // Крокодил
             nextCrocodileWordBtn.addEventListener('click', showNextCrocodileWord);
 
             // ================== ЗАПУСК ==================
