@@ -813,9 +813,356 @@
         </div>
     </div>
 
-    <!-- Все игровые контейнеры (кроме Ультиматума) остаются без изменений -->
-    
-    <script src="words.js"></script>
+    <!-- ИГРА БАНАН ШПИОН -->
+    <div class="game-container hidden" id="spy-game">
+        <div id="spy-game-content">
+            <h1 class="game-title">🍌 БАНАН ШПИОН</h1>
+            <p class="subtitle">Найди шпиона среди игроков</p>
+            
+            <div id="screen-select">
+                <div class="step-title" style="font-size: 1.2rem; margin-bottom: 15px;">На сколько человек играем?</div>
+                <div class="btn-grid" id="player-select" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                    <!-- Кнопки добавятся из JS -->
+                </div>
+                <div class="info-text" style="color: #aaa; font-size: 0.8rem; margin-top: 10px;">Минимум 3, максимум 10</div>
+                <button class="btn btn-secondary" id="show-rules-spy">📖 Правила</button>
+                <button class="btn btn-secondary" id="back-to-menu-1">← В меню</button>
+            </div>
+            
+            <div id="rules-spy" class="hidden">
+                <div class="rules-container">
+                    <div class="rules-title">📖 Правила игры "БАНАН ШПИОН"</div>
+                    <ol class="rules-text">
+                        <li>Выберите количество игроков (от 3 до 10).</li>
+                        <li>Каждый игрок по очереди смотрит на экран и запоминает слово.</li>
+                        <li>Один из игроков - ШПИОН. У него другое слово, похожее по смыслу.</li>
+                        <li>После того как все посмотрели слова, начните обсуждение.</li>
+                        <li>Игроки задают друг другу вопросы о слове, не называя его прямо.</li>
+                        <li>Задача мирных жителей - найти шпиона.</li>
+                        <li>Задача шпиона - понять слово мирных и не попасться.</li>
+                        <li>В конце обсуждения проголосуйте, кто шпион.</li>
+                    </ol>
+                </div>
+                <button class="btn btn-primary" id="back-from-rules-spy">✅ Понятно</button>
+            </div>
+
+            <div id="screen-role" class="hidden">
+                <div id="player-header" class="role-badge">Игрок 1</div>
+                <div class="step-title" style="font-size: 1rem; margin: 10px 0;">Запомни слово и нажми "Скрыть"</div>
+                <div id="role-display" style="background: #0f3460; padding: 30px; border-radius: 20px; margin: 15px 0; font-size: 2rem; font-weight: bold;">СЛОВО</div>
+                <button class="btn btn-primary" id="hide-word-btn">🙈 Скрыть и передать</button>
+                <button class="btn btn-secondary" id="restart-from-role">🔄 Заново</button>
+                <button class="btn btn-secondary" id="back-to-menu-2">← В меню</button>
+            </div>
+
+            <div id="screen-hidden" class="hidden">
+                <div id="next-player-header" class="role-badge">Игрок 2</div>
+                <div style="font-size: 4rem; margin: 20px 0;">🔒</div>
+                <div class="step-title" style="font-size: 1rem;">Передай телефон следующему игроку</div>
+                <div style="color: #ffd700; font-weight: bold; margin: 10px 0;" id="pass-message-hidden">📱 Телефон у Игрока 2?</div>
+                <button class="btn btn-primary" id="show-word-btn">👁️ Показать слово</button>
+                <button class="btn btn-secondary" id="restart-from-hidden">🔄 Заново</button>
+                <button class="btn btn-secondary" id="back-to-menu-3">← В меню</button>
+            </div>
+
+            <div id="screen-all-done" class="hidden">
+                <div style="font-size: 4rem; margin: 20px 0;">🎉</div>
+                <div class="step-title" style="font-size: 1rem;">Все игроки посмотрели свои слова!</div>
+                <div style="color: #ffd700; font-weight: bold; margin: 10px 0;">Готовы начать обсуждение?</div>
+                <button class="btn btn-primary" id="start-game-btn">🏁 Начать игру</button>
+                <button class="btn btn-secondary" id="restart-from-done">🔄 Заново</button>
+                <button class="btn btn-secondary" id="back-to-menu-4">← В меню</button>
+            </div>
+
+            <div id="screen-start" class="hidden">
+                <h1 class="game-title">🎉 ВСЁ!</h1>
+                <div class="step-title" style="font-size: 1rem; margin: 10px 0;">Роли розданы. Обсуждайте и найдите шпиона!</div>
+                <div id="final-words" style="background: #222; border-radius: 15px; padding: 10px; margin: 10px 0; font-size: 0.9rem; color: #ccc;"></div>
+                <button class="btn btn-primary" id="reveal-spy-btn">🔍 Показать шпиона</button>
+                <button class="btn btn-primary" id="restart-from-start">🔄 Играть ещё раз</button>
+                <button class="btn btn-secondary" id="back-to-menu-5">← В меню</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ИГРА КРОКОДИЛ -->
+    <div id="crocodile-game" class="game-container crocodile-container hidden">
+        <h2 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🐊 КРОКОДИЛ</h2>
+        <div class="step-title" style="color: white; text-shadow: 2px 2px 0 #000; font-size: 1rem;">Покажи слово жестами!</div>
+        
+        <div id="crocodile-content">
+            <div class="crocodile-word" id="crocodile-word-display">НАЖМИ НАЧАТЬ</div>
+            <button class="btn btn-primary" id="next-crocodile-word">🎲 Следующее слово</button>
+            <button class="btn btn-secondary" id="show-rules-crocodile">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-crocodile">← В меню</button>
+        </div>
+        
+        <div id="rules-crocodile" class="hidden">
+            <div class="rules-container" style="background: rgba(255,255,255,0.2);">
+                <div class="rules-title" style="color: white;">📖 Правила игры "КРОКОДИЛ"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>Один игрок смотрит на слово и показывает его жестами.</li>
+                    <li>Нельзя произносить звуки, шевелить губами или показывать буквы.</li>
+                    <li>Остальные игроки должны угадать слово.</li>
+                    <li>Тот, кто угадал, становится следующим показывающим.</li>
+                    <li>Можно использовать категории: животные, действия, предметы, профессии.</li>
+                    <li>Играйте на время - кто быстрее угадает, тот и победил!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-crocodile">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА БОМБА -->
+    <div id="bomb-game" class="game-container bomb-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">💣 БОМБА</h1>
+        <p class="subtitle" style="color: #ccc;">Горячая карточка со словами</p>
+        
+        <div id="bomb-content">
+            <div class="bomb-timer" id="bomb-timer">10</div>
+            <div class="bomb-word" id="bomb-word-display">НАЖМИ СТАРТ</div>
+            <div style="display: flex; gap: 10px; justify-content: center; margin: 10px 0;">
+                <button class="btn btn-warning" id="set-bomb-5s">5 сек</button>
+                <button class="btn btn-warning" id="set-bomb-10s">10 сек</button>
+                <button class="btn btn-warning" id="set-bomb-15s">15 сек</button>
+                <button class="btn btn-warning" id="set-bomb-30s">30 сек</button>
+            </div>
+            <button class="btn btn-primary" id="start-bomb-game">🎯 Старт</button>
+            <button class="btn btn-secondary" id="show-rules-bomb">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-bomb">← В меню</button>
+        </div>
+        
+        <div id="rules-bomb" class="hidden">
+            <div class="rules-container" style="background: rgba(0,0,0,0.5);">
+                <div class="rules-title" style="color: #ffd700;">📖 Правила игры "БОМБА"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>Игроки садятся в круг и передают телефон друг другу.</li>
+                    <li>На экране появляется слово, которое нужно назвать.</li>
+                    <li>Игрок должен быстро сказать ассоциацию и передать телефон.</li>
+                    <li>Таймер тикает всё быстрее!</li>
+                    <li>У кого взорвётся бомба - выбывает.</li>
+                    <li>Последний оставшийся игрок побеждает!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-bomb">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА 20 ВОПРОСОВ -->
+    <div id="questions-game" class="game-container questions-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">❓ 20 ВОПРОСОВ</h1>
+        <p class="subtitle" style="color: #ccc;">Угадай слово за 20 вопросов</p>
+        
+        <div id="questions-content">
+            <div class="questions-card" id="questions-word-display">ЗАГАДАЙ СЛОВО</div>
+            <div class="questions-counter" id="questions-counter">Вопросов: 0/20</div>
+            <button class="btn btn-primary" id="start-questions-game">🎯 Начать</button>
+            <button class="btn btn-danger" id="reset-questions-game">🔄 Сбросить</button>
+            <button class="btn btn-secondary" id="show-rules-questions">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-questions">← В меню</button>
+        </div>
+        
+        <div id="rules-questions" class="hidden">
+            <div class="rules-container" style="background: rgba(0,0,0,0.5);">
+                <div class="rules-title" style="color: #ffd700;">📖 Правила игры "20 ВОПРОСОВ"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>Один игрок загадывает слово (предмет, животное, человек).</li>
+                    <li>Остальные игроки задают до 20 вопросов "да/нет".</li>
+                    <li>Отвечать можно только "да" или "нет".</li>
+                    <li>Телефон ведёт подсчёт вопросов.</li>
+                    <li>Если угадали за 20 вопросов - игроки победили!</li>
+                    <li>Если нет - побеждает загадавший.</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-questions">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА ПРАВДА ИЛИ ДЕЙСТВИЕ -->
+    <div id="truth-game" class="game-container truth-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🎭 ПРАВДА ИЛИ ДЕЙСТВИЕ</h1>
+        <p class="subtitle" style="color: #ccc;">Нажми и узнай своё задание</p>
+        
+        <div id="truth-content">
+            <div class="truth-card" id="truth-card-display">НАЖМИ УЗНАТЬ</div>
+            <button class="btn btn-primary" id="generate-truth">🎲 Узнать задание</button>
+            <button class="btn btn-primary" id="generate-action" style="display: none;">🎯 Ещё раз</button>
+            <button class="btn btn-secondary" id="show-rules-truth">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-truth">← В меню</button>
+        </div>
+        
+        <div id="rules-truth" class="hidden">
+            <div class="rules-container" style="background: rgba(0,0,0,0.5);">
+                <div class="rules-title" style="color: #ffd700;">📖 Правила игры "ПРАВДА ИЛИ ДЕЙСТВИЕ"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>Игрок нажимает кнопку "Узнать задание".</li>
+                    <li>Система случайно выбирает: Правда или Действие.</li>
+                    <li>Если Правда - игрок должен честно ответить на вопрос.</li>
+                    <li>Если Действие - игрок должен выполнить задание.</li>
+                    <li>Передайте телефон следующему игроку.</li>
+                    <li>Играйте по кругу, пока не надоест!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-truth">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА КУБИК -->
+    <div id="dice-game" class="game-container dice-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🎲 КУБИК</h1>
+        <p class="subtitle" style="color: #ccc;">Бросок игрального кубика</p>
+        
+        <div id="dice-content">
+            <div class="dice-display" id="dice-display">🎲</div>
+            <button class="btn btn-primary" id="roll-dice">🎲 Бросить</button>
+            <button class="btn btn-secondary" id="back-to-menu-dice">← В меню</button>
+        </div>
+    </div>
+
+    <!-- ИГРА УГАДАЙ ЧИСЛО -->
+    <div id="guess-game" class="game-container guess-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🎯 УГАДАЙ ЧИСЛО</h1>
+        <p class="subtitle" style="color: #ccc;">Компьютер угадает твоё число</p>
+        
+        <div id="guess-content">
+            <div class="guess-card" id="guess-card-display">Загадай число от 1 до 100</div>
+            <div id="guess-buttons" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-success" id="guess-higher">Больше</button>
+                <button class="btn btn-success" id="guess-correct">Верно!</button>
+                <button class="btn btn-danger" id="guess-lower">Меньше</button>
+            </div>
+            <button class="btn btn-secondary" id="reset-guess-game">🔄 Заново</button>
+            <button class="btn btn-secondary" id="back-to-menu-guess">← В меню</button>
+        </div>
+    </div>
+
+    <!-- ИГРА ТАЙНЫЙ ЛИДЕР -->
+    <div id="leader-game" class="game-container hidden">
+        <h1 class="game-title">👁️ ТАЙНЫЙ ЛИДЕР</h1>
+        <p class="subtitle">Найди того, кто задаёт движения</p>
+        
+        <div id="leader-content">
+            <div class="leader-card" id="leader-role-display">НАЖМИ НАЧАТЬ</div>
+            <button class="btn btn-primary" id="start-leader-game">🎯 Раздать роли</button>
+            <button class="btn btn-secondary" id="show-rules-leader">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-leader">← В меню</button>
+        </div>
+        
+        <div id="rules-leader" class="hidden">
+            <div class="rules-container">
+                <div class="rules-title">📖 Правила игры "ТАЙНЫЙ ЛИДЕР"</div>
+                <ol class="rules-text">
+                    <li>Игроки садятся в круг, чтобы видеть друг друга.</li>
+                    <li>Один игрок - Лидер, второй - Подражатель, третий - Шпион.</li>
+                    <li>Лидер начинает делать повторяющиеся движения (хлопки, щелчки, жесты).</li>
+                    <li>Подражатель копирует движения Лидера с задержкой 1-2 секунды.</li>
+                    <li>Шпион не знает, кто Лидер. Его задача - вычислить его за 1 минуту.</li>
+                    <li>Лидер должен менять движения примерно каждые 10-15 секунд.</li>
+                    <li>Если Шпион угадал - он победил. Если нет - победили Лидер и Подражатель.</li>
+                    <li>Меняйтесь ролями каждый раунд!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-leader">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА АССОЦИАЦИИ -->
+    <div id="word-association-game" class="game-container hidden" style="background: linear-gradient(135deg, #e65100 0%, #ff6f00 50%, #ff8f00 100%);">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🔗 АССОЦИАЦИИ</h1>
+        <p class="subtitle" style="color: #ccc;">Назови первую ассоциацию к слову</p>
+        
+        <div id="word-association-content">
+            <div id="association-word-display" style="background: white; color: #333; font-size: 2rem; font-weight: bold; padding: 30px 20px; border-radius: 20px; margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">НАЖМИ НАЧАТЬ</div>
+            <button class="btn btn-primary" id="next-association-word">🎲 Следующее слово</button>
+            <button class="btn btn-secondary" id="show-rules-association">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-association">← В меню</button>
+        </div>
+        
+        <div id="rules-association" class="hidden">
+            <div class="rules-container" style="background: rgba(0,0,0,0.5);">
+                <div class="rules-title" style="color: #ffd700;">📖 Правила игры "АССОЦИАЦИИ"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>Игроки садятся в круг.</li>
+                    <li>На экране появляется слово.</li>
+                    <li>Каждый игрок должен быстро назвать первую ассоциацию.</li>
+                    <li>Нельзя повторяться!</li>
+                    <li>Кто задумался больше 3 секунд - выбывает.</li>
+                    <li>Последний оставшийся игрок побеждает!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-association">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА СМЕШНАЯ ИСТОРИЯ -->
+    <div id="story-game" class="game-container story-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">📖 СМЕШНАЯ ИСТОРИЯ</h1>
+        <p class="subtitle" style="color: #ccc;">Заполни пропуски и получи историю</p>
+        
+        <div id="story-content">
+            <div class="story-question" id="story-question-display">Назови любое животное</div>
+            <input type="text" id="story-answer-input" class="story-input" placeholder="Введи ответ...">
+            <button class="btn btn-primary" id="story-next-btn">➡️ Дальше</button>
+            <div class="story-result hidden" id="story-story-display"></div>
+            <button class="btn btn-secondary" id="story-start-btn">🔄 Заново</button>
+            <button class="btn btn-secondary" id="show-rules-story">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-story">← В меню</button>
+        </div>
+        
+        <div id="rules-story" class="hidden">
+            <div class="rules-container" style="background: rgba(0,0,0,0.5);">
+                <div class="rules-title" style="color: #ffd700;">📖 Правила игры "СМЕШНАЯ ИСТОРИЯ"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>Отвечай на вопросы, вводя любые слова.</li>
+                    <li>Можно играть одному или с друзьями.</li>
+                    <li>Если играешь с друзьями - спрашивай слова у них по очереди.</li>
+                    <li>В конце получится смешная история с твоими словами!</li>
+                    <li>Чем смешнее слова, тем веселее история!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-story">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА ФАКТ ИЛИ ФЕЙК -->
+    <div id="fact-game" class="game-container fact-container hidden">
+        <h1 class="game-title" style="color: white; text-shadow: 2px 2px 0 #000;">🤔 ФАКТ ИЛИ ФЕЙК</h1>
+        <p class="subtitle" style="color: #ccc;">Угадай, правда это или нет</p>
+        
+        <div id="fact-content">
+            <div class="fact-card" id="fact-fact-display">НАЖМИ НАЧАТЬ</div>
+            <div class="fact-answer hidden" id="fact-answer-display"></div>
+            <button class="btn btn-success" id="fact-true-btn">✅ Правда</button>
+            <button class="btn btn-danger" id="fact-false-btn">❌ Фейк</button>
+            <button class="btn btn-primary hidden" id="fact-next-btn">🎲 Следующий факт</button>
+            <button class="btn btn-secondary" id="show-rules-fact">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-fact">← В меню</button>
+        </div>
+        
+        <div id="rules-fact" class="hidden">
+            <div class="rules-container" style="background: rgba(0,0,0,0.5);">
+                <div class="rules-title" style="color: #ffd700;">📖 Правила игры "ФАКТ ИЛИ ФЕЙК"</div>
+                <ol class="rules-text" style="color: white;">
+                    <li>На экране появляется утверждение.</li>
+                    <li>Угадай: это правда или выдумка?</li>
+                    <li>Нажми соответствующую кнопку.</li>
+                    <li>Узнай правильный ответ!</li>
+                    <li>Можно играть одному или с друзьями.</li>
+                    <li>Кто больше угадает - тот и победил!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-fact">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ПОДКЛЮЧЕНИЕ ФАЙЛОВ СО СЛОВАМИ ИЗ ПАПКИ words/ -->
+    <script src="words/spy-words.js"></script>
+    <script src="words/crocodile-words.js"></script>
+    <script src="words/bomb-words.js"></script>
+    <script src="words/association-words.js"></script>
+    <script src="words/truth-dare.js"></script>
+    <script src="words/story-templates.js"></script>
+    <script src="words/facts.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
