@@ -67,6 +67,7 @@ const guessHigherBtn = document.getElementById('guess-higher');
 const guessCorrectBtn = document.getElementById('guess-correct');
 const guessLowerBtn = document.getElementById('guess-lower');
 const resetGuessBtn = document.getElementById('reset-guess-game');
+const guessStartBtn = document.getElementById('guess-start-btn');
 
 // Элементы игры "Тайный лидер"
 const leaderRoleDisplay = document.getElementById('leader-role-display');
@@ -122,6 +123,7 @@ let guessMin = 1;
 let guessMax = 100;
 let guessCurrent = 50;
 let guessTries = 0;
+let guessGameStarted = false;
 
 // ================== СОСТОЯНИЕ АССОЦИАЦИЙ ==================
 let recentlyUsedAssociationWords = [];
@@ -761,11 +763,32 @@ function resetGuessGame() {
     guessMax = 100;
     guessCurrent = 50;
     guessTries = 0;
-    guessCardDisplay.textContent = 'Загадай число от 1 до 100';
+    guessGameStarted = false;
+    guessCardDisplay.textContent = 'Загадай число от 1 до 100 и нажми "Начать"';
+    
+    // Показываем кнопку "Начать" вместо кнопок ответа
+    document.getElementById('guess-buttons').classList.add('hidden');
+    if (guessStartBtn) {
+        guessStartBtn.classList.remove('hidden');
+    }
+}
+
+function startGuessGame() {
+    playSound('click');
+    
+    guessGameStarted = true;
+    guessCardDisplay.textContent = `Я думаю, это число ${guessCurrent}?`;
+    
+    // Показываем кнопки ответа, скрываем кнопку "Начать"
     document.getElementById('guess-buttons').classList.remove('hidden');
+    if (guessStartBtn) {
+        guessStartBtn.classList.add('hidden');
+    }
 }
 
 function makeGuess(response) {
+    if (!guessGameStarted) return;
+    
     playSound('click');
     guessTries++;
     
@@ -1296,10 +1319,10 @@ function resetBottlesGame() {
     const secondRowElement = document.getElementById('bottles-second-row');
     
     if (firstRowElement) {
-        firstRowElement.innerHTML = '<div style="color: #aaa;">Выбери режим и нажми "Начать"</div>';
+        firstRowElement.innerHTML = '<div style="color: #aaa; padding: 20px;">Выбери режим и нажми "Начать"</div>';
     }
     if (secondRowElement) {
-        secondRowElement.innerHTML = '';
+        secondRowElement.innerHTML = '<div style="color: #aaa; padding: 20px;"></div>';
     }
     
     const resultElement = document.getElementById('bottles-result');
@@ -1312,7 +1335,15 @@ function resetBottlesGame() {
         timerElement.textContent = '⏱️ 0:00';
     }
     
-    updateBottlesStats();
+    const attemptsElement = document.getElementById('bottles-attempts');
+    if (attemptsElement) {
+        attemptsElement.textContent = 'Попытки: 0/0';
+    }
+    
+    const matchedElement = document.getElementById('bottles-matched');
+    if (matchedElement) {
+        matchedElement.textContent = 'Найдено пар: 0/0';
+    }
 }
 
 // ================== ОБРАБОТЧИКИ МЕНЮ ==================
@@ -1410,6 +1441,9 @@ generateActionBtn.addEventListener('click', generateTruthOrAction);
 rollDiceBtn.addEventListener('click', rollDice);
 
 // Обработчики Угадай Число
+if (guessStartBtn) {
+    guessStartBtn.addEventListener('click', startGuessGame);
+}
 guessHigherBtn.addEventListener('click', () => makeGuess('higher'));
 guessCorrectBtn.addEventListener('click', () => makeGuess('correct'));
 guessLowerBtn.addEventListener('click', () => makeGuess('lower'));
@@ -1447,4 +1481,5 @@ document.getElementById('mode-emoji').addEventListener('click', () => setBottles
 
 // ================== ЗАПУСК ==================
 initPlayerButtons();
+resetBottlesGame();
 showMainMenu();
