@@ -11,7 +11,6 @@ const truthGame = document.getElementById('truth-game');
 const diceGame = document.getElementById('dice-game');
 const guessGame = document.getElementById('guess-game');
 const leaderGame = document.getElementById('leader-game');
-const ultimatumGame = document.getElementById('ultimatum-game');
 const wordAssociationGame = document.getElementById('word-association-game');
 const storyGame = document.getElementById('story-game');
 const factGame = document.getElementById('fact-game');
@@ -72,11 +71,6 @@ const resetGuessBtn = document.getElementById('reset-guess-game');
 const leaderRoleDisplay = document.getElementById('leader-role-display');
 const startLeaderGameBtn = document.getElementById('start-leader-game');
 
-// Элементы игры "Ультиматум"
-const ultimatumSituation = document.getElementById('ultimatum-situation');
-const ultimatumRoles = document.getElementById('ultimatum-roles');
-const startUltimatumGameBtn = document.getElementById('start-ultimatum-game');
-
 // Элементы игры "Ассоциации"
 const associationWordDisplay = document.getElementById('association-word-display');
 const nextAssociationWordBtn = document.getElementById('next-association-word');
@@ -106,11 +100,6 @@ const MAX_RECENT_PAIRS = 100;
 // ================== СОСТОЯНИЕ КРОКОДИЛА ==================
 let recentlyUsedCrocodileWords = [];
 const MAX_RECENT_CROCODILE_WORDS = 100;
-
-// ================== СОСТОЯНИЕ УЛЬТИМАТУМА ==================
-let currentSituationIndex = -1;
-let recentlyUsedSituations = [];
-const MAX_RECENT_SITUATIONS = 10;
 
 // ================== СОСТОЯНИЕ БОМБЫ ==================
 let bombTimer = null;
@@ -320,11 +309,6 @@ function showLeaderGame() {
     showLeaderContent();
 }
 
-function showUltimatumGame() {
-    showGame(ultimatumGame);
-    showUltimatumContent();
-}
-
 function showWordAssociationGame() {
     showGame(wordAssociationGame);
     showWordAssociationContent();
@@ -354,7 +338,6 @@ function toggleRules(type) {
         'questions': ['questions-content', 'rules-questions'],
         'truth': ['truth-content', 'rules-truth'],
         'leader': ['leader-content', 'rules-leader'],
-        'ultimatum': ['ultimatum-content', 'rules-ultimatum'],
         'association': ['word-association-content', 'rules-association'],
         'story': ['story-content', 'rules-story'],
         'fact': ['fact-content', 'rules-fact']
@@ -379,7 +362,6 @@ function showContent(type) {
         'questions': ['questions-content', 'rules-questions'],
         'truth': ['truth-content', 'rules-truth'],
         'leader': ['leader-content', 'rules-leader'],
-        'ultimatum': ['ultimatum-content', 'rules-ultimatum'],
         'association': ['word-association-content', 'rules-association'],
         'story': ['story-content', 'rules-story'],
         'fact': ['fact-content', 'rules-fact']
@@ -826,55 +808,6 @@ function shuffleArray(array) {
     return newArray;
 }
 
-// ================== ФУНКЦИИ УЛЬТИМАТУМА ==================
-function getRandomSituationIndex() {
-    let availableIndices = [];
-    for (let i = 0; i < ULTIMATUM_SITUATIONS.length; i++) {
-        if (!recentlyUsedSituations.includes(i)) {
-            availableIndices.push(i);
-        }
-    }
-    
-    if (availableIndices.length === 0) {
-        availableIndices = ULTIMATUM_SITUATIONS.map((_, index) => index);
-    }
-    
-    const randomIndex = Math.floor(Math.random() * availableIndices.length);
-    return availableIndices[randomIndex];
-}
-
-function startUltimatumGame() {
-    playSound('click');
-    
-    const situationIndex = getRandomSituationIndex();
-    currentSituationIndex = situationIndex;
-    
-    recentlyUsedSituations.push(situationIndex);
-    while (recentlyUsedSituations.length > MAX_RECENT_SITUATIONS) {
-        recentlyUsedSituations.shift();
-    }
-    
-    const shuffledRoles = shuffleArray(ULTIMATUM_ROLES);
-    
-    ultimatumSituation.textContent = ULTIMATUM_SITUATIONS[situationIndex];
-    
-    ultimatumRoles.innerHTML = `
-        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <div class="role-badge">${shuffledRoles[0].emoji} Игрок 1: ${shuffledRoles[0].role}</div>
-            <div class="role-badge">${shuffledRoles[1].emoji} Игрок 2: ${shuffledRoles[1].role}</div>
-            <div class="role-badge">${shuffledRoles[2].emoji} Игрок 3: ${shuffledRoles[2].role}</div>
-        </div>
-        <div style="margin-top: 15px; color: #a0a0b0; font-size: 0.9rem;">
-            Обсуждайте 60 секунд, затем голосуйте!
-        </div>
-    `;
-}
-
-function showUltimatumContent() {
-    document.getElementById('ultimatum-content').classList.remove('hidden');
-    document.getElementById('rules-ultimatum').classList.add('hidden');
-}
-
 // ================== ФУНКЦИИ АССОЦИАЦИЙ ==================
 function getRandomAssociationWord() {
     let availableWords = [];
@@ -971,45 +904,18 @@ function showStoryResult() {
     // Заполняем шаблон ответами
     let story = STORY_TEMPLATES[storyIndex];
     
-    // Склоняем животное (добавляем окончания)
-    const animal = storyAnswers['животное'] || 'животное';
-    const animal2 = storyAnswers['животное2'] || 'животное';
-    const name = storyAnswers['имя'] || 'Алекс';
-    const name2 = storyAnswers['имя2'] || 'Саша';
-    
-    // Простая склонения для женского рода (если имя заканчивается на "а" или "я")
-    const isFeminine1 = name.endsWith('а') || name.endsWith('я');
-    const isFeminine2 = name2.endsWith('а') || name2.endsWith('я');
-    
-    // Заменяем окончания для действий
-    let action = storyAnswers['действие'] || 'бегать';
-    let action2 = storyAnswers['действие2'] || 'прыгать';
-    let action3 = storyAnswers['действие3'] || 'танцевать';
-    
-    // Формируем историю
-    story = story.replace(/{животное}/g, animal);
-    story = story.replace(/{животное2}/g, animal2);
-    story = story.replace(/{имя}/g, name);
-    story = story.replace(/{имя2}/g, name2);
+    // Заменяем все плейсхолдеры
+    story = story.replace(/{животное}/g, storyAnswers['животное'] || 'животное');
+    story = story.replace(/{животное2}/g, storyAnswers['животное2'] || 'животное');
+    story = story.replace(/{имя}/g, storyAnswers['имя'] || 'Алекс');
+    story = story.replace(/{имя2}/g, storyAnswers['имя2'] || 'Саша');
     story = story.replace(/{место}/g, storyAnswers['место'] || 'парк');
     story = story.replace(/{еда}/g, storyAnswers['еда'] || 'пицца');
     story = story.replace(/{предмет}/g, storyAnswers['предмет'] || 'мяч');
     story = story.replace(/{предмет2}/g, storyAnswers['предмет2'] || 'зонт');
-    story = story.replace(/{действие}/g, action);
-    story = story.replace(/{действие2}/g, action2);
-    story = story.replace(/{действие3}/g, action3);
-    
-    // Исправляем склонения
-    story = story.replace(/он\(а\)/g, isFeminine1 ? 'она' : 'он');
-    story = story.replace(/его\(её\)/g, isFeminine1 ? 'её' : 'его');
-    story = story.replace(/ему\(ей\)/g, isFeminine1 ? 'ей' : 'ему');
-    story = story.replace(/\(ла\)/g, isFeminine1 ? 'ла' : 'л');
-    story = story.replace(/\(лась\)/g, isFeminine1 ? 'лась' : 'лся');
-    story = story.replace(/\(ась\)/g, isFeminine1 ? 'ась' : 'ся');
-    story = story.replace(/\(ла\)/g, isFeminine1 ? 'ла' : 'л');
-    story = story.replace(/\(лся\)/g, isFeminine1 ? 'лась' : 'лся');
-    story = story.replace(/\(ой\)/g, isFeminine1 ? 'ой' : 'ый');
-    story = story.replace(/\(ая\)/g, isFeminine1 ? 'ая' : 'ой');
+    story = story.replace(/{действие}/g, storyAnswers['действие'] || 'бегать');
+    story = story.replace(/{действие2}/g, storyAnswers['действие2'] || 'прыгать');
+    story = story.replace(/{действие3}/g, storyAnswers['действие3'] || 'танцевать');
     
     // Очищаем оставшиеся скобки
     story = story.replace(/\([^)]*\)/g, 'л');
@@ -1089,7 +995,6 @@ document.getElementById('truth-game-btn').addEventListener('click', showTruthGam
 document.getElementById('dice-game-btn').addEventListener('click', showDiceGame);
 document.getElementById('guess-game-btn').addEventListener('click', showGuessGame);
 document.getElementById('leader-game-btn').addEventListener('click', showLeaderGame);
-document.getElementById('ultimatum-game-btn').addEventListener('click', showUltimatumGame);
 document.getElementById('word-association-btn').addEventListener('click', showWordAssociationGame);
 document.getElementById('story-game-btn').addEventListener('click', showStoryGame);
 document.getElementById('fact-game-btn').addEventListener('click', showFactGame);
@@ -1107,8 +1012,7 @@ const backButtons = [
     'back-to-menu-4', 'back-to-menu-5', 'back-to-menu-crocodile',
     'back-to-menu-bomb', 'back-to-menu-questions', 'back-to-menu-truth',
     'back-to-menu-dice', 'back-to-menu-guess', 'back-to-menu-leader',
-    'back-to-menu-ultimatum', 'back-to-menu-association',
-    'back-to-menu-story', 'back-to-menu-fact'
+    'back-to-menu-association', 'back-to-menu-story', 'back-to-menu-fact'
 ];
 
 backButtons.forEach(id => {
@@ -1134,8 +1038,6 @@ document.getElementById('show-rules-truth').addEventListener('click', () => togg
 document.getElementById('back-from-rules-truth').addEventListener('click', () => showContent('truth'));
 document.getElementById('show-rules-leader').addEventListener('click', () => toggleRules('leader'));
 document.getElementById('back-from-rules-leader').addEventListener('click', () => showContent('leader'));
-document.getElementById('show-rules-ultimatum').addEventListener('click', () => toggleRules('ultimatum'));
-document.getElementById('back-from-rules-ultimatum').addEventListener('click', () => showContent('ultimatum'));
 document.getElementById('show-rules-association').addEventListener('click', () => toggleRules('association'));
 document.getElementById('back-from-rules-association').addEventListener('click', () => showContent('association'));
 document.getElementById('show-rules-story').addEventListener('click', () => toggleRules('story'));
@@ -1182,9 +1084,6 @@ resetGuessBtn.addEventListener('click', resetGuessGame);
 
 // Обработчики Тайного лидера
 startLeaderGameBtn.addEventListener('click', startLeaderGame);
-
-// Обработчики Ультиматума
-startUltimatumGameBtn.addEventListener('click', startUltimatumGame);
 
 // Обработчики Ассоциаций
 nextAssociationWordBtn.addEventListener('click', showNextAssociationWord);
