@@ -213,19 +213,80 @@ function showGame(gameElement) {
     gameElement.classList.remove('hidden');
 }
 
-function showSpyGame() { showGame(spyGame); resetSpyGame(); }
-function showCrocodileGame() { showGame(crocodileGame); showCrocodileContent(); showNextCrocodileWord(); }
-function showBombGame() { showGame(bombGame); showBombContent(); resetBombGame(); }
-function showQuestionsGame() { showGame(questionsGame); showQuestionsContent(); resetQuestionsGame(); }
-function showTruthGame() { showGame(truthGame); showTruthContent(); }
-function showDiceGame() { showGame(diceGame); showDiceContent(); }
-function showGuessGame() { showGame(guessGame); showGuessContent(); resetGuessGame(); }
-function showLeaderGame() { showGame(leaderGame); showLeaderContent(); }
-function showWordAssociationGame() { showGame(wordAssociationGame); showWordAssociationContent(); showNextAssociationWord(); }
-function showStoryGame() { showGame(storyGame); showStoryContent(); resetStoryGame(); }
-function showFactGame() { showGame(factGame); showFactContent(); showNextFact(); }
-function showBottlesGame() { showGame(bottlesGame); showBottlesContent(); resetBottlesGame(); }
-function showSwapGame() { showGame(swapGame); showSwapContent(); resetSwapGame(); }
+function showSpyGame() { 
+    showGame(spyGame); 
+    resetSpyGame(); 
+    console.log('Spy game opened');
+}
+function showCrocodileGame() { 
+    showGame(crocodileGame); 
+    showCrocodileContent(); 
+    showNextCrocodileWord(); 
+    console.log('Crocodile game opened');
+}
+function showBombGame() { 
+    showGame(bombGame); 
+    showBombContent(); 
+    resetBombGame(); 
+    console.log('Bomb game opened');
+}
+function showQuestionsGame() { 
+    showGame(questionsGame); 
+    showQuestionsContent(); 
+    resetQuestionsGame(); 
+    console.log('Questions game opened');
+}
+function showTruthGame() { 
+    showGame(truthGame); 
+    showTruthContent(); 
+    console.log('Truth game opened');
+}
+function showDiceGame() { 
+    showGame(diceGame); 
+    showDiceContent(); 
+    console.log('Dice game opened');
+}
+function showGuessGame() { 
+    showGame(guessGame); 
+    showGuessContent(); 
+    resetGuessGame(); 
+    console.log('Guess game opened');
+}
+function showLeaderGame() { 
+    showGame(leaderGame); 
+    showLeaderContent(); 
+    console.log('Leader game opened');
+}
+function showWordAssociationGame() { 
+    showGame(wordAssociationGame); 
+    showWordAssociationContent(); 
+    showNextAssociationWord(); 
+    console.log('Association game opened');
+}
+function showStoryGame() { 
+    showGame(storyGame); 
+    showStoryContent(); 
+    resetStoryGame(); 
+    console.log('Story game opened');
+}
+function showFactGame() { 
+    showGame(factGame); 
+    showFactContent(); 
+    showNextFact(); 
+    console.log('Fact game opened');
+}
+function showBottlesGame() { 
+    showGame(bottlesGame); 
+    showBottlesContent(); 
+    resetBottlesGame(); 
+    console.log('Bottles game opened');
+}
+function showSwapGame() { 
+    showGame(swapGame); 
+    showSwapContent(); 
+    resetSwapGame(); 
+    console.log('Swap game opened');
+}
 
 // ================== ФУНКЦИИ ПРАВИЛ ==================
 function toggleRules(type) {
@@ -284,7 +345,12 @@ function initPlayerButtons() {
         btn.className = 'btn';
         btn.style.minWidth = '50px';
         btn.style.padding = '12px';
-        btn.addEventListener('click', () => {
+        btn.style.pointerEvents = 'auto';
+        btn.style.cursor = 'pointer';
+        btn.style.zIndex = '1000';
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             playSound('click');
             totalPlayers = i;
             startRoleAssignment();
@@ -930,6 +996,9 @@ function createBottleElement(emoji, index, row) {
     const element = document.createElement('div');
     element.className = 'bottle-item';
     element.textContent = emoji;
+    element.style.pointerEvents = 'auto';
+    element.style.cursor = 'pointer';
+    element.style.zIndex = '1000';
     
     const isMatched = bottlesMatched.has(index);
     if (isMatched) element.classList.add('matched');
@@ -937,7 +1006,10 @@ function createBottleElement(emoji, index, row) {
     if (row === 'first' && bottlesSelectedFirst === index) element.classList.add('selected');
     if (row === 'second' && bottlesSelectedSecond === index) element.classList.add('selected');
     
-    element.addEventListener('click', () => {
+    element.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         if (!bottlesGameActive) return;
         if (isMatched) return;
         
@@ -1176,6 +1248,9 @@ function renderSwapGame() {
         element.style.width = itemSize;
         element.style.height = itemSize;
         element.style.fontSize = fontSize;
+        element.style.pointerEvents = 'auto';
+        element.style.cursor = 'pointer';
+        element.style.zIndex = '1000';
         
         const isCorrect = swapCurrentOrder[index] === swapCorrectOrder[index];
         if (isCorrect) element.classList.add('correct');
@@ -1183,7 +1258,10 @@ function renderSwapGame() {
         if (swapSelectedFirst === index) element.classList.add('selected');
         if (swapSelectedSecond === index) element.classList.add('selected');
         
-        element.addEventListener('click', () => {
+        element.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
             if (!swapGameActive) return;
             
             if (swapSelectedFirst === null) {
@@ -1282,34 +1360,66 @@ function resetSwapGame() {
     if (resultElement) resultElement.classList.add('hidden');
 }
 
-// ================== ИНИЦИАЛИЗАЦИЯ ==================
-document.addEventListener('DOMContentLoaded', () => {
-    // Инициализация звука при первом клике
-    document.addEventListener('click', () => {
-        initAudio();
-    }, { once: true });
+// ================== ФУНКЦИЯ ПРИВЯЗКИ СОБЫТИЙ ==================
+function attachEventListeners() {
+    console.log('Attaching event listeners...');
+    
+    // Принудительно делаем все интерактивные элементы кликабельными
+    document.querySelectorAll('.game-card, .btn, .bottle-item, .swap-item').forEach(el => {
+        el.style.pointerEvents = 'auto';
+        el.style.cursor = 'pointer';
+        el.style.position = 'relative';
+        el.style.zIndex = '1000';
+    });
+    
+    // Убеждаемся, что фоновые элементы не блокируют
+    document.querySelectorAll('.joystick-bg').forEach(el => {
+        el.style.pointerEvents = 'none';
+        el.style.zIndex = '0';
+    });
     
     // Обработчики меню
-    document.getElementById('spy-game-btn').addEventListener('click', showSpyGame);
-    document.getElementById('crocodile-game-btn').addEventListener('click', showCrocodileGame);
-    document.getElementById('bomb-game-btn').addEventListener('click', showBombGame);
-    document.getElementById('questions-game-btn').addEventListener('click', showQuestionsGame);
-    document.getElementById('truth-game-btn').addEventListener('click', showTruthGame);
-    document.getElementById('dice-game-btn').addEventListener('click', showDiceGame);
-    document.getElementById('guess-game-btn').addEventListener('click', showGuessGame);
-    document.getElementById('leader-game-btn').addEventListener('click', showLeaderGame);
-    document.getElementById('word-association-btn').addEventListener('click', showWordAssociationGame);
-    document.getElementById('story-game-btn').addEventListener('click', showStoryGame);
-    document.getElementById('fact-game-btn').addEventListener('click', showFactGame);
-    document.getElementById('bottles-game-btn').addEventListener('click', showBottlesGame);
-    document.getElementById('swap-game-btn').addEventListener('click', showSwapGame);
+    const menuButtons = {
+        'spy-game-btn': showSpyGame,
+        'crocodile-game-btn': showCrocodileGame,
+        'bomb-game-btn': showBombGame,
+        'questions-game-btn': showQuestionsGame,
+        'truth-game-btn': showTruthGame,
+        'dice-game-btn': showDiceGame,
+        'guess-game-btn': showGuessGame,
+        'leader-game-btn': showLeaderGame,
+        'word-association-btn': showWordAssociationGame,
+        'story-game-btn': showStoryGame,
+        'fact-game-btn': showFactGame,
+        'bottles-game-btn': showBottlesGame,
+        'swap-game-btn': showSwapGame
+    };
+    
+    Object.keys(menuButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Menu button clicked:', id);
+                playSound('click');
+                menuButtons[id]();
+            });
+        } else {
+            console.error('Element not found:', id);
+        }
+    });
     
     // Кнопка звука
-    document.getElementById('sound-toggle-btn').addEventListener('click', () => {
-        soundEnabled = !soundEnabled;
-        document.getElementById('sound-toggle-btn').textContent = soundEnabled ? '🔊 Звук: ВКЛ' : '🔇 Звук: ВЫКЛ';
-        playSound('click');
-    });
+    const soundBtn = document.getElementById('sound-toggle-btn');
+    if (soundBtn) {
+        soundBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            soundEnabled = !soundEnabled;
+            soundBtn.textContent = soundEnabled ? '🔊 Звук: ВКЛ' : '🔇 Звук: ВЫКЛ';
+            playSound('click');
+        });
+    }
     
     // Обработчики "Назад в меню"
     const backButtons = [
@@ -1324,7 +1434,9 @@ document.addEventListener('DOMContentLoaded', () => {
     backButtons.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('click', () => {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 playSound('click');
                 showMainMenu();
             });
@@ -1332,105 +1444,233 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Обработчики правил
-    document.getElementById('show-rules-spy').addEventListener('click', () => toggleRules('spy'));
-    document.getElementById('back-from-rules-spy').addEventListener('click', () => showContent('spy'));
-    document.getElementById('show-rules-crocodile').addEventListener('click', () => toggleRules('crocodile'));
-    document.getElementById('back-from-rules-crocodile').addEventListener('click', () => showContent('crocodile'));
-    document.getElementById('show-rules-bomb').addEventListener('click', () => toggleRules('bomb'));
-    document.getElementById('back-from-rules-bomb').addEventListener('click', () => showContent('bomb'));
-    document.getElementById('show-rules-questions').addEventListener('click', () => toggleRules('questions'));
-    document.getElementById('back-from-rules-questions').addEventListener('click', () => showContent('questions'));
-    document.getElementById('show-rules-truth').addEventListener('click', () => toggleRules('truth'));
-    document.getElementById('back-from-rules-truth').addEventListener('click', () => showContent('truth'));
-    document.getElementById('show-rules-leader').addEventListener('click', () => toggleRules('leader'));
-    document.getElementById('back-from-rules-leader').addEventListener('click', () => showContent('leader'));
-    document.getElementById('show-rules-association').addEventListener('click', () => toggleRules('association'));
-    document.getElementById('back-from-rules-association').addEventListener('click', () => showContent('association'));
-    document.getElementById('show-rules-story').addEventListener('click', () => toggleRules('story'));
-    document.getElementById('back-from-rules-story').addEventListener('click', () => showContent('story'));
-    document.getElementById('show-rules-fact').addEventListener('click', () => toggleRules('fact'));
-    document.getElementById('back-from-rules-fact').addEventListener('click', () => showContent('fact'));
-    document.getElementById('show-rules-bottles').addEventListener('click', () => toggleRules('bottles'));
-    document.getElementById('back-from-rules-bottles').addEventListener('click', () => showContent('bottles'));
-    document.getElementById('show-rules-swap').addEventListener('click', () => toggleRules('swap'));
-    document.getElementById('back-from-rules-swap').addEventListener('click', () => showContent('swap'));
+    const rulesButtons = {
+        'show-rules-spy': () => toggleRules('spy'),
+        'back-from-rules-spy': () => showContent('spy'),
+        'show-rules-crocodile': () => toggleRules('crocodile'),
+        'back-from-rules-crocodile': () => showContent('crocodile'),
+        'show-rules-bomb': () => toggleRules('bomb'),
+        'back-from-rules-bomb': () => showContent('bomb'),
+        'show-rules-questions': () => toggleRules('questions'),
+        'back-from-rules-questions': () => showContent('questions'),
+        'show-rules-truth': () => toggleRules('truth'),
+        'back-from-rules-truth': () => showContent('truth'),
+        'show-rules-leader': () => toggleRules('leader'),
+        'back-from-rules-leader': () => showContent('leader'),
+        'show-rules-association': () => toggleRules('association'),
+        'back-from-rules-association': () => showContent('association'),
+        'show-rules-story': () => toggleRules('story'),
+        'back-from-rules-story': () => showContent('story'),
+        'show-rules-fact': () => toggleRules('fact'),
+        'back-from-rules-fact': () => showContent('fact'),
+        'show-rules-bottles': () => toggleRules('bottles'),
+        'back-from-rules-bottles': () => showContent('bottles'),
+        'show-rules-swap': () => toggleRules('swap'),
+        'back-from-rules-swap': () => showContent('swap')
+    };
+    
+    Object.keys(rulesButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                playSound('click');
+                rulesButtons[id]();
+            });
+        }
+    });
     
     // Обработчики Банан Шпиона
-    hideWordBtn.addEventListener('click', handleHideWord);
-    showWordBtn.addEventListener('click', handleShowWord);
-    startGameBtn.addEventListener('click', showStartScreen);
-    revealSpyBtn.addEventListener('click', revealSpy);
-    restartFromRole.addEventListener('click', resetSpyGame);
-    restartFromHidden.addEventListener('click', resetSpyGame);
-    restartFromDone.addEventListener('click', resetSpyGame);
-    restartFromStart.addEventListener('click', resetSpyGame);
+    if (hideWordBtn) hideWordBtn.addEventListener('click', (e) => { e.preventDefault(); handleHideWord(); });
+    if (showWordBtn) showWordBtn.addEventListener('click', (e) => { e.preventDefault(); handleShowWord(); });
+    if (startGameBtn) startGameBtn.addEventListener('click', (e) => { e.preventDefault(); showStartScreen(); });
+    if (revealSpyBtn) revealSpyBtn.addEventListener('click', (e) => { e.preventDefault(); revealSpy(); });
+    if (restartFromRole) restartFromRole.addEventListener('click', (e) => { e.preventDefault(); resetSpyGame(); });
+    if (restartFromHidden) restartFromHidden.addEventListener('click', (e) => { e.preventDefault(); resetSpyGame(); });
+    if (restartFromDone) restartFromDone.addEventListener('click', (e) => { e.preventDefault(); resetSpyGame(); });
+    if (restartFromStart) restartFromStart.addEventListener('click', (e) => { e.preventDefault(); resetSpyGame(); });
     
     // Обработчики Крокодила
-    nextCrocodileWordBtn.addEventListener('click', showNextCrocodileWord);
+    if (nextCrocodileWordBtn) nextCrocodileWordBtn.addEventListener('click', (e) => { e.preventDefault(); showNextCrocodileWord(); });
     
     // Обработчики Бомбы
-    startBombBtn.addEventListener('click', startBombGame);
-    document.getElementById('set-bomb-5s').addEventListener('click', () => setBombDuration(5));
-    document.getElementById('set-bomb-10s').addEventListener('click', () => setBombDuration(10));
-    document.getElementById('set-bomb-15s').addEventListener('click', () => setBombDuration(15));
-    document.getElementById('set-bomb-30s').addEventListener('click', () => setBombDuration(30));
+    if (startBombBtn) startBombBtn.addEventListener('click', (e) => { e.preventDefault(); startBombGame(); });
+    
+    const bombTimeButtons = {
+        'set-bomb-5s': 5,
+        'set-bomb-10s': 10,
+        'set-bomb-15s': 15,
+        'set-bomb-30s': 30
+    };
+    
+    Object.keys(bombTimeButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                setBombDuration(bombTimeButtons[id]);
+            });
+        }
+    });
     
     // Обработчики 20 вопросов
-    startQuestionsBtn.addEventListener('click', startQuestionsGame);
-    resetQuestionsBtn.addEventListener('click', resetQuestionsGame);
+    if (startQuestionsBtn) startQuestionsBtn.addEventListener('click', (e) => { e.preventDefault(); startQuestionsGame(); });
+    if (resetQuestionsBtn) resetQuestionsBtn.addEventListener('click', (e) => { e.preventDefault(); resetQuestionsGame(); });
     
     // Обработчики Правда или Действие
-    generateTruthBtn.addEventListener('click', generateTruthOrAction);
+    if (generateTruthBtn) generateTruthBtn.addEventListener('click', (e) => { e.preventDefault(); generateTruthOrAction(); });
     
     // Обработчики Кубика
-    rollDiceBtn.addEventListener('click', rollDice);
+    if (rollDiceBtn) rollDiceBtn.addEventListener('click', (e) => { e.preventDefault(); rollDice(); });
     
     // Обработчики Угадай Число
-    if (guessStartBtn) guessStartBtn.addEventListener('click', startGuessGame);
-    guessHigherBtn.addEventListener('click', () => makeGuess('higher'));
-    guessCorrectBtn.addEventListener('click', () => makeGuess('correct'));
-    guessLowerBtn.addEventListener('click', () => makeGuess('lower'));
-    resetGuessBtn.addEventListener('click', resetGuessGame);
+    if (guessStartBtn) guessStartBtn.addEventListener('click', (e) => { e.preventDefault(); startGuessGame(); });
+    if (guessHigherBtn) guessHigherBtn.addEventListener('click', (e) => { e.preventDefault(); makeGuess('higher'); });
+    if (guessCorrectBtn) guessCorrectBtn.addEventListener('click', (e) => { e.preventDefault(); makeGuess('correct'); });
+    if (guessLowerBtn) guessLowerBtn.addEventListener('click', (e) => { e.preventDefault(); makeGuess('lower'); });
+    if (resetGuessBtn) resetGuessBtn.addEventListener('click', (e) => { e.preventDefault(); resetGuessGame(); });
     
     // Обработчики Тайного лидера
-    startLeaderGameBtn.addEventListener('click', startLeaderGame);
+    if (startLeaderGameBtn) startLeaderGameBtn.addEventListener('click', (e) => { e.preventDefault(); startLeaderGame(); });
     
     // Обработчики Ассоциаций
-    nextAssociationWordBtn.addEventListener('click', showNextAssociationWord);
+    if (nextAssociationWordBtn) nextAssociationWordBtn.addEventListener('click', (e) => { e.preventDefault(); showNextAssociationWord(); });
     
     // Обработчики Смешной истории
-    storyNextBtn.addEventListener('click', submitStoryAnswer);
-    storyAnswerInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') submitStoryAnswer();
-    });
-    storyStartBtn.addEventListener('click', resetStoryGame);
+    if (storyNextBtn) storyNextBtn.addEventListener('click', (e) => { e.preventDefault(); submitStoryAnswer(); });
+    if (storyAnswerInput) {
+        storyAnswerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitStoryAnswer();
+            }
+        });
+    }
+    if (storyStartBtn) storyStartBtn.addEventListener('click', (e) => { e.preventDefault(); resetStoryGame(); });
     
     // Обработчики Факт или Фейк
-    factTrueBtn.addEventListener('click', () => checkFact(true));
-    factFalseBtn.addEventListener('click', () => checkFact(false));
-    factNextBtn.addEventListener('click', showNextFact);
+    if (factTrueBtn) factTrueBtn.addEventListener('click', (e) => { e.preventDefault(); checkFact(true); });
+    if (factFalseBtn) factFalseBtn.addEventListener('click', (e) => { e.preventDefault(); checkFact(false); });
+    if (factNextBtn) factNextBtn.addEventListener('click', (e) => { e.preventDefault(); showNextFact(); });
     
     // Обработчики Бутылочек
-    document.getElementById('start-bottles-game').addEventListener('click', startBottlesGame);
-    document.getElementById('reset-bottles-game').addEventListener('click', resetBottlesGame);
-    document.getElementById('bottles-4').addEventListener('click', () => setBottlesCount(4));
-    document.getElementById('bottles-6').addEventListener('click', () => setBottlesCount(6));
-    document.getElementById('bottles-8').addEventListener('click', () => setBottlesCount(8));
-    document.getElementById('mode-bottles').addEventListener('click', () => setBottlesMode('bottles'));
-    document.getElementById('mode-caps').addEventListener('click', () => setBottlesMode('caps'));
-    document.getElementById('mode-emoji').addEventListener('click', () => setBottlesMode('emoji'));
+    const bottlesButtons = {
+        'start-bottles-game': startBottlesGame,
+        'reset-bottles-game': resetBottlesGame
+    };
+    
+    Object.keys(bottlesButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                bottlesButtons[id]();
+            });
+        }
+    });
+    
+    const bottlesCountButtons = {
+        'bottles-4': 4,
+        'bottles-6': 6,
+        'bottles-8': 8
+    };
+    
+    Object.keys(bottlesCountButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                setBottlesCount(bottlesCountButtons[id]);
+            });
+        }
+    });
+    
+    const bottlesModeButtons = {
+        'mode-bottles': 'bottles',
+        'mode-caps': 'caps',
+        'mode-emoji': 'emoji'
+    };
+    
+    Object.keys(bottlesModeButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                setBottlesMode(bottlesModeButtons[id]);
+            });
+        }
+    });
     
     // Обработчики Обмена
-    document.getElementById('start-swap-game').addEventListener('click', startSwapGame);
-    document.getElementById('reset-swap-game').addEventListener('click', resetSwapGame);
-    document.getElementById('swap-4').addEventListener('click', () => setSwapCount(4));
-    document.getElementById('swap-6').addEventListener('click', () => setSwapCount(6));
-    document.getElementById('swap-mode-bottles').addEventListener('click', () => setSwapMode('bottles'));
-    document.getElementById('swap-mode-emoji').addEventListener('click', () => setSwapMode('emoji'));
+    const swapButtons = {
+        'start-swap-game': startSwapGame,
+        'reset-swap-game': resetSwapGame
+    };
+    
+    Object.keys(swapButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                swapButtons[id]();
+            });
+        }
+    });
+    
+    const swapCountButtons = {
+        'swap-4': 4,
+        'swap-6': 6
+    };
+    
+    Object.keys(swapCountButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                setSwapCount(swapCountButtons[id]);
+            });
+        }
+    });
+    
+    const swapModeButtons = {
+        'swap-mode-bottles': 'bottles',
+        'swap-mode-emoji': 'emoji'
+    };
+    
+    Object.keys(swapModeButtons).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                setSwapMode(swapModeButtons[id]);
+            });
+        }
+    });
+    
+    console.log('All event listeners attached successfully!');
+}
+
+// ================== ИНИЦИАЛИЗАЦИЯ ==================
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing...');
+    
+    // Инициализация звука при первом клике
+    document.addEventListener('click', () => {
+        initAudio();
+    }, { once: true });
+    
+    // Привязываем все события
+    attachEventListeners();
     
     // Запуск
     initPlayerButtons();
     resetBottlesGame();
     resetSwapGame();
     showMainMenu();
+    
+    console.log('Initialization complete!');
 });
+
+// Для мобильных устройств - добавляем touchstart для предотвращения задержки
+document.addEventListener('touchstart', function() {}, {passive: true});
