@@ -95,11 +95,11 @@ let currentPlayerIndex = 0;
 let currentPair = null;
 let spyIndex = -1;
 let recentlyUsedPairs = [];
-const MAX_RECENT_PAIRS = 100;
+const MAX_RECENT_PAIRS = 50;
 
 // ================== СОСТОЯНИЕ КРОКОДИЛА ==================
 let recentlyUsedCrocodileWords = [];
-const MAX_RECENT_CROCODILE_WORDS = 100;
+const MAX_RECENT_CROCODILE_WORDS = 30;
 
 // ================== СОСТОЯНИЕ БОМБЫ ==================
 let bombTimer = null;
@@ -124,18 +124,18 @@ let guessTries = 0;
 
 // ================== СОСТОЯНИЕ АССОЦИАЦИЙ ==================
 let recentlyUsedAssociationWords = [];
-const MAX_RECENT_ASSOCIATION_WORDS = 50;
+const MAX_RECENT_ASSOCIATION_WORDS = 30;
 
 // ================== СОСТОЯНИЕ СМЕШНОЙ ИСТОРИИ ==================
 let storyAnswers = {};
 let storyStep = 0;
 let recentlyUsedStories = [];
-const MAX_RECENT_STORIES = 100;
+const MAX_RECENT_STORIES = 5;
 
 // ================== СОСТОЯНИЕ ФАКТ ИЛИ ФЕЙК ==================
 let currentFact = null;
 let recentlyUsedFacts = [];
-const MAX_RECENT_FACTS = 50;
+const MAX_RECENT_FACTS = 30;
 
 // ================== СОСТОЯНИЕ ЗВУКА ==================
 let soundEnabled = true;
@@ -558,13 +558,11 @@ function startBombGame() {
     playSound('click');
     
     if (bombActive) {
-        // Пауза
         clearInterval(bombTimer);
         bombTimer = null;
         bombActive = false;
         startBombBtn.textContent = '▶️ Продолжить';
     } else {
-        // Старт или рестарт
         if (bombCountdown <= 0) {
             bombCountdown = bombDuration;
             bombTimerDisplay.textContent = bombCountdown;
@@ -575,7 +573,6 @@ function startBombGame() {
         bombActive = true;
         startBombBtn.textContent = '⏸️ Пауза';
         
-        // Показываем первое слово
         if (bombWordDisplay.textContent === 'НАЖМИ СТАРТ') {
             showNextBombWord();
         }
@@ -700,7 +697,6 @@ function getRandomAction() {
 function generateTruthOrAction() {
     playSound('flip');
     
-    // Случайный выбор: правда или действие (50/50)
     const isTruth = Math.random() < 0.5;
     
     if (isTruth) {
@@ -882,42 +878,44 @@ function submitStoryAnswer() {
 function showStoryResult() {
     playSound('win');
     
-    // Выбираем случайный шаблон истории
-    let availableStories = [];
-    for (let i = 0; i < STORY_TEMPLATES.length; i++) {
-        if (!recentlyUsedStories.includes(i)) {
-            availableStories.push(i);
-        }
-    }
+    const storyIndex = Math.floor(Math.random() * STORY_TEMPLATES.length);
     
-    if (availableStories.length === 0) {
-        availableStories = STORY_TEMPLATES.map((_, index) => index);
-    }
-    
-    const storyIndex = availableStories[Math.floor(Math.random() * availableStories.length)];
-    
-    recentlyUsedStories.push(storyIndex);
-    while (recentlyUsedStories.length > MAX_RECENT_STORIES) {
-        recentlyUsedStories.shift();
-    }
-    
-    // Заполняем шаблон ответами
     let story = STORY_TEMPLATES[storyIndex];
     
-    // Заменяем все плейсхолдеры
-    story = story.replace(/{животное}/g, storyAnswers['животное'] || 'животное');
-    story = story.replace(/{животное2}/g, storyAnswers['животное2'] || 'животное');
-    story = story.replace(/{имя}/g, storyAnswers['имя'] || 'Алекс');
-    story = story.replace(/{имя2}/g, storyAnswers['имя2'] || 'Саша');
+    const animal = storyAnswers['животное'] || 'животное';
+    const animal2 = storyAnswers['животное2'] || 'животное';
+    const name = storyAnswers['имя'] || 'Алекс';
+    const name2 = storyAnswers['имя2'] || 'Саша';
+    
+    const isFeminine1 = name.endsWith('а') || name.endsWith('я');
+    const isFeminine2 = name2.endsWith('а') || name2.endsWith('я');
+    
+    let action = storyAnswers['действие'] || 'бегать';
+    let action2 = storyAnswers['действие2'] || 'прыгать';
+    let action3 = storyAnswers['действие3'] || 'танцевать';
+    
+    story = story.replace(/{животное}/g, animal);
+    story = story.replace(/{животное2}/g, animal2);
+    story = story.replace(/{имя}/g, name);
+    story = story.replace(/{имя2}/g, name2);
     story = story.replace(/{место}/g, storyAnswers['место'] || 'парк');
     story = story.replace(/{еда}/g, storyAnswers['еда'] || 'пицца');
     story = story.replace(/{предмет}/g, storyAnswers['предмет'] || 'мяч');
     story = story.replace(/{предмет2}/g, storyAnswers['предмет2'] || 'зонт');
-    story = story.replace(/{действие}/g, storyAnswers['действие'] || 'бегать');
-    story = story.replace(/{действие2}/g, storyAnswers['действие2'] || 'прыгать');
-    story = story.replace(/{действие3}/g, storyAnswers['действие3'] || 'танцевать');
+    story = story.replace(/{действие}/g, action);
+    story = story.replace(/{действие2}/g, action2);
+    story = story.replace(/{действие3}/g, action3);
     
-    // Очищаем оставшиеся скобки
+    story = story.replace(/он\(а\)/g, isFeminine1 ? 'она' : 'он');
+    story = story.replace(/его\(её\)/g, isFeminine1 ? 'её' : 'его');
+    story = story.replace(/ему\(ей\)/g, isFeminine1 ? 'ей' : 'ему');
+    story = story.replace(/\(ла\)/g, isFeminine1 ? 'ла' : 'л');
+    story = story.replace(/\(лась\)/g, isFeminine1 ? 'лась' : 'лся');
+    story = story.replace(/\(ась\)/g, isFeminine1 ? 'ась' : 'ся');
+    story = story.replace(/\(лся\)/g, isFeminine1 ? 'лась' : 'лся');
+    story = story.replace(/\(ой\)/g, isFeminine1 ? 'ой' : 'ый');
+    story = story.replace(/\(ая\)/g, isFeminine1 ? 'ая' : 'ой');
+    
     story = story.replace(/\([^)]*\)/g, 'л');
     
     storyStoryDisplay.textContent = story;
