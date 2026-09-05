@@ -14,6 +14,7 @@ const leaderGame = document.getElementById('leader-game');
 const wordAssociationGame = document.getElementById('word-association-game');
 const storyGame = document.getElementById('story-game');
 const factGame = document.getElementById('fact-game');
+const bottlesGame = document.getElementById('bottles-game');
 
 // Элементы игры "Банан Шпион"
 const screenSelect = document.getElementById('screen-select');
@@ -136,6 +137,20 @@ const MAX_RECENT_STORIES = 5;
 let currentFact = null;
 let recentlyUsedFacts = [];
 const MAX_RECENT_FACTS = 30;
+
+// ================== СОСТОЯНИЕ ИГРЫ БУТЫЛОЧКИ ==================
+let bottlesCount = 4;
+let bottlesFirstRow = [];
+let bottlesSecondRow = [];
+let bottlesSelectedFirst = null;
+let bottlesSelectedSecond = null;
+let bottlesMatched = new Set();
+let bottlesAttempts = 0;
+let bottlesMaxAttempts = 0;
+let bottlesGameActive = false;
+let bottlesTimer = null;
+let bottlesSeconds = 0;
+let bottlesMode = 'bottles';
 
 // ================== СОСТОЯНИЕ ЗВУКА ==================
 let soundEnabled = true;
@@ -327,6 +342,12 @@ function showFactGame() {
     showNextFact();
 }
 
+function showBottlesGame() {
+    showGame(bottlesGame);
+    showBottlesContent();
+    resetBottlesGame();
+}
+
 // ================== ФУНКЦИИ ПРАВИЛ ==================
 function toggleRules(type) {
     let contentId, rulesId;
@@ -340,7 +361,8 @@ function toggleRules(type) {
         'leader': ['leader-content', 'rules-leader'],
         'association': ['word-association-content', 'rules-association'],
         'story': ['story-content', 'rules-story'],
-        'fact': ['fact-content', 'rules-fact']
+        'fact': ['fact-content', 'rules-fact'],
+        'bottles': ['bottles-content', 'rules-bottles']
     };
     
     if (rulesMap[type]) {
@@ -364,7 +386,8 @@ function showContent(type) {
         'leader': ['leader-content', 'rules-leader'],
         'association': ['word-association-content', 'rules-association'],
         'story': ['story-content', 'rules-story'],
-        'fact': ['fact-content', 'rules-fact']
+        'fact': ['fact-content', 'rules-fact'],
+        'bottles': ['bottles-content', 'rules-bottles']
     };
     
     if (rulesMap[type]) {
@@ -984,6 +1007,314 @@ function checkFact(answer) {
     factNextBtn.classList.remove('hidden');
 }
 
+// ================== ФУНКЦИИ ИГРЫ БУТЫЛОЧКИ ==================
+function showBottlesContent() {
+    document.getElementById('bottles-content').classList.remove('hidden');
+    document.getElementById('rules-bottles').classList.add('hidden');
+}
+
+function getBottlesEmojis() {
+    const emojiSets = {
+        bottles: ['🍾', '🧴', '🧪', '⚗️', '🧫', '🫗', '🥤', '🍶'],
+        caps: ['🔴', '🔵', '🟢', '🟡', '🟣', '🟠', '⚫', '⚪'],
+        emoji: ['😀', '😎', '🤠', '👻', '🤖', '👽', '🎃', '😺']
+    };
+    return emojiSets[bottlesMode] || emojiSets.bottles;
+}
+
+function startBottlesGame() {
+    playSound('click');
+    
+    const emojis = getBottlesEmojis();
+    const selectedEmojis = emojis.slice(0, bottlesCount);
+    
+    bottlesFirstRow = shuffleArray([...selectedEmojis]);
+    bottlesSecondRow = shuffleArray([...selectedEmojis]);
+    
+    while (arraysEqual(bottlesFirstRow, bottlesSecondRow)) {
+        bottlesSecondRow = shuffleArray([...selectedEmojis]);
+    }
+    
+    bottlesSelectedFirst = null;
+    bottlesSelectedSecond = null;
+    bottlesMatched = new Set();
+    bottlesAttempts = 0;
+    bottlesMaxAttempts = Math.ceil(bottlesCount * 1.5);
+    bottlesGameActive = true;
+    bottlesSeconds = 0;
+    
+    if (bottlesTimer) {
+        clearInterval(bottlesTimer);
+    }
+    bottlesTimer = setInterval(() => {
+        bottlesSeconds++;
+        updateBottlesTimer();
+    }, 1000);
+    
+    renderBottlesGame();
+    updateBottlesStats();
+    
+    const resultElement = document.getElementById('bottles-result');
+    if (resultElement) {
+        resultElement.classList.add('hidden');
+    }
+}
+
+function arraysEqual(arr1, arr2) {
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
+}
+
+function setBottlesMode(mode) {
+    if (bottlesGameActive && bottlesAttempts > 0) return;
+    
+    playSound('click');
+    bottlesMode = mode;
+    
+    document.querySelectorAll('.bottles-mode-btn').forEach(btn => {
+        btn.style.background = '#533483';
+    });
+    
+    const modeMap = {
+        'bottles': 'mode-bottles',
+        'caps': 'mode-caps',
+        'emoji': 'mode-emoji'
+    };
+    
+    const activeBtn = document.getElementById(modeMap[mode]);
+    if (activeBtn) {
+        activeBtn.style.background = '#e94560';
+    }
+    
+    resetBottlesGame();
+}
+
+function setBottlesCount(count) {
+    if (bottlesGameActive && bottlesAttempts > 0) return;
+    
+    playSound('click');
+    bottlesCount = count;
+    
+    document.querySelectorAll('.bottles-count-btn').forEach(btn => {
+        btn.style.background = '#533483';
+    });
+    
+    const countMap = {
+        4: 'bottles-4',
+        6: 'bottles-6',
+        8: 'bottles-8'
+    };
+    
+    const activeBtn = document.getElementById(countMap[count]);
+    if (activeBtn) {
+        activeBtn.style.background = '#e94560';
+    }
+    
+    resetBottlesGame();
+}
+
+function renderBottlesGame() {
+    const firstRowElement = document.getElementById('bottles-first-row');
+    const secondRowElement = document.getElementById('bottles-second-row');
+    
+    if (!firstRowElement || !secondRowElement) return;
+    
+    firstRowElement.innerHTML = '';
+    secondRowElement.innerHTML = '';
+    
+    const bottleSize = bottlesCount <= 4 ? '80px' : bottlesCount <= 6 ? '65px' : '50px';
+    
+    bottlesFirstRow.forEach((emoji, index) => {
+        const bottleElement = createBottleElement(emoji, index, 'first');
+        bottleElement.style.width = bottleSize;
+        bottleElement.style.height = bottleSize;
+        bottleElement.style.fontSize = bottlesCount <= 4 ? '3rem' : bottlesCount <= 6 ? '2.5rem' : '2rem';
+        firstRowElement.appendChild(bottleElement);
+    });
+    
+    bottlesSecondRow.forEach((emoji, index) => {
+        const bottleElement = createBottleElement(emoji, index, 'second');
+        bottleElement.style.width = bottleSize;
+        bottleElement.style.height = bottleSize;
+        bottleElement.style.fontSize = bottlesCount <= 4 ? '3rem' : bottlesCount <= 6 ? '2.5rem' : '2rem';
+        secondRowElement.appendChild(bottleElement);
+    });
+}
+
+function createBottleElement(emoji, index, row) {
+    const element = document.createElement('div');
+    element.className = 'bottle-item';
+    element.textContent = emoji;
+    
+    const isMatched = bottlesMatched.has(index);
+    if (isMatched) {
+        element.classList.add('matched');
+    }
+    
+    if (row === 'first' && bottlesSelectedFirst === index) {
+        element.classList.add('selected');
+    }
+    if (row === 'second' && bottlesSelectedSecond === index) {
+        element.classList.add('selected');
+    }
+    
+    element.addEventListener('click', () => {
+        if (!bottlesGameActive) return;
+        
+        if (row === 'first') {
+            playSound('click');
+            bottlesSelectedFirst = index;
+            renderBottlesGame();
+            
+            if (bottlesSelectedSecond !== null) {
+                checkBottlesMatch();
+            }
+        } else if (row === 'second') {
+            playSound('click');
+            bottlesSelectedSecond = index;
+            renderBottlesGame();
+            
+            if (bottlesSelectedFirst !== null) {
+                checkBottlesMatch();
+            }
+        }
+    });
+    
+    return element;
+}
+
+function checkBottlesMatch() {
+    const firstEmoji = bottlesFirstRow[bottlesSelectedFirst];
+    const secondEmoji = bottlesSecondRow[bottlesSelectedSecond];
+    
+    bottlesAttempts++;
+    
+    if (firstEmoji === secondEmoji) {
+        playSound('success');
+        bottlesMatched.add(bottlesSelectedFirst);
+        bottlesMatched.add(bottlesSelectedSecond);
+        
+        bottlesSelectedFirst = null;
+        bottlesSelectedSecond = null;
+        
+        renderBottlesGame();
+        updateBottlesStats();
+        
+        if (bottlesMatched.size === bottlesCount * 2) {
+            endBottlesGame(true);
+        }
+    } else {
+        playSound('fail');
+        
+        setTimeout(() => {
+            bottlesSelectedFirst = null;
+            bottlesSelectedSecond = null;
+            renderBottlesGame();
+            updateBottlesStats();
+            
+            if (bottlesAttempts >= bottlesMaxAttempts && bottlesMatched.size < bottlesCount * 2) {
+                endBottlesGame(false);
+            }
+        }, 800);
+    }
+    
+    updateBottlesStats();
+}
+
+function updateBottlesStats() {
+    const attemptsElement = document.getElementById('bottles-attempts');
+    const matchedElement = document.getElementById('bottles-matched');
+    
+    if (attemptsElement) {
+        attemptsElement.textContent = `Попытки: ${bottlesAttempts}/${bottlesMaxAttempts}`;
+    }
+    
+    if (matchedElement) {
+        const matchedPairs = Math.floor(bottlesMatched.size / 2);
+        matchedElement.textContent = `Найдено пар: ${matchedPairs}/${bottlesCount}`;
+    }
+}
+
+function updateBottlesTimer() {
+    const timerElement = document.getElementById('bottles-timer');
+    if (timerElement) {
+        const minutes = Math.floor(bottlesSeconds / 60);
+        const seconds = bottlesSeconds % 60;
+        timerElement.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+}
+
+function endBottlesGame(won) {
+    bottlesGameActive = false;
+    
+    if (bottlesTimer) {
+        clearInterval(bottlesTimer);
+        bottlesTimer = null;
+    }
+    
+    const resultElement = document.getElementById('bottles-result');
+    
+    if (won) {
+        playSound('win');
+        resultElement.innerHTML = `
+            🎉 ПОБЕДА!<br>
+            Найдены все пары!<br>
+            Попыток: ${bottlesAttempts}<br>
+            Время: ${Math.floor(bottlesSeconds / 60)}:${(bottlesSeconds % 60).toString().padStart(2, '0')}
+        `;
+    } else {
+        playSound('bomb');
+        resultElement.innerHTML = `
+            😔 ИГРА ОКОНЧЕНА<br>
+            Не все пары найдены<br>
+            Использовано попыток: ${bottlesAttempts}
+        `;
+    }
+    
+    resultElement.classList.remove('hidden');
+}
+
+function resetBottlesGame() {
+    if (bottlesTimer) {
+        clearInterval(bottlesTimer);
+        bottlesTimer = null;
+    }
+    
+    bottlesFirstRow = [];
+    bottlesSecondRow = [];
+    bottlesSelectedFirst = null;
+    bottlesSelectedSecond = null;
+    bottlesMatched = new Set();
+    bottlesAttempts = 0;
+    bottlesMaxAttempts = 0;
+    bottlesGameActive = false;
+    bottlesSeconds = 0;
+    
+    const firstRowElement = document.getElementById('bottles-first-row');
+    const secondRowElement = document.getElementById('bottles-second-row');
+    
+    if (firstRowElement) {
+        firstRowElement.innerHTML = '<div style="color: #aaa;">Выбери режим и нажми "Начать"</div>';
+    }
+    if (secondRowElement) {
+        secondRowElement.innerHTML = '';
+    }
+    
+    const resultElement = document.getElementById('bottles-result');
+    if (resultElement) {
+        resultElement.classList.add('hidden');
+    }
+    
+    const timerElement = document.getElementById('bottles-timer');
+    if (timerElement) {
+        timerElement.textContent = '⏱️ 0:00';
+    }
+    
+    updateBottlesStats();
+}
+
 // ================== ОБРАБОТЧИКИ МЕНЮ ==================
 document.getElementById('spy-game-btn').addEventListener('click', showSpyGame);
 document.getElementById('crocodile-game-btn').addEventListener('click', showCrocodileGame);
@@ -996,6 +1327,7 @@ document.getElementById('leader-game-btn').addEventListener('click', showLeaderG
 document.getElementById('word-association-btn').addEventListener('click', showWordAssociationGame);
 document.getElementById('story-game-btn').addEventListener('click', showStoryGame);
 document.getElementById('fact-game-btn').addEventListener('click', showFactGame);
+document.getElementById('bottles-game-btn').addEventListener('click', showBottlesGame);
 
 // Кнопка звука
 document.getElementById('sound-toggle-btn').addEventListener('click', () => {
@@ -1010,7 +1342,8 @@ const backButtons = [
     'back-to-menu-4', 'back-to-menu-5', 'back-to-menu-crocodile',
     'back-to-menu-bomb', 'back-to-menu-questions', 'back-to-menu-truth',
     'back-to-menu-dice', 'back-to-menu-guess', 'back-to-menu-leader',
-    'back-to-menu-association', 'back-to-menu-story', 'back-to-menu-fact'
+    'back-to-menu-association', 'back-to-menu-story', 'back-to-menu-fact',
+    'back-to-menu-bottles'
 ];
 
 backButtons.forEach(id => {
@@ -1042,6 +1375,8 @@ document.getElementById('show-rules-story').addEventListener('click', () => togg
 document.getElementById('back-from-rules-story').addEventListener('click', () => showContent('story'));
 document.getElementById('show-rules-fact').addEventListener('click', () => toggleRules('fact'));
 document.getElementById('back-from-rules-fact').addEventListener('click', () => showContent('fact'));
+document.getElementById('show-rules-bottles').addEventListener('click', () => toggleRules('bottles'));
+document.getElementById('back-from-rules-bottles').addEventListener('click', () => showContent('bottles'));
 
 // Обработчики Банан Шпиона
 hideWordBtn.addEventListener('click', handleHideWord);
@@ -1099,6 +1434,16 @@ storyStartBtn.addEventListener('click', resetStoryGame);
 factTrueBtn.addEventListener('click', () => checkFact(true));
 factFalseBtn.addEventListener('click', () => checkFact(false));
 factNextBtn.addEventListener('click', showNextFact);
+
+// Обработчики Бутылочек
+document.getElementById('start-bottles-game').addEventListener('click', startBottlesGame);
+document.getElementById('reset-bottles-game').addEventListener('click', resetBottlesGame);
+document.getElementById('bottles-4').addEventListener('click', () => setBottlesCount(4));
+document.getElementById('bottles-6').addEventListener('click', () => setBottlesCount(6));
+document.getElementById('bottles-8').addEventListener('click', () => setBottlesCount(8));
+document.getElementById('mode-bottles').addEventListener('click', () => setBottlesMode('bottles'));
+document.getElementById('mode-caps').addEventListener('click', () => setBottlesMode('caps'));
+document.getElementById('mode-emoji').addEventListener('click', () => setBottlesMode('emoji'));
 
 // ================== ЗАПУСК ==================
 initPlayerButtons();
