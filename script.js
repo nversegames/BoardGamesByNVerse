@@ -1,8 +1,5 @@
 // ================== DOM ЭЛЕМЕНТЫ ==================
-// Меню
 const gameMenu = document.getElementById('game-menu');
-
-// Контейнеры игр
 const spyGame = document.getElementById('spy-game');
 const crocodileGame = document.getElementById('crocodile-game');
 const bombGame = document.getElementById('bomb-game');
@@ -15,6 +12,7 @@ const wordAssociationGame = document.getElementById('word-association-game');
 const storyGame = document.getElementById('story-game');
 const factGame = document.getElementById('fact-game');
 const bottlesGame = document.getElementById('bottles-game');
+const swapGame = document.getElementById('swap-game');
 
 // Элементы игры "Банан Шпион"
 const screenSelect = document.getElementById('screen-select');
@@ -55,7 +53,6 @@ const resetQuestionsBtn = document.getElementById('reset-questions-game');
 // Элементы игры "Правда или Действие"
 const truthCardDisplay = document.getElementById('truth-card-display');
 const generateTruthBtn = document.getElementById('generate-truth');
-const generateActionBtn = document.getElementById('generate-action');
 
 // Элементы игры "Кубик"
 const diceDisplay = document.getElementById('dice-display');
@@ -91,7 +88,7 @@ const factTrueBtn = document.getElementById('fact-true-btn');
 const factFalseBtn = document.getElementById('fact-false-btn');
 const factNextBtn = document.getElementById('fact-next-btn');
 
-// ================== СОСТОЯНИЕ БАНАН ШПИОНА ==================
+// ================== СОСТОЯНИЕ ==================
 let totalPlayers = 3;
 let currentPlayerIndex = 0;
 let currentPair = null;
@@ -99,48 +96,39 @@ let spyIndex = -1;
 let recentlyUsedPairs = [];
 const MAX_RECENT_PAIRS = 50;
 
-// ================== СОСТОЯНИЕ КРОКОДИЛА ==================
 let recentlyUsedCrocodileWords = [];
 const MAX_RECENT_CROCODILE_WORDS = 30;
 
-// ================== СОСТОЯНИЕ БОМБЫ ==================
 let bombTimer = null;
 let bombCountdown = 10;
 let bombActive = false;
 let bombDuration = 10;
 
-// ================== СОСТОЯНИЕ 20 ВОПРОСОВ ==================
 let questionsCount = 0;
 
-// ================== СОСТОЯНИЕ ПРАВДА ИЛИ ДЕЙСТВИЕ ==================
 let recentlyUsedTruth = [];
 let recentlyUsedAction = [];
 const MAX_RECENT_TRUTH = 10;
 const MAX_RECENT_ACTION = 10;
 
-// ================== СОСТОЯНИЕ УГАДАЙ ЧИСЛО ==================
 let guessMin = 1;
 let guessMax = 100;
 let guessCurrent = 50;
 let guessTries = 0;
 let guessGameStarted = false;
 
-// ================== СОСТОЯНИЕ АССОЦИАЦИЙ ==================
 let recentlyUsedAssociationWords = [];
 const MAX_RECENT_ASSOCIATION_WORDS = 30;
 
-// ================== СОСТОЯНИЕ СМЕШНОЙ ИСТОРИИ ==================
 let storyAnswers = {};
 let storyStep = 0;
 let recentlyUsedStories = [];
 const MAX_RECENT_STORIES = 5;
 
-// ================== СОСТОЯНИЕ ФАКТ ИЛИ ФЕЙК ==================
 let currentFact = null;
 let recentlyUsedFacts = [];
 const MAX_RECENT_FACTS = 30;
 
-// ================== СОСТОЯНИЕ ИГРЫ БУТЫЛОЧКИ ==================
 let bottlesCount = 4;
 let bottlesFirstRow = [];
 let bottlesSecondRow = [];
@@ -154,7 +142,16 @@ let bottlesTimer = null;
 let bottlesSeconds = 0;
 let bottlesMode = 'bottles';
 
-// ================== СОСТОЯНИЕ ЗВУКА ==================
+let swapElements = [];
+let swapCorrectOrder = [];
+let swapCurrentOrder = [];
+let swapSelectedFirst = null;
+let swapSelectedSecond = null;
+let swapMoves = 0;
+let swapGameActive = false;
+let swapMode = 'bottles';
+let swapCount = 4;
+
 let soundEnabled = true;
 let audioContext = null;
 
@@ -176,46 +173,14 @@ function playSound(type) {
         let volume = 0.3;
         
         switch(type) {
-            case 'click':
-                frequency = 600;
-                duration = 0.05;
-                volume = 0.2;
-                break;
-            case 'flip':
-                frequency = 800;
-                duration = 0.08;
-                volume = 0.25;
-                break;
-            case 'success':
-                frequency = 880;
-                duration = 0.2;
-                volume = 0.4;
-                break;
-            case 'fail':
-                frequency = 220;
-                duration = 0.3;
-                volume = 0.3;
-                break;
-            case 'tick':
-                frequency = 1000;
-                duration = 0.03;
-                volume = 0.15;
-                break;
-            case 'bomb':
-                frequency = 110;
-                duration = 0.5;
-                volume = 0.5;
-                break;
-            case 'win':
-                frequency = 1200;
-                duration = 0.4;
-                volume = 0.5;
-                break;
-            case 'roll':
-                frequency = 400;
-                duration = 0.15;
-                volume = 0.3;
-                break;
+            case 'click': frequency = 600; duration = 0.05; volume = 0.2; break;
+            case 'flip': frequency = 800; duration = 0.08; volume = 0.25; break;
+            case 'success': frequency = 880; duration = 0.2; volume = 0.4; break;
+            case 'fail': frequency = 220; duration = 0.3; volume = 0.3; break;
+            case 'tick': frequency = 1000; duration = 0.03; volume = 0.15; break;
+            case 'bomb': frequency = 110; duration = 0.5; volume = 0.5; break;
+            case 'win': frequency = 1200; duration = 0.4; volume = 0.5; break;
+            case 'roll': frequency = 400; duration = 0.15; volume = 0.3; break;
         }
         
         const oscillator = audioContext.createOscillator();
@@ -282,78 +247,22 @@ function showGame(gameElement) {
     gameElement.classList.remove('hidden');
 }
 
-function showSpyGame() {
-    showGame(spyGame);
-    resetSpyGame();
-}
-
-function showCrocodileGame() {
-    showGame(crocodileGame);
-    showCrocodileContent();
-    showNextCrocodileWord();
-}
-
-function showBombGame() {
-    showGame(bombGame);
-    showBombContent();
-    resetBombGame();
-}
-
-function showQuestionsGame() {
-    showGame(questionsGame);
-    showQuestionsContent();
-    resetQuestionsGame();
-}
-
-function showTruthGame() {
-    showGame(truthGame);
-    showTruthContent();
-}
-
-function showDiceGame() {
-    showGame(diceGame);
-    showDiceContent();
-}
-
-function showGuessGame() {
-    showGame(guessGame);
-    showGuessContent();
-    resetGuessGame();
-}
-
-function showLeaderGame() {
-    showGame(leaderGame);
-    showLeaderContent();
-}
-
-function showWordAssociationGame() {
-    showGame(wordAssociationGame);
-    showWordAssociationContent();
-    showNextAssociationWord();
-}
-
-function showStoryGame() {
-    showGame(storyGame);
-    showStoryContent();
-    resetStoryGame();
-}
-
-function showFactGame() {
-    showGame(factGame);
-    showFactContent();
-    showNextFact();
-}
-
-function showBottlesGame() {
-    showGame(bottlesGame);
-    showBottlesContent();
-    resetBottlesGame();
-}
+function showSpyGame() { showGame(spyGame); resetSpyGame(); }
+function showCrocodileGame() { showGame(crocodileGame); showCrocodileContent(); showNextCrocodileWord(); }
+function showBombGame() { showGame(bombGame); showBombContent(); resetBombGame(); }
+function showQuestionsGame() { showGame(questionsGame); showQuestionsContent(); resetQuestionsGame(); }
+function showTruthGame() { showGame(truthGame); showTruthContent(); }
+function showDiceGame() { showGame(diceGame); showDiceContent(); }
+function showGuessGame() { showGame(guessGame); showGuessContent(); resetGuessGame(); }
+function showLeaderGame() { showGame(leaderGame); showLeaderContent(); }
+function showWordAssociationGame() { showGame(wordAssociationGame); showWordAssociationContent(); showNextAssociationWord(); }
+function showStoryGame() { showGame(storyGame); showStoryContent(); resetStoryGame(); }
+function showFactGame() { showGame(factGame); showFactContent(); showNextFact(); }
+function showBottlesGame() { showGame(bottlesGame); showBottlesContent(); resetBottlesGame(); }
+function showSwapGame() { showGame(swapGame); showSwapContent(); resetSwapGame(); }
 
 // ================== ФУНКЦИИ ПРАВИЛ ==================
 function toggleRules(type) {
-    let contentId, rulesId;
-    
     const rulesMap = {
         'spy': ['screen-select', 'rules-spy'],
         'crocodile': ['crocodile-content', 'rules-crocodile'],
@@ -364,21 +273,17 @@ function toggleRules(type) {
         'association': ['word-association-content', 'rules-association'],
         'story': ['story-content', 'rules-story'],
         'fact': ['fact-content', 'rules-fact'],
-        'bottles': ['bottles-content', 'rules-bottles']
+        'bottles': ['bottles-content', 'rules-bottles'],
+        'swap': ['swap-content', 'rules-swap']
     };
     
     if (rulesMap[type]) {
-        contentId = rulesMap[type][0];
-        rulesId = rulesMap[type][1];
-        
-        document.getElementById(contentId).classList.add('hidden');
-        document.getElementById(rulesId).classList.remove('hidden');
+        document.getElementById(rulesMap[type][0]).classList.add('hidden');
+        document.getElementById(rulesMap[type][1]).classList.remove('hidden');
     }
 }
 
 function showContent(type) {
-    let contentId, rulesId;
-    
     const rulesMap = {
         'spy': ['screen-select', 'rules-spy'],
         'crocodile': ['crocodile-content', 'rules-crocodile'],
@@ -389,15 +294,13 @@ function showContent(type) {
         'association': ['word-association-content', 'rules-association'],
         'story': ['story-content', 'rules-story'],
         'fact': ['fact-content', 'rules-fact'],
-        'bottles': ['bottles-content', 'rules-bottles']
+        'bottles': ['bottles-content', 'rules-bottles'],
+        'swap': ['swap-content', 'rules-swap']
     };
     
     if (rulesMap[type]) {
-        contentId = rulesMap[type][0];
-        rulesId = rulesMap[type][1];
-        
-        document.getElementById(rulesId).classList.add('hidden');
-        document.getElementById(contentId).classList.remove('hidden');
+        document.getElementById(rulesMap[type][1]).classList.add('hidden');
+        document.getElementById(rulesMap[type][0]).classList.remove('hidden');
     }
 }
 
@@ -427,35 +330,25 @@ function initPlayerButtons() {
 function getRandomPairIndex() {
     let availableIndices = [];
     for (let i = 0; i < WORD_PAIRS.length; i++) {
-        if (!recentlyUsedPairs.includes(i)) {
-            availableIndices.push(i);
-        }
+        if (!recentlyUsedPairs.includes(i)) availableIndices.push(i);
     }
     
-    if (availableIndices.length === 0) {
-        availableIndices = WORD_PAIRS.map((_, index) => index);
-    }
+    if (availableIndices.length === 0) availableIndices = WORD_PAIRS.map((_, index) => index);
     
-    const randomIndex = Math.floor(Math.random() * availableIndices.length);
-    return availableIndices[randomIndex];
+    return availableIndices[Math.floor(Math.random() * availableIndices.length)];
 }
 
 function addToRecentlyUsed(index) {
     recentlyUsedPairs.push(index);
-    while (recentlyUsedPairs.length > MAX_RECENT_PAIRS) {
-        recentlyUsedPairs.shift();
-    }
+    while (recentlyUsedPairs.length > MAX_RECENT_PAIRS) recentlyUsedPairs.shift();
 }
 
 function startRoleAssignment() {
     currentPlayerIndex = 0;
-    
     const pairIndex = getRandomPairIndex();
     currentPair = WORD_PAIRS[pairIndex];
-    
     addToRecentlyUsed(pairIndex);
     spyIndex = Math.floor(Math.random() * totalPlayers);
-    
     showRoleScreen();
 }
 
@@ -464,13 +357,7 @@ function showRoleScreen() {
     const isSpy = currentPlayerIndex === spyIndex;
     
     playerHeader.textContent = `Игрок ${playerNum}`;
-    
-    if (isSpy) {
-        roleDisplay.textContent = currentPair.spy;
-    } else {
-        roleDisplay.textContent = currentPair.civilian;
-    }
-    
+    roleDisplay.textContent = isSpy ? currentPair.spy : currentPair.civilian;
     showSpyScreen(screenRole);
 }
 
@@ -518,30 +405,21 @@ function resetSpyGame() {
 function getRandomCrocodileWord() {
     let availableWords = [];
     for (let i = 0; i < CROCODILE_WORDS.length; i++) {
-        if (!recentlyUsedCrocodileWords.includes(i)) {
-            availableWords.push(i);
-        }
+        if (!recentlyUsedCrocodileWords.includes(i)) availableWords.push(i);
     }
     
-    if (availableWords.length === 0) {
-        availableWords = CROCODILE_WORDS.map((_, index) => index);
-    }
+    if (availableWords.length === 0) availableWords = CROCODILE_WORDS.map((_, index) => index);
     
-    const randomIndex = Math.floor(Math.random() * availableWords.length);
-    const wordIndex = availableWords[randomIndex];
-    
+    const wordIndex = availableWords[Math.floor(Math.random() * availableWords.length)];
     recentlyUsedCrocodileWords.push(wordIndex);
-    while (recentlyUsedCrocodileWords.length > MAX_RECENT_CROCODILE_WORDS) {
-        recentlyUsedCrocodileWords.shift();
-    }
+    while (recentlyUsedCrocodileWords.length > MAX_RECENT_CROCODILE_WORDS) recentlyUsedCrocodileWords.shift();
     
     return CROCODILE_WORDS[wordIndex];
 }
 
 function showNextCrocodileWord() {
     playSound('flip');
-    const word = getRandomCrocodileWord();
-    crocodileWordDisplay.textContent = word;
+    crocodileWordDisplay.textContent = getRandomCrocodileWord();
 }
 
 function showCrocodileContent() {
@@ -556,10 +434,7 @@ function showBombContent() {
 }
 
 function resetBombGame() {
-    if (bombTimer) {
-        clearInterval(bombTimer);
-        bombTimer = null;
-    }
+    if (bombTimer) { clearInterval(bombTimer); bombTimer = null; }
     bombCountdown = bombDuration;
     bombActive = false;
     bombTimerDisplay.textContent = bombCountdown;
@@ -598,9 +473,7 @@ function startBombGame() {
         bombActive = true;
         startBombBtn.textContent = '⏸️ Пауза';
         
-        if (bombWordDisplay.textContent === 'НАЖМИ СТАРТ') {
-            showNextBombWord();
-        }
+        if (bombWordDisplay.textContent === 'НАЖМИ СТАРТ') showNextBombWord();
         
         bombTimer = setInterval(() => {
             bombCountdown--;
@@ -676,22 +549,14 @@ function showTruthContent() {
 function getRandomTruth() {
     let availableIndices = [];
     for (let i = 0; i < TRUTH_QUESTIONS.length; i++) {
-        if (!recentlyUsedTruth.includes(i)) {
-            availableIndices.push(i);
-        }
+        if (!recentlyUsedTruth.includes(i)) availableIndices.push(i);
     }
     
-    if (availableIndices.length === 0) {
-        availableIndices = TRUTH_QUESTIONS.map((_, index) => index);
-    }
+    if (availableIndices.length === 0) availableIndices = TRUTH_QUESTIONS.map((_, index) => index);
     
-    const randomIndex = Math.floor(Math.random() * availableIndices.length);
-    const truthIndex = availableIndices[randomIndex];
-    
+    const truthIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
     recentlyUsedTruth.push(truthIndex);
-    while (recentlyUsedTruth.length > MAX_RECENT_TRUTH) {
-        recentlyUsedTruth.shift();
-    }
+    while (recentlyUsedTruth.length > MAX_RECENT_TRUTH) recentlyUsedTruth.shift();
     
     return TRUTH_QUESTIONS[truthIndex];
 }
@@ -699,22 +564,14 @@ function getRandomTruth() {
 function getRandomAction() {
     let availableIndices = [];
     for (let i = 0; i < ACTION_TASKS.length; i++) {
-        if (!recentlyUsedAction.includes(i)) {
-            availableIndices.push(i);
-        }
+        if (!recentlyUsedAction.includes(i)) availableIndices.push(i);
     }
     
-    if (availableIndices.length === 0) {
-        availableIndices = ACTION_TASKS.map((_, index) => index);
-    }
+    if (availableIndices.length === 0) availableIndices = ACTION_TASKS.map((_, index) => index);
     
-    const randomIndex = Math.floor(Math.random() * availableIndices.length);
-    const actionIndex = availableIndices[randomIndex];
-    
+    const actionIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
     recentlyUsedAction.push(actionIndex);
-    while (recentlyUsedAction.length > MAX_RECENT_ACTION) {
-        recentlyUsedAction.shift();
-    }
+    while (recentlyUsedAction.length > MAX_RECENT_ACTION) recentlyUsedAction.shift();
     
     return ACTION_TASKS[actionIndex];
 }
@@ -766,11 +623,8 @@ function resetGuessGame() {
     guessGameStarted = false;
     guessCardDisplay.textContent = 'Загадай число от 1 до 100 и нажми "Начать"';
     
-    // Показываем кнопку "Начать" вместо кнопок ответа
     document.getElementById('guess-buttons').classList.add('hidden');
-    if (guessStartBtn) {
-        guessStartBtn.classList.remove('hidden');
-    }
+    if (guessStartBtn) guessStartBtn.classList.remove('hidden');
 }
 
 function startGuessGame() {
@@ -779,11 +633,8 @@ function startGuessGame() {
     guessGameStarted = true;
     guessCardDisplay.textContent = `Я думаю, это число ${guessCurrent}?`;
     
-    // Показываем кнопки ответа, скрываем кнопку "Начать"
     document.getElementById('guess-buttons').classList.remove('hidden');
-    if (guessStartBtn) {
-        guessStartBtn.classList.add('hidden');
-    }
+    if (guessStartBtn) guessStartBtn.classList.add('hidden');
 }
 
 function makeGuess(response) {
@@ -854,30 +705,21 @@ function shuffleArray(array) {
 function getRandomAssociationWord() {
     let availableWords = [];
     for (let i = 0; i < ASSOCIATION_WORDS.length; i++) {
-        if (!recentlyUsedAssociationWords.includes(i)) {
-            availableWords.push(i);
-        }
+        if (!recentlyUsedAssociationWords.includes(i)) availableWords.push(i);
     }
     
-    if (availableWords.length === 0) {
-        availableWords = ASSOCIATION_WORDS.map((_, index) => index);
-    }
+    if (availableWords.length === 0) availableWords = ASSOCIATION_WORDS.map((_, index) => index);
     
-    const randomIndex = Math.floor(Math.random() * availableWords.length);
-    const wordIndex = availableWords[randomIndex];
-    
+    const wordIndex = availableWords[Math.floor(Math.random() * availableWords.length)];
     recentlyUsedAssociationWords.push(wordIndex);
-    while (recentlyUsedAssociationWords.length > MAX_RECENT_ASSOCIATION_WORDS) {
-        recentlyUsedAssociationWords.shift();
-    }
+    while (recentlyUsedAssociationWords.length > MAX_RECENT_ASSOCIATION_WORDS) recentlyUsedAssociationWords.shift();
     
     return ASSOCIATION_WORDS[wordIndex];
 }
 
 function showNextAssociationWord() {
     playSound('flip');
-    const word = getRandomAssociationWord();
-    associationWordDisplay.textContent = word;
+    associationWordDisplay.textContent = getRandomAssociationWord();
 }
 
 function showWordAssociationContent() {
@@ -934,7 +776,6 @@ function showStoryResult() {
     const name2 = storyAnswers['имя2'] || 'Саша';
     
     const isFeminine1 = name.endsWith('а') || name.endsWith('я');
-    const isFeminine2 = name2.endsWith('а') || name2.endsWith('я');
     
     let action = storyAnswers['действие'] || 'бегать';
     let action2 = storyAnswers['действие2'] || 'прыгать';
@@ -981,21 +822,14 @@ function showFactContent() {
 function getRandomFact() {
     let availableFacts = [];
     for (let i = 0; i < FACTS.length; i++) {
-        if (!recentlyUsedFacts.includes(i)) {
-            availableFacts.push(i);
-        }
+        if (!recentlyUsedFacts.includes(i)) availableFacts.push(i);
     }
     
-    if (availableFacts.length === 0) {
-        availableFacts = FACTS.map((_, index) => index);
-    }
+    if (availableFacts.length === 0) availableFacts = FACTS.map((_, index) => index);
     
     const factIndex = availableFacts[Math.floor(Math.random() * availableFacts.length)];
-    
     recentlyUsedFacts.push(factIndex);
-    while (recentlyUsedFacts.length > MAX_RECENT_FACTS) {
-        recentlyUsedFacts.shift();
-    }
+    while (recentlyUsedFacts.length > MAX_RECENT_FACTS) recentlyUsedFacts.shift();
     
     return FACTS[factIndex];
 }
@@ -1066,9 +900,7 @@ function startBottlesGame() {
     bottlesGameActive = true;
     bottlesSeconds = 0;
     
-    if (bottlesTimer) {
-        clearInterval(bottlesTimer);
-    }
+    if (bottlesTimer) clearInterval(bottlesTimer);
     bottlesTimer = setInterval(() => {
         bottlesSeconds++;
         updateBottlesTimer();
@@ -1078,9 +910,7 @@ function startBottlesGame() {
     updateBottlesStats();
     
     const resultElement = document.getElementById('bottles-result');
-    if (resultElement) {
-        resultElement.classList.add('hidden');
-    }
+    if (resultElement) resultElement.classList.add('hidden');
 }
 
 function arraysEqual(arr1, arr2) {
@@ -1100,16 +930,9 @@ function setBottlesMode(mode) {
         btn.style.background = '#533483';
     });
     
-    const modeMap = {
-        'bottles': 'mode-bottles',
-        'caps': 'mode-caps',
-        'emoji': 'mode-emoji'
-    };
-    
+    const modeMap = { 'bottles': 'mode-bottles', 'caps': 'mode-caps', 'emoji': 'mode-emoji' };
     const activeBtn = document.getElementById(modeMap[mode]);
-    if (activeBtn) {
-        activeBtn.style.background = '#e94560';
-    }
+    if (activeBtn) activeBtn.style.background = '#e94560';
     
     resetBottlesGame();
 }
@@ -1124,16 +947,9 @@ function setBottlesCount(count) {
         btn.style.background = '#533483';
     });
     
-    const countMap = {
-        4: 'bottles-4',
-        6: 'bottles-6',
-        8: 'bottles-8'
-    };
-    
+    const countMap = { 4: 'bottles-4', 6: 'bottles-6', 8: 'bottles-8' };
     const activeBtn = document.getElementById(countMap[count]);
-    if (activeBtn) {
-        activeBtn.style.background = '#e94560';
-    }
+    if (activeBtn) activeBtn.style.background = '#e94560';
     
     resetBottlesGame();
 }
@@ -1148,12 +964,13 @@ function renderBottlesGame() {
     secondRowElement.innerHTML = '';
     
     const bottleSize = bottlesCount <= 4 ? '80px' : bottlesCount <= 6 ? '65px' : '50px';
+    const fontSize = bottlesCount <= 4 ? '3rem' : bottlesCount <= 6 ? '2.5rem' : '2rem';
     
     bottlesFirstRow.forEach((emoji, index) => {
         const bottleElement = createBottleElement(emoji, index, 'first');
         bottleElement.style.width = bottleSize;
         bottleElement.style.height = bottleSize;
-        bottleElement.style.fontSize = bottlesCount <= 4 ? '3rem' : bottlesCount <= 6 ? '2.5rem' : '2rem';
+        bottleElement.style.fontSize = fontSize;
         firstRowElement.appendChild(bottleElement);
     });
     
@@ -1161,7 +978,7 @@ function renderBottlesGame() {
         const bottleElement = createBottleElement(emoji, index, 'second');
         bottleElement.style.width = bottleSize;
         bottleElement.style.height = bottleSize;
-        bottleElement.style.fontSize = bottlesCount <= 4 ? '3rem' : bottlesCount <= 6 ? '2.5rem' : '2rem';
+        bottleElement.style.fontSize = fontSize;
         secondRowElement.appendChild(bottleElement);
     });
 }
@@ -1172,36 +989,39 @@ function createBottleElement(emoji, index, row) {
     element.textContent = emoji;
     
     const isMatched = bottlesMatched.has(index);
-    if (isMatched) {
-        element.classList.add('matched');
-    }
+    if (isMatched) element.classList.add('matched');
     
-    if (row === 'first' && bottlesSelectedFirst === index) {
-        element.classList.add('selected');
-    }
-    if (row === 'second' && bottlesSelectedSecond === index) {
-        element.classList.add('selected');
-    }
+    if (row === 'first' && bottlesSelectedFirst === index) element.classList.add('selected');
+    if (row === 'second' && bottlesSelectedSecond === index) element.classList.add('selected');
     
     element.addEventListener('click', () => {
         if (!bottlesGameActive) return;
+        if (isMatched) return;
         
         if (row === 'first') {
+            if (bottlesSelectedFirst === index) {
+                bottlesSelectedFirst = null;
+                renderBottlesGame();
+                return;
+            }
+            
             playSound('click');
             bottlesSelectedFirst = index;
             renderBottlesGame();
             
-            if (bottlesSelectedSecond !== null) {
-                checkBottlesMatch();
-            }
+            if (bottlesSelectedSecond !== null) checkBottlesMatch();
         } else if (row === 'second') {
+            if (bottlesSelectedSecond === index) {
+                bottlesSelectedSecond = null;
+                renderBottlesGame();
+                return;
+            }
+            
             playSound('click');
             bottlesSelectedSecond = index;
             renderBottlesGame();
             
-            if (bottlesSelectedFirst !== null) {
-                checkBottlesMatch();
-            }
+            if (bottlesSelectedFirst !== null) checkBottlesMatch();
         }
     });
     
@@ -1250,9 +1070,7 @@ function updateBottlesStats() {
     const attemptsElement = document.getElementById('bottles-attempts');
     const matchedElement = document.getElementById('bottles-matched');
     
-    if (attemptsElement) {
-        attemptsElement.textContent = `Попытки: ${bottlesAttempts}/${bottlesMaxAttempts}`;
-    }
+    if (attemptsElement) attemptsElement.textContent = `Попытки: ${bottlesAttempts}/${bottlesMaxAttempts}`;
     
     if (matchedElement) {
         const matchedPairs = Math.floor(bottlesMatched.size / 2);
@@ -1272,10 +1090,7 @@ function updateBottlesTimer() {
 function endBottlesGame(won) {
     bottlesGameActive = false;
     
-    if (bottlesTimer) {
-        clearInterval(bottlesTimer);
-        bottlesTimer = null;
-    }
+    if (bottlesTimer) { clearInterval(bottlesTimer); bottlesTimer = null; }
     
     const resultElement = document.getElementById('bottles-result');
     
@@ -1300,10 +1115,7 @@ function endBottlesGame(won) {
 }
 
 function resetBottlesGame() {
-    if (bottlesTimer) {
-        clearInterval(bottlesTimer);
-        bottlesTimer = null;
-    }
+    if (bottlesTimer) { clearInterval(bottlesTimer); bottlesTimer = null; }
     
     bottlesFirstRow = [];
     bottlesSecondRow = [];
@@ -1318,32 +1130,216 @@ function resetBottlesGame() {
     const firstRowElement = document.getElementById('bottles-first-row');
     const secondRowElement = document.getElementById('bottles-second-row');
     
-    if (firstRowElement) {
-        firstRowElement.innerHTML = '<div style="color: #aaa; padding: 20px;">Выбери режим и нажми "Начать"</div>';
-    }
-    if (secondRowElement) {
-        secondRowElement.innerHTML = '<div style="color: #aaa; padding: 20px;"></div>';
-    }
+    if (firstRowElement) firstRowElement.innerHTML = '<div style="color: #aaa; padding: 20px;">Выбери режим и нажми "Начать"</div>';
+    if (secondRowElement) secondRowElement.innerHTML = '';
     
     const resultElement = document.getElementById('bottles-result');
-    if (resultElement) {
-        resultElement.classList.add('hidden');
-    }
+    if (resultElement) resultElement.classList.add('hidden');
     
     const timerElement = document.getElementById('bottles-timer');
-    if (timerElement) {
-        timerElement.textContent = '⏱️ 0:00';
-    }
+    if (timerElement) timerElement.textContent = '⏱️ 0:00';
     
     const attemptsElement = document.getElementById('bottles-attempts');
-    if (attemptsElement) {
-        attemptsElement.textContent = 'Попытки: 0/0';
-    }
+    if (attemptsElement) attemptsElement.textContent = 'Попытки: 0/0';
     
     const matchedElement = document.getElementById('bottles-matched');
-    if (matchedElement) {
-        matchedElement.textContent = 'Найдено пар: 0/0';
+    if (matchedElement) matchedElement.textContent = 'Найдено пар: 0/0';
+}
+
+// ================== ФУНКЦИИ ИГРЫ ОБМЕН ==================
+function showSwapContent() {
+    document.getElementById('swap-content').classList.remove('hidden');
+    document.getElementById('rules-swap').classList.add('hidden');
+}
+
+function getSwapEmojis() {
+    const emojiSets = {
+        bottles: ['🍾', '🧴', '🧪', '⚗️', '🧫', '🫗'],
+        emoji: ['😀', '😎', '🤠', '👻', '🤖', '👽']
+    };
+    return emojiSets[swapMode] || emojiSets.bottles;
+}
+
+function setSwapMode(mode) {
+    if (swapGameActive && swapMoves > 0) return;
+    
+    playSound('click');
+    swapMode = mode;
+    
+    document.querySelectorAll('.swap-mode-btn').forEach(btn => {
+        btn.style.background = '#533483';
+    });
+    
+    const modeMap = { 'bottles': 'swap-mode-bottles', 'emoji': 'swap-mode-emoji' };
+    const activeBtn = document.getElementById(modeMap[mode]);
+    if (activeBtn) activeBtn.style.background = '#e94560';
+    
+    resetSwapGame();
+}
+
+function setSwapCount(count) {
+    if (swapGameActive && swapMoves > 0) return;
+    
+    playSound('click');
+    swapCount = count;
+    
+    document.querySelectorAll('.swap-count-btn').forEach(btn => {
+        btn.style.background = '#533483';
+    });
+    
+    const countMap = { 4: 'swap-4', 6: 'swap-6' };
+    const activeBtn = document.getElementById(countMap[count]);
+    if (activeBtn) activeBtn.style.background = '#e94560';
+    
+    resetSwapGame();
+}
+
+function startSwapGame() {
+    playSound('click');
+    
+    const emojis = getSwapEmojis();
+    swapCorrectOrder = emojis.slice(0, swapCount);
+    swapCurrentOrder = shuffleArray([...swapCorrectOrder]);
+    
+    // Проверяем, чтобы не совпадало с правильным порядком
+    while (arraysEqual(swapCorrectOrder, swapCurrentOrder)) {
+        swapCurrentOrder = shuffleArray([...swapCorrectOrder]);
     }
+    
+    swapSelectedFirst = null;
+    swapSelectedSecond = null;
+    swapMoves = 0;
+    swapGameActive = true;
+    
+    renderSwapGame();
+    updateSwapProgress();
+    
+    const resultElement = document.getElementById('swap-result');
+    if (resultElement) resultElement.classList.add('hidden');
+}
+
+function renderSwapGame() {
+    const swapElementsContainer = document.getElementById('swap-elements');
+    if (!swapElementsContainer) return;
+    
+    swapElementsContainer.innerHTML = '';
+    
+    const itemSize = swapCount <= 4 ? '90px' : '70px';
+    const fontSize = swapCount <= 4 ? '3.5rem' : '2.5rem';
+    
+    swapCurrentOrder.forEach((emoji, index) => {
+        const element = document.createElement('div');
+        element.className = 'swap-item';
+        element.textContent = emoji;
+        element.style.width = itemSize;
+        element.style.height = itemSize;
+        element.style.fontSize = fontSize;
+        
+        const isCorrect = swapCurrentOrder[index] === swapCorrectOrder[index];
+        if (isCorrect) element.classList.add('correct');
+        
+        if (swapSelectedFirst === index) element.classList.add('selected');
+        if (swapSelectedSecond === index) element.classList.add('selected');
+        
+        element.addEventListener('click', () => {
+            if (!swapGameActive) return;
+            
+            if (swapSelectedFirst === null) {
+                swapSelectedFirst = index;
+                playSound('click');
+                renderSwapGame();
+            } else if (swapSelectedSecond === null && swapSelectedFirst !== index) {
+                swapSelectedSecond = index;
+                playSound('click');
+                swapElements();
+            } else if (swapSelectedFirst === index) {
+                swapSelectedFirst = null;
+                playSound('click');
+                renderSwapGame();
+            }
+        });
+        
+        swapElementsContainer.appendChild(element);
+    });
+}
+
+function swapElements() {
+    // Меняем элементы местами
+    const temp = swapCurrentOrder[swapSelectedFirst];
+    swapCurrentOrder[swapSelectedFirst] = swapCurrentOrder[swapSelectedSecond];
+    swapCurrentOrder[swapSelectedSecond] = temp;
+    
+    swapMoves++;
+    
+    swapSelectedFirst = null;
+    swapSelectedSecond = null;
+    
+    renderSwapGame();
+    updateSwapProgress();
+    
+    // Проверяем победу
+    if (arraysEqual(swapCorrectOrder, swapCurrentOrder)) {
+        endSwapGame(true);
+    }
+}
+
+function updateSwapProgress() {
+    const percentageElement = document.getElementById('swap-percentage');
+    if (!percentageElement) return;
+    
+    let correctCount = 0;
+    for (let i = 0; i < swapCurrentOrder.length; i++) {
+        if (swapCurrentOrder[i] === swapCorrectOrder[i]) correctCount++;
+    }
+    
+    const percentage = Math.round((correctCount / swapCount) * 100);
+    percentageElement.textContent = `${percentage}%`;
+    
+    if (percentage === 100) {
+        percentageElement.style.background = '#4caf50';
+    } else {
+        percentageElement.style.background = '#e94560';
+    }
+}
+
+function endSwapGame(won) {
+    swapGameActive = false;
+    
+    const resultElement = document.getElementById('swap-result');
+    
+    if (won) {
+        playSound('win');
+        resultElement.innerHTML = `
+            🎉 ПОБЕДА!<br>
+            Все элементы на своих местах!<br>
+            Ходов: ${swapMoves}
+        `;
+    }
+    
+    resultElement.classList.remove('hidden');
+}
+
+function resetSwapGame() {
+    swapCurrentOrder = [];
+    swapCorrectOrder = [];
+    swapSelectedFirst = null;
+    swapSelectedSecond = null;
+    swapMoves = 0;
+    swapGameActive = false;
+    
+    const swapElementsContainer = document.getElementById('swap-elements');
+    if (swapElementsContainer) {
+        swapElementsContainer.innerHTML = '<div style="color: #aaa; padding: 20px;">Выбери режим и нажми "Начать"</div>';
+    }
+    
+    const percentageElement = document.getElementById('swap-percentage');
+    if (percentageElement) {
+        percentageElement.textContent = '0%';
+        percentageElement.style.background = '#e94560';
+    }
+    
+    const resultElement = document.getElementById('swap-result');
+    if (resultElement) resultElement.classList.add('hidden');
 }
 
 // ================== ОБРАБОТЧИКИ МЕНЮ ==================
@@ -1359,6 +1355,7 @@ document.getElementById('word-association-btn').addEventListener('click', showWo
 document.getElementById('story-game-btn').addEventListener('click', showStoryGame);
 document.getElementById('fact-game-btn').addEventListener('click', showFactGame);
 document.getElementById('bottles-game-btn').addEventListener('click', showBottlesGame);
+document.getElementById('swap-game-btn').addEventListener('click', showSwapGame);
 
 // Кнопка звука
 document.getElementById('sound-toggle-btn').addEventListener('click', () => {
@@ -1374,7 +1371,7 @@ const backButtons = [
     'back-to-menu-bomb', 'back-to-menu-questions', 'back-to-menu-truth',
     'back-to-menu-dice', 'back-to-menu-guess', 'back-to-menu-leader',
     'back-to-menu-association', 'back-to-menu-story', 'back-to-menu-fact',
-    'back-to-menu-bottles'
+    'back-to-menu-bottles', 'back-to-menu-swap'
 ];
 
 backButtons.forEach(id => {
@@ -1408,6 +1405,8 @@ document.getElementById('show-rules-fact').addEventListener('click', () => toggl
 document.getElementById('back-from-rules-fact').addEventListener('click', () => showContent('fact'));
 document.getElementById('show-rules-bottles').addEventListener('click', () => toggleRules('bottles'));
 document.getElementById('back-from-rules-bottles').addEventListener('click', () => showContent('bottles'));
+document.getElementById('show-rules-swap').addEventListener('click', () => toggleRules('swap'));
+document.getElementById('back-from-rules-swap').addEventListener('click', () => showContent('swap'));
 
 // Обработчики Банан Шпиона
 hideWordBtn.addEventListener('click', handleHideWord);
@@ -1435,15 +1434,12 @@ resetQuestionsBtn.addEventListener('click', resetQuestionsGame);
 
 // Обработчики Правда или Действие
 generateTruthBtn.addEventListener('click', generateTruthOrAction);
-generateActionBtn.addEventListener('click', generateTruthOrAction);
 
 // Обработчики Кубика
 rollDiceBtn.addEventListener('click', rollDice);
 
 // Обработчики Угадай Число
-if (guessStartBtn) {
-    guessStartBtn.addEventListener('click', startGuessGame);
-}
+if (guessStartBtn) guessStartBtn.addEventListener('click', startGuessGame);
 guessHigherBtn.addEventListener('click', () => makeGuess('higher'));
 guessCorrectBtn.addEventListener('click', () => makeGuess('correct'));
 guessLowerBtn.addEventListener('click', () => makeGuess('lower'));
@@ -1458,9 +1454,7 @@ nextAssociationWordBtn.addEventListener('click', showNextAssociationWord);
 // Обработчики Смешной истории
 storyNextBtn.addEventListener('click', submitStoryAnswer);
 storyAnswerInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        submitStoryAnswer();
-    }
+    if (e.key === 'Enter') submitStoryAnswer();
 });
 storyStartBtn.addEventListener('click', resetStoryGame);
 
@@ -1479,7 +1473,16 @@ document.getElementById('mode-bottles').addEventListener('click', () => setBottl
 document.getElementById('mode-caps').addEventListener('click', () => setBottlesMode('caps'));
 document.getElementById('mode-emoji').addEventListener('click', () => setBottlesMode('emoji'));
 
+// Обработчики Обмена
+document.getElementById('start-swap-game').addEventListener('click', startSwapGame);
+document.getElementById('reset-swap-game').addEventListener('click', resetSwapGame);
+document.getElementById('swap-4').addEventListener('click', () => setSwapCount(4));
+document.getElementById('swap-6').addEventListener('click', () => setSwapCount(6));
+document.getElementById('swap-mode-bottles').addEventListener('click', () => setSwapMode('bottles'));
+document.getElementById('swap-mode-emoji').addEventListener('click', () => setSwapMode('emoji'));
+
 // ================== ЗАПУСК ==================
 initPlayerButtons();
 resetBottlesGame();
+resetSwapGame();
 showMainMenu();
