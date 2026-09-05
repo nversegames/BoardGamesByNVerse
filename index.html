@@ -313,6 +313,10 @@
             background: radial-gradient(circle, #e8f5e9 0%, #66bb6a 50%, #2e7d32 100%);
         }
         
+        .association-avatar {
+            background: radial-gradient(circle, #fff3e0 0%, #ff6f00 50%, #e65100 100%);
+        }
+        
         .game-info {
             flex: 1;
             text-align: left;
@@ -785,7 +789,7 @@
             </div>
             
             <div class="game-card" id="word-association-btn">
-                <div class="game-avatar" style="background: radial-gradient(circle, #fff3e0 0%, #ff6f00 50%, #e65100 100%);">🔗</div>
+                <div class="game-avatar association-avatar">🔗</div>
                 <div class="game-info">
                     <div class="game-name">АССОЦИАЦИИ</div>
                     <div class="game-description">Назови ассоциацию к слову</div>
@@ -986,7 +990,6 @@
         <div id="truth-content">
             <div class="truth-card" id="truth-card-display">НАЖМИ УЗНАТЬ</div>
             <button class="btn btn-primary" id="generate-truth">🎲 Узнать задание</button>
-            <button class="btn btn-primary" id="generate-action" style="display: none;">🎯 Ещё раз</button>
             <button class="btn btn-secondary" id="show-rules-truth">📖 Правила</button>
             <button class="btn btn-secondary" id="back-to-menu-truth">← В меню</button>
         </div>
