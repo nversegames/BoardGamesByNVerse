@@ -1109,12 +1109,18 @@
         <p class="subtitle" style="color: #ccc;">Компьютер угадает твоё число</p>
         
         <div id="guess-content">
-            <div class="guess-card" id="guess-card-display">Загадай число от 1 до 100</div>
-            <div id="guess-buttons" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <div class="guess-card" id="guess-card-display">Загадай число от 1 до 100 и нажми "Начать"</div>
+            
+            <!-- Кнопка "Начать" -->
+            <button class="btn btn-primary" id="guess-start-btn">🎯 Начать</button>
+            
+            <!-- Кнопки ответа (изначально скрыты) -->
+            <div id="guess-buttons" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;" class="hidden">
                 <button class="btn btn-success" id="guess-higher">Больше</button>
                 <button class="btn btn-success" id="guess-correct">Верно!</button>
                 <button class="btn btn-danger" id="guess-lower">Меньше</button>
             </div>
+            
             <button class="btn btn-secondary" id="reset-guess-game">🔄 Заново</button>
             <button class="btn btn-secondary" id="back-to-menu-guess">← В меню</button>
         </div>
