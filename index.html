@@ -313,6 +313,10 @@
             background: radial-gradient(circle, #e8f5e9 0%, #66bb6a 50%, #2e7d32 100%);
         }
         
+        .bottles-avatar {
+            background: radial-gradient(circle, #f3e5f5 0%, #9c27b0 50%, #6a1b9a 100%);
+        }
+        
         .game-info {
             flex: 1;
             text-align: left;
@@ -684,6 +688,77 @@
             transform: translateY(4px);
             box-shadow: 0 1px 0 #3b1f5e;
         }
+        
+        .bottle-item {
+            background: #0f3460;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 0 #0a2540;
+            border: 3px solid transparent;
+            animation: bottle-appear 0.5s ease-out;
+        }
+        
+        @keyframes bottle-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .bottle-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 0 #0a2540;
+        }
+        
+        .bottle-item:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 0 #0a2540;
+        }
+        
+        .bottle-item.selected {
+            border-color: #ffd700;
+            background: #533483;
+            transform: scale(1.1);
+            animation: bottle-selected 0.3s ease-out;
+        }
+        
+        @keyframes bottle-selected {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+        
+        .bottle-item.matched {
+            opacity: 0.3;
+            cursor: default;
+            transform: scale(0.8);
+            animation: bottle-matched 0.5s ease-out;
+        }
+        
+        @keyframes bottle-matched {
+            0% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.3;
+            }
+        }
     </style>
 </head>
 <body>
@@ -808,6 +883,15 @@
                     <div class="game-name">ФАКТ ИЛИ ФЕЙК</div>
                     <div class="game-description">Угадай, правда это или нет</div>
                     <div class="game-players">👤 1+ игроков</div>
+                </div>
+            </div>
+            
+            <div class="game-card" id="bottles-game-btn">
+                <div class="game-avatar bottles-avatar">🍾</div>
+                <div class="game-info">
+                    <div class="game-name">БУТЫЛОЧКИ</div>
+                    <div class="game-description">Сопоставь пары одинаковых бутылочек</div>
+                    <div class="game-players">👤 1 игрок</div>
                 </div>
             </div>
         </div>
@@ -1152,6 +1236,87 @@
                 </ol>
             </div>
             <button class="btn btn-primary" id="back-from-rules-fact">✅ Понятно</button>
+        </div>
+    </div>
+
+    <!-- ИГРА БУТЫЛОЧКИ -->
+    <div id="bottles-game" class="game-container hidden">
+        <h1 class="game-title">🍾 БУТЫЛОЧКИ</h1>
+        <p class="subtitle">Сопоставь пары одинаковых бутылочек</p>
+        
+        <div id="bottles-content">
+            <!-- Режимы игры -->
+            <div style="margin: 10px 0;">
+                <div style="margin-bottom: 5px; font-weight: bold;">Режим:</div>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn bottles-mode-btn" id="mode-bottles" style="background: #e94560;">🍾 Бутылки</button>
+                    <button class="btn bottles-mode-btn" id="mode-caps">🔴 Крышки</button>
+                    <button class="btn bottles-mode-btn" id="mode-emoji">😀 Смайлы</button>
+                </div>
+            </div>
+            
+            <!-- Количество бутылочек -->
+            <div style="margin: 10px 0;">
+                <div style="margin-bottom: 5px; font-weight: bold;">Количество:</div>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn bottles-count-btn" id="bottles-4" style="background: #e94560;">4 пары</button>
+                    <button class="btn bottles-count-btn" id="bottles-6">6 пар</button>
+                    <button class="btn bottles-count-btn" id="bottles-8">8 пар</button>
+                </div>
+            </div>
+            
+            <!-- Таймер и статистика -->
+            <div style="display: flex; gap: 10px; justify-content: center; margin: 10px 0; flex-wrap: wrap;">
+                <div id="bottles-timer" style="background: #0f3460; padding: 8px 15px; border-radius: 20px;">⏱️ 0:00</div>
+                <div id="bottles-attempts" style="background: #0f3460; padding: 8px 15px; border-radius: 20px;">Попытки: 0/0</div>
+                <div id="bottles-matched" style="background: #0f3460; padding: 8px 15px; border-radius: 20px;">Найдено пар: 0/0</div>
+            </div>
+            
+            <!-- Первый ряд бутылочек -->
+            <div style="margin: 15px 0;">
+                <div style="margin-bottom: 5px; color: #ffd700;">Верхний ряд:</div>
+                <div id="bottles-first-row" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; min-height: 100px;">
+                    <div style="color: #aaa;">Выбери режим и нажми "Начать"</div>
+                </div>
+            </div>
+            
+            <!-- Стрелка -->
+            <div style="font-size: 2rem; margin: 10px 0;">⬇️</div>
+            
+            <!-- Второй ряд бутылочек -->
+            <div style="margin: 15px 0;">
+                <div style="margin-bottom: 5px; color: #ffd700;">Нижний ряд:</div>
+                <div id="bottles-second-row" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; min-height: 100px;">
+                </div>
+            </div>
+            
+            <!-- Результат -->
+            <div id="bottles-result" class="fact-answer hidden" style="background: #0f3460; color: #ffd700;"></div>
+            
+            <!-- Кнопки управления -->
+            <button class="btn btn-primary" id="start-bottles-game">🎯 Начать</button>
+            <button class="btn btn-secondary" id="reset-bottles-game">🔄 Заново</button>
+            <button class="btn btn-secondary" id="show-rules-bottles">📖 Правила</button>
+            <button class="btn btn-secondary" id="back-to-menu-bottles">← В меню</button>
+        </div>
+        
+        <!-- Правила игры БУТЫЛОЧКИ -->
+        <div id="rules-bottles" class="hidden">
+            <div class="rules-container">
+                <div class="rules-title">📖 Правила игры "БУТЫЛОЧКИ"</div>
+                <ol class="rules-text">
+                    <li>Выберите режим игры: бутылки, крышки или смайлики.</li>
+                    <li>Выберите количество пар (4, 6 или 8).</li>
+                    <li>Нажмите "Начать", чтобы перемешать бутылочки.</li>
+                    <li>Верхний и нижний ряды содержат одинаковые бутылочки, но в разном порядке.</li>
+                    <li>Кликните на бутылочку в верхнем ряду, затем на бутылочку в нижнем.</li>
+                    <li>Если они совпадают - пара найдена и бутылочки исчезнут.</li>
+                    <li>Если не совпадают - попробуйте снова.</li>
+                    <li>Старайтесь найти все пары за минимальное количество попыток!</li>
+                    <li>У вас ограниченное количество попыток. Используйте их с умом!</li>
+                </ol>
+            </div>
+            <button class="btn btn-primary" id="back-from-rules-bottles">✅ Понятно</button>
         </div>
     </div>
 
