@@ -111,6 +111,9 @@
             align-items: center;
             gap: 15px;
             box-shadow: 0 5px 0 #0a2540;
+            pointer-events: auto;
+            position: relative;
+            z-index: 10;
         }
         .game-card:active { transform: translateY(5px); box-shadow: 0 0 0 #0a2540; }
         
@@ -125,6 +128,7 @@
             flex-shrink: 0;
             position: relative;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            pointer-events: none;
         }
         
         .banana-spy-avatar { background: radial-gradient(circle, #fff9c4 0%, #ffd700 50%, #ffc107 100%); position: relative; overflow: hidden; }
@@ -174,13 +178,18 @@
         .bottles-avatar { background: radial-gradient(circle, #f3e5f5 0%, #9c27b0 50%, #6a1b9a 100%); }
         .swap-avatar { background: radial-gradient(circle, #fff3e0 0%, #ff9800 50%, #e65100 100%); }
         
-        .game-info { flex: 1; text-align: left; }
+        .game-info {
+            flex: 1;
+            text-align: left;
+            pointer-events: none;
+        }
         .game-name { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; color: #fff; }
         .game-description { font-size: 0.8rem; color: #a0a0b0; }
         .game-players { display: inline-block; background: #e94560; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; margin-top: 5px; }
         
         .game-title { margin: 0 0 8px; font-size: 1.8rem; letter-spacing: 2px; color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
         .subtitle { margin: 0 0 20px; color: #a0a0b0; font-size: 0.9rem; }
+        
         .btn {
             background: #533483;
             border: none;
@@ -196,6 +205,9 @@
             letter-spacing: 1px;
             margin: 5px;
             touch-action: manipulation;
+            pointer-events: auto;
+            position: relative;
+            z-index: 10;
         }
         .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #3b1f5e; }
         .btn-primary { background: #e94560; box-shadow: 0 5px 0 #a02040; width: 100%; margin-top: 8px; font-size: 1.3rem; padding: 18px; }
@@ -204,6 +216,7 @@
         .btn-success { background: #4caf50; box-shadow: 0 5px 0 #388e3c; }
         .btn-danger { background: #e94560; box-shadow: 0 5px 0 #a02040; }
         .btn-warning { background: #ff9800; box-shadow: 0 5px 0 #e65100; }
+        
         .hidden { display: none !important; }
         
         .rules-container { background: #0f3460; border-radius: 20px; padding: 15px; margin: 15px 0; text-align: left; max-height: 300px; overflow-y: auto; }
@@ -379,6 +392,7 @@
             font-size: 0.9rem;
             cursor: pointer;
             box-shadow: 0 5px 0 #3b1f5e;
+            pointer-events: auto;
         }
         .sound-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #3b1f5e; }
         
@@ -393,6 +407,7 @@
             box-shadow: 0 5px 0 #0a2540;
             border: 3px solid transparent;
             animation: bottle-appear 0.5s ease-out;
+            pointer-events: auto;
         }
         
         @keyframes bottle-appear {
@@ -407,13 +422,6 @@
             border-color: #ffd700;
             background: #533483;
             transform: scale(1.1);
-            animation: bottle-selected 0.3s ease-out;
-        }
-        
-        @keyframes bottle-selected {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1.1); }
         }
         
         .bottle-item.matched, .swap-item.correct {
@@ -796,7 +804,7 @@
         <div id="guess-content">
             <div class="guess-card" id="guess-card-display">Загадай число от 1 до 100 и нажми "Начать"</div>
             <button class="btn btn-primary" id="guess-start-btn">🎯 Начать</button>
-            <div id="guess-buttons" class="hidden" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <div id="guess-buttons" class="hidden" style="gap: 10px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn btn-success" id="guess-higher">Больше</button>
                 <button class="btn btn-success" id="guess-correct">Верно!</button>
                 <button class="btn btn-danger" id="guess-lower">Меньше</button>
